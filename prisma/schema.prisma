@@ -1,0 +1,326 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CONSUMER
+  CONSULTANT
+  MANUFACTURER
+  ADMIN
+}
+
+enum ArticleType {
+  HERB
+  CONDITION
+  DIET
+  LIFESTYLE
+  RESEARCH
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum ConsultationType {
+  CHAT
+  AUDIO
+  VIDEO
+}
+
+model User {
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  email               String               @unique
+  password            String?
+  role                Role                 @default(CONSUMER)
+  avatar              String?
+  phone               String?
+  isActive            Boolean              @default(true)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  consultantProfile   ConsultantProfile?
+  manufacturerProfile ManufacturerProfile?
+  appointments        Appointment[]
+  reviews             Review[]
+  articles            KnowledgeArticle[]
+  enrollments         Enrollment[]
+  accounts            Account[]
+  sessions            Session[]
+  enquiries           Enquiry[]
+
+  @@map("users")
+}
+
+model Account {
+  id                Int     @id @default(autoincrement())
+  userId            Int
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model ConsultantProfile {
+  id               Int           @id @default(autoincrement())
+  userId           Int           @unique
+  specialization   String
+  experience       Int
+  bio              String        @db.Text
+  languages        Json
+  consultationFee  Decimal       @db.Decimal(10, 2)
+  isVerified       Boolean       @default(false)
+  isFeatured       Boolean       @default(false)
+  subscriptionTier String        @default("basic") // basic | premium
+  rating           Decimal       @default(0) @db.Decimal(3, 2)
+  totalReviews     Int           @default(0)
+  availability     Json
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments     Appointment[]
+
+  @@map("consultant_profiles")
+}
+
+model ManufacturerProfile {
+  id             Int       @id @default(autoincrement())
+  userId         Int       @unique
+  companyName    String
+  slug           String    @unique
+  description    String    @db.Text
+  logo           String?
+  manufacturingLicense String?
+  certifications Json
+  gstNumber      String?
+  address        Json
+  website        String?
+  contactEmail   String?
+  contactPhone   String?
+  distributorInfo Json?    // Info about distributors/how to reach products
+  isVerified     Boolean   @default(false)
+  isPremium      Boolean   @default(false)
+  isFeatured     Boolean   @default(false)
+  listingTier    String    @default("basic") // basic | premium | featured
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products       Product[]
+  enquiries      Enquiry[]
+
+  @@map("manufacturer_profiles")
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String
+  slug        String     @unique
+  description String?
+  image       String?
+  parentId    Int?
+  parent      Category?  @relation("SubCategory", fields: [parentId], references: [id])
+  children    Category[] @relation("SubCategory")
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id             Int                 @id @default(autoincrement())
+  name           String
+  slug           String              @unique
+  description    String              @db.Text
+  ingredients    Json
+  benefits       Json
+  usage          String              @db.Text
+  mrp            Decimal?            @db.Decimal(10, 2) // Reference MRP only — not for purchase
+  images         Json
+  categoryId     Int
+  manufacturerId Int
+  isActive       Boolean             @default(true)
+  isFeatured     Boolean             @default(false)
+  isSponsored    Boolean             @default(false)
+  rating         Decimal             @default(0) @db.Decimal(3, 2)
+  totalReviews   Int                 @default(0)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  category       Category            @relation(fields: [categoryId], references: [id])
+  manufacturer   ManufacturerProfile @relation(fields: [manufacturerId], references: [id])
+  reviews        Review[]
+  enquiries      Enquiry[]
+  indications    Indication[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@map("products")
+}
+
+model Indication {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  slug        String    @unique
+  description String?   @db.Text
+  isActive    Boolean   @default(true)
+  products    Product[]
+
+  @@map("indications")
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  rating    Int
+  comment   String   @db.Text
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+// Lead Generation — consumer enquiries to manufacturers
+model Enquiry {
+  id             Int                 @id @default(autoincrement())
+  manufacturerId Int
+  userId         Int?
+  productId      Int?
+  name           String
+  email          String
+  phone          String?
+  message        String              @db.Text
+  isRead         Boolean             @default(false)
+  createdAt      DateTime            @default(now())
+  manufacturer   ManufacturerProfile @relation(fields: [manufacturerId], references: [id])
+  user           User?               @relation(fields: [userId], references: [id])
+  product        Product?            @relation(fields: [productId], references: [id])
+
+  @@map("enquiries")
+}
+
+model Appointment {
+  id           Int               @id @default(autoincrement())
+  consultantId Int
+  userId       Int
+  scheduledAt  DateTime
+  duration     Int               @default(30)
+  status       AppointmentStatus @default(PENDING)
+  type         ConsultationType
+  concern      String            @db.Text
+  notes        String?           @db.Text
+  fee          Decimal           @db.Decimal(10, 2)
+  paymentId    String?
+  meetingLink  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  consultant   ConsultantProfile @relation(fields: [consultantId], references: [id])
+  user         User              @relation(fields: [userId], references: [id])
+
+  @@map("appointments")
+}
+
+model KnowledgeArticle {
+  id            Int         @id @default(autoincrement())
+  title         String
+  slug          String      @unique
+  excerpt       String
+  content       String      @db.LongText
+  type          ArticleType
+  tags          Json
+  featuredImage String?
+  authorId      Int
+  isPublished   Boolean     @default(false)
+  isSponsored   Boolean     @default(false)
+  sponsorName   String?
+  sponsorUrl    String?
+  publishedAt   DateTime?
+  viewCount     Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  author        User        @relation(fields: [authorId], references: [id])
+
+  @@index([slug])
+  @@index([type])
+  @@map("knowledge_articles")
+}
+
+model Course {
+  id           Int          @id @default(autoincrement())
+  title        String
+  slug         String       @unique
+  description  String       @db.Text
+  price        Decimal      @db.Decimal(10, 2)
+  instructorId Int
+  thumbnail    String
+  isPublished  Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  lessons      Lesson[]
+  enrollments  Enrollment[]
+
+  @@map("courses")
+}
+
+model Lesson {
+  id       Int    @id @default(autoincrement())
+  courseId Int
+  title    String
+  content  String @db.LongText
+  videoUrl String?
+  order    Int
+  duration Int
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("lessons")
+}
+
+model Enrollment {
+  id             Int       @id @default(autoincrement())
+  userId         Int
+  courseId       Int
+  progress       Int       @default(0)
+  completedAt    DateTime?
+  certificateUrl String?
+  createdAt      DateTime  @default(now())
+  user           User      @relation(fields: [userId], references: [id])
+  course         Course    @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+model Testimonial {
+  id        Int      @id @default(autoincrement())
+  name      String
+  subtitle  String
+  quote     String   @db.Text
+  rating    Int      @default(5)
+  avatar    String?
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("testimonials")
+}

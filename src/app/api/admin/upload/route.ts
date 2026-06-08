@@ -1,0 +1,52 @@
+import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
+
+export async function POST(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || (session.user as any).role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const formData = await req.formData();
+    const file = formData.get('file') as File | null;
+    const folder = (formData.get('folder') as string) || 'misc';
+
+    if (!file) {
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json({ error: 'Only JPEG, PNG, WebP and GIF images are allowed.' }, { status: 415 });
+    }
+
+    // Max 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File size must be under 5MB.' }, { status: 413 });
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    // Build a unique filename
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const uploadDir = join(process.cwd(), 'public', 'uploads', folder);
+
+    // Ensure dir exists
+    await mkdir(uploadDir, { recursive: true });
+
+    const filepath = join(uploadDir, filename);
+    await writeFile(filepath, buffer);
+
+    const publicUrl = `/uploads/${folder}/${filename}`;
+    return NextResponse.json({ url: publicUrl }, { status: 201 });
+  } catch (err: any) {
+    console.error('[UPLOAD_ERROR]', err);
+    return NextResponse.json({ error: err.message || 'Upload failed' }, { status: 500 });
+  }
+}

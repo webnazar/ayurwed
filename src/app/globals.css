@@ -2,15 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #e8f5ee; /* Light green background */
-  --foreground: #1a1a1a;
-  
-  --brand-green: #1a5c2e;
-  --brand-green-light: #e8f5ee;
-  --brand-gold: #c9a227;
-  --brand-gold-light: #fdf6e3;
-  --brand-gold-dark: #7a5d10;
+@layer base {
+  :root {
+    --background: #e8f5ee; /* Light green background */
+    --foreground: #1a1a1a;
+    
+    --brand-green: #1a5c2e;
+    --brand-green-light: #e8f5ee;
+    --brand-gold: #c9a227;
+    --brand-gold-light: #fdf6e3;
+    --brand-gold-dark: #7a5d10;
+  }
+
+  .dark {
+    --background: #020617; /* Deep slate background */
+    --foreground: #f8fafc; /* Light text */
+    
+    --brand-green: #34d399; /* Brighter green for contrast */
+    --brand-green-light: #064e3b; /* Deep green */
+    --brand-gold: #fbbf24; /* Brighter gold */
+    --brand-gold-light: #451a03; /* Deep amber/gold background */
+    --brand-gold-dark: #fde68a; /* Light gold for text/borders in dark mode */
+  }
 }
 
 body {

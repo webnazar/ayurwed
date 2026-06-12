@@ -6,6 +6,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { User, Menu, X, LogOut, LayoutDashboard, Building2, ShoppingCart } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
 export default function Header() {
   const { data: session } = useSession();
@@ -76,8 +77,9 @@ export default function Header() {
           <div className="flex items-center space-x-4">
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center space-x-6">
+              <ThemeToggle />
               {/* Shopping Cart */}
-              <Link href="/cart" className="relative text-brand-green hover:text-brand-gold transition-colors duration-200" title="Shopping Cart">
+              <Link href="/cart" className="relative text-brand-green hover:text-brand-gold dark:text-brand-gold transition-colors duration-200" title="Shopping Cart">
                 <ShoppingCart className="h-5 w-5" />
                 {mounted && cartCount > 0 && (
                   <span className="absolute -top-2 -right-2.5 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
@@ -116,7 +118,8 @@ export default function Header() {
 
             {/* Mobile Actions */}
             <div className="flex md:hidden items-center space-x-2">
-              <Link href="/cart" className="relative p-2 text-brand-green hover:text-brand-gold">
+              <ThemeToggle />
+              <Link href="/cart" className="relative p-2 text-brand-green hover:text-brand-gold dark:text-brand-gold">
                 <ShoppingCart className="h-5 w-5" />
                 {mounted && cartCount > 0 && (
                   <span className="absolute top-1 right-0.5 bg-red-500 text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center">

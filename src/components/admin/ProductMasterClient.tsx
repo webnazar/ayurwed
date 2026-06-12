@@ -40,7 +40,7 @@ interface FormState {
   mrp: string;
   categoryId: string; manufacturerId: string;
   indicationIds: string[];
-  isActive: boolean; isFeatured: boolean; isSponsored: boolean;
+  isActive: boolean; isFeatured: boolean; isSponsored: boolean; isShopProduct: boolean;
   images: string[];
   ingredients: string; benefits: string;
 }
@@ -50,7 +50,7 @@ const emptyForm: FormState = {
   mrp: '',
   categoryId: '', manufacturerId: '',
   indicationIds: [],
-  isActive: true, isFeatured: false, isSponsored: false,
+  isActive: true, isFeatured: false, isSponsored: false, isShopProduct: false,
   images: [], ingredients: '', benefits: '',
 };
 
@@ -112,6 +112,7 @@ export default function ProductMasterClient({
     if (filterStatus === 'inactive') list = list.filter(p => !p.isActive);
     if (filterStatus === 'featured') list = list.filter(p => p.isFeatured);
     if (filterStatus === 'sponsored') list = list.filter(p => p.isSponsored);
+    if (filterStatus === 'shop') list = list.filter(p => (p as any).isShopProduct);
     if (filterCat) list = list.filter(p => p.categoryId === Number(filterCat));
     return list;
   }, [products, search, filterStatus, filterCat]);
@@ -125,7 +126,7 @@ export default function ProductMasterClient({
       categoryId: String(p.categoryId),
       manufacturerId: String(p.manufacturerId),
       indicationIds: p.indications?.map(ind => String(ind.id)) || [],
-      isActive: p.isActive, isFeatured: p.isFeatured, isSponsored: p.isSponsored,
+      isActive: p.isActive, isFeatured: p.isFeatured, isSponsored: p.isSponsored, isShopProduct: (p as any).isShopProduct || false,
       images: p.images || [],
       ingredients: Array.isArray(p.ingredients) ? p.ingredients.join('\n') : '',
       benefits: Array.isArray(p.benefits) ? p.benefits.join('\n') : '',
@@ -149,7 +150,7 @@ export default function ProductMasterClient({
         mrp: form.mrp,
         categoryId: form.categoryId, manufacturerId: form.manufacturerId,
         indicationIds: form.indicationIds.map(id => Number(id)),
-        isActive: form.isActive, isFeatured: form.isFeatured, isSponsored: form.isSponsored,
+        isActive: form.isActive, isFeatured: form.isFeatured, isSponsored: form.isSponsored, isShopProduct: form.isShopProduct,
         images: form.images,
         ingredients: form.ingredients.split('\n').map(s => s.trim()).filter(Boolean),
         benefits: form.benefits.split('\n').map(s => s.trim()).filter(Boolean),
@@ -246,6 +247,7 @@ export default function ProductMasterClient({
                 <option value="inactive">Inactive</option>
                 <option value="featured">Featured</option>
                 <option value="sponsored">Sponsored</option>
+                <option value="shop">Ayurwed Shop</option>
               </select>
             </div>
             <SearchSelect
@@ -317,6 +319,11 @@ export default function ProductMasterClient({
                         <Tag className="h-3 w-3" />
                         {p.isSponsored ? 'Sponsored' : 'Not Sponsored'}
                       </button>
+                      <button onClick={() => toggleField(p.id, 'isShopProduct', !(p as any).isShopProduct)}
+                        className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full transition-colors ${(p as any).isShopProduct ? 'bg-fuchsia-100 text-fuchsia-700 hover:bg-fuchsia-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+                        <Package className="h-3 w-3" />
+                        {(p as any).isShopProduct ? 'In Shop' : 'Not in Shop'}
+                      </button>
                     </div>
                   </td>
                   <td className="px-5 py-4 text-center">
@@ -358,7 +365,7 @@ export default function ProductMasterClient({
             <div className="bg-gradient-to-r from-brand-green to-[#0f381b] p-6 text-white flex items-center justify-between flex-shrink-0">
               <div>
                 <h3 className="font-extrabold text-lg">{editing ? 'Edit Product' : 'New Product'}</h3>
-                <p className="text-xs text-brand-green-light mt-0.5">{editing ? `Editing: ${editing.name}` : 'Add a new Ayurvedic formulation'}</p>
+                <p className="text-xs text-brand-green-light mt-0.5">{editing ? `Editing: ${editing.name}` : 'Add a new Ayurvedic preparation'}</p>
                 <div className="flex items-center gap-3 mt-2">
                   <kbd className="text-[10px] bg-white/10 px-1.5 py-0.5 rounded font-mono">Alt+S</kbd>
                   <span className="text-[10px] text-white/50">{editing ? 'Save Changes' : 'Create'}</span>
@@ -506,6 +513,12 @@ export default function ProductMasterClient({
                     {form.isSponsored ? <ToggleRight className="h-7 w-7 text-indigo-500" /> : <ToggleLeft className="h-7 w-7 text-gray-400" />}
                   </button>
                   <span className="text-sm font-semibold text-brand-foreground/70">Sponsored</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <button type="button" onClick={() => setForm(f => ({ ...f, isShopProduct: !f.isShopProduct }))}>
+                    {form.isShopProduct ? <ToggleRight className="h-7 w-7 text-fuchsia-600" /> : <ToggleLeft className="h-7 w-7 text-gray-400" />}
+                  </button>
+                  <span className="text-sm font-semibold text-brand-foreground/70">AYURWED Shop</span>
                 </label>
               </div>
 

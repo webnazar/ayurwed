@@ -21,9 +21,9 @@ export default async function AdminEnquiriesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 text-white border border-brand-green-border/20 shadow">
-        <h1 className="text-2xl sm:text-3xl font-extrabold">All Enquiries</h1>
-        <p className="text-sm text-brand-green-light mt-2">{enquiries.length} total consumer enquiries across all manufacturers.</p>
+      <div className="dashboard-header-card">
+        <h1 className="dashboard-header-title">All Enquiries</h1>
+        <p className="dashboard-header-subtitle">{enquiries.length} total consumer enquiries across all manufacturers.</p>
       </div>
 
       {enquiries.length === 0 ? (
@@ -59,7 +59,7 @@ export default async function AdminEnquiriesPage() {
                 )}
                 <p className="text-[10px] text-brand-foreground/40">{new Date(enq.createdAt).toLocaleString()}</p>
               </div>
-              <div className="bg-brand-green-light/30 rounded-2xl p-3 text-xs text-brand-foreground/80 leading-relaxed">
+              <div className="dashboard-header-card">
                 {enq.message}
               </div>
             </div>

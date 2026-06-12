@@ -29,11 +29,11 @@ export default async function ConsumerDashboard() {
   return (
     <div className="space-y-8">
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-6 sm:p-8 text-white flex items-center justify-between border border-brand-green-border/20 shadow-md">
+      <div className={`dashboard-header-card flex items-center justify-between`}>
         <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-extrabold">Welcome, {session?.user?.name}!</h1>
-          <p className="text-xs sm:text-sm text-brand-green-light max-w-md">
-            Your Ayurveda wellness hub — manage consultations, track courses, and discover formulations.
+          <h1 className="dashboard-header-title">Welcome, {session?.user?.name}!</h1>
+          <p className="dashboard-header-subtitle">
+            Your Ayurveda wellness hub — manage consultations, track courses, and discover preparations.
           </p>
         </div>
         <div className="hidden md:block bg-brand-gold/15 p-3 rounded-full text-brand-gold">
@@ -44,13 +44,13 @@ export default async function ConsumerDashboard() {
       {/* Quick Explore Links */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: 'Explore Formulations', href: '/products', icon: Leaf, desc: 'Discover Ayurvedic products' },
+          { label: 'Explore Preparations', href: '/preparations', icon: Leaf, desc: 'Discover Ayurvedic products' },
           { label: 'Find Consultants', href: '/consultants', icon: Calendar, desc: 'Book an expert consultation' },
           { label: 'Browse Manufacturers', href: '/manufacturers', icon: ShieldCheck, desc: 'Connect with verified brands' },
         ].map(({ label, href, icon: Icon, desc }) => (
           <Link key={href} href={href}
             className="bg-white rounded-3xl p-5 border border-brand-green-border/10 shadow-sm hover:shadow-md transition-all group flex items-center gap-4">
-            <div className="bg-brand-green-light p-3 rounded-2xl text-brand-green group-hover:bg-brand-green group-hover:text-white transition-colors flex-shrink-0">
+            <div className="dashboard-header-card">
               <Icon className="h-5 w-5" />
             </div>
             <div className="min-w-0">
@@ -111,7 +111,7 @@ export default async function ConsumerDashboard() {
             <div className="space-y-4">
               {enrollments.map((enr) => (
                 <div key={enr.id} className="flex items-center gap-4 p-4 bg-brand-gold-light/40 rounded-2xl border border-brand-green-border/5">
-                  <div className="bg-brand-green-light h-12 w-12 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="dashboard-header-card">
                     <BookOpen className="h-5 w-5 text-brand-green" />
                   </div>
                   <div className="flex-grow min-w-0">

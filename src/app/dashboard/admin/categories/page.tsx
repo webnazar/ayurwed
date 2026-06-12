@@ -38,9 +38,9 @@ export default async function AdminCategoriesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 text-white border border-brand-green-border/20 shadow">
-        <h1 className="text-2xl sm:text-3xl font-extrabold">Category Master</h1>
-        <p className="text-sm text-brand-green-light mt-2">
+      <div className="dashboard-header-card">
+        <h1 className="dashboard-header-title">Category Master</h1>
+        <p className="dashboard-header-subtitle">
           Manage product categories and sub-categories. Categories are required before adding products.
         </p>
       </div>

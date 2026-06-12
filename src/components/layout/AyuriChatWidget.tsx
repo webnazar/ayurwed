@@ -13,7 +13,7 @@ export default function AyuriChatWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Namaste! I am Ayuri, your Ayurveda guide on AYURWED. I can help you discover formulations, understand ingredients, or find the right consultant — I never push products, I only guide. How can I help you today?",
+      content: "Namaste! I am Ayuri, your Ayurveda guide on AYURWED. I can help you discover preparations, understand ingredients, or find the right consultant — I never push products, I only guide. How can I help you today?",
     },
   ]);
   const [input, setInput] = useState('');

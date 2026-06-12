@@ -5,16 +5,26 @@ import { authOptions } from '@/lib/auth';
 
 export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session || (session.user as any).role !== 'MANUFACTURER') {
+  const body = await req.json();
+  const { targetUserId, description, website, contactEmail, contactPhone, gstNumber, logo, manufacturingLicense, certifications } = body;
+
+  const isAdmin = (session.user as any).role === 'ADMIN';
+  const isOwner = (session.user as any).role === 'MANUFACTURER';
+
+  if (!isAdmin && !isOwner) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await req.json();
-  const { description, website, contactEmail, contactPhone, gstNumber, logo, manufacturingLicense, certifications } = body;
+  // Determine which user's profile to update
+  let profileUserId = Number((session.user as any).id);
+  if (targetUserId) {
+    if (!isAdmin) return NextResponse.json({ error: 'Unauthorized to edit other profiles' }, { status: 403 });
+    profileUserId = Number(targetUserId);
+  }
 
   try {
     const profile = await db.manufacturerProfile.update({
-      where: { userId: Number((session.user as any).id) },
+      where: { userId: profileUserId },
       data: {
         description: description || undefined,
         website: website || null,

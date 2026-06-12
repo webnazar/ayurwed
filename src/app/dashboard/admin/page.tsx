@@ -17,16 +17,16 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 text-white border border-brand-green-border/20 shadow">
-        <h1 className="text-2xl sm:text-3xl font-extrabold">System Administration</h1>
-        <p className="text-sm text-brand-green-light mt-2">
-          Global stats overview, formulation validations, doctor approvals, and content logs.
+      <div className="dashboard-header-card">
+        <h1 className="dashboard-header-title">System Administration</h1>
+        <p className="dashboard-header-subtitle">
+          Global stats overview, preparation validations, doctor approvals, and content logs.
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-3xl p-6 border border-brand-green-border/10 shadow-sm flex items-center gap-4">
-          <div className="bg-brand-green-light p-3 rounded-2xl text-brand-green">
+          <div className="dashboard-header-card">
             <Users className="h-6 w-6" />
           </div>
           <div>
@@ -40,7 +40,7 @@ export default async function AdminDashboard() {
             <Layers className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-xs text-brand-foreground/50 block font-semibold">Active Formulations</span>
+            <span className="text-xs text-brand-foreground/50 block font-semibold">Active Preparations</span>
             <span className="text-xl font-extrabold text-brand-green">{productsCount} products</span>
           </div>
         </div>

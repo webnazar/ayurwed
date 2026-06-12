@@ -6,15 +6,29 @@ import { formatPrice } from '@/lib/utils';
 import Image from 'next/image';
 import AyuriTriggerButton from '@/components/layout/AyuriTriggerButton';
 import HeroCard from '@/components/home/HeroCard';
+import HeroCarousel from '@/components/home/HeroCarousel';
 
 export const revalidate = 0; // Dynamic rendering to fetch latest db updates
 
 export default async function HomePage() {
-  // 1. Fetch Featured Products
+  // Fetch active carousels
+  const carousels = await db.carousel.findMany({
+    where: { isActive: true },
+    orderBy: { sortOrder: 'asc' },
+    take: 5,
+  });
+
+  // 1. Fetch Featured & Premium Products
   const featuredProducts = await db.product.findMany({
-    where: { isActive: true, isFeatured: true },
+    where: { 
+      isActive: true,
+      OR: [
+        { isFeatured: true },
+        { manufacturer: { isPremium: true } }
+      ]
+    },
     take: 3,
-    include: { category: true }
+    include: { category: true, manufacturer: true }
   });
 
   // 2. Fetch Verified Consultants
@@ -40,17 +54,23 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-16 pb-20">
-      {/* 1. Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#124220] to-brand-green text-white py-16 sm:py-24">
-        {/* Soft background glow circles */}
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-brand-gold/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-10 w-80 h-80 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+      {/* 1. Carousel Section */}
+      {carousels.length > 0 && (
+        <section className="w-full relative z-20 -mb-16">
+          <HeroCarousel carousels={carousels} />
+        </section>
+      )}
 
-        {/* Hero Card Component */}
+      {/* 2. Hero Card (Logo & Ayuri Section) */}
+      <section className="relative overflow-hidden bg-white text-brand-green py-16">
+        {/* Soft background glow circles */}
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-brand-green-light rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-10 w-80 h-80 bg-brand-gold/10 rounded-full blur-2xl pointer-events-none" />
+
         <HeroCard />
       </section>
 
-      {/* 2. How It Works Section */}
+      {/* 3. How It Works Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-4">
           <h2 className="text-3xl sm:text-4xl font-bold text-brand-green">The Wellness Journey</h2>
@@ -64,7 +84,7 @@ export default async function HomePage() {
             </div>
             <h3 className="text-xl font-bold text-brand-green">1. Discover Slugs</h3>
             <p className="text-sm text-brand-foreground/70 leading-relaxed">
-              Browse classical certifications, pure adaptogenic single herbs, daily formulations, and learn about your Dosha types.
+              Browse classical certifications, pure adaptogenic single herbs, daily preparations, and learn about your Dosha types.
             </p>
           </div>
           {/* Step 2 */}
@@ -84,7 +104,7 @@ export default async function HomePage() {
             </div>
             <h3 className="text-xl font-bold text-brand-green">3. Heal Naturally</h3>
             <p className="text-sm text-brand-foreground/70 leading-relaxed">
-              Receive custom diet sheets, specialized formulation regimes, and follow-up consultation routines tailored to your Prakriti.
+              Receive custom diet sheets, specialized preparation regimes, and follow-up consultation routines tailored to your Prakriti.
             </p>
           </div>
         </div>
@@ -94,10 +114,10 @@ export default async function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-end gap-4 border-b border-brand-green-border/10 pb-6">
           <div>
-            <h2 className="text-3xl font-bold text-brand-green">Featured Formulations</h2>
+            <h2 className="text-3xl font-bold text-brand-green">Featured Preparations</h2>
             <p className="text-brand-foreground/70 mt-1">Sourced from certified, GMP/AYUSH premium manufacturers.</p>
           </div>
-          <Link href="/products" className="text-brand-gold hover:text-brand-green font-bold flex items-center gap-1 group">
+          <Link href="/preparations" className="text-brand-gold hover:text-brand-green font-bold flex items-center gap-1 group">
             <span>View All Products</span>
             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
@@ -141,7 +161,7 @@ export default async function HomePage() {
                     )}
                   </div>
                   <Link
-                    href={`/products/${p.slug}`}
+                    href={`/preparations/${p.slug}`}
                     className="bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200"
                   >
                     Details
@@ -155,17 +175,17 @@ export default async function HomePage() {
 
       {/* 4. Ayuri Chatbot Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden shadow-xl border border-brand-green-border/20">
-          <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-72 h-72 bg-brand-gold/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="bg-brand-green-light rounded-3xl p-8 sm:p-12 text-brand-green relative overflow-hidden shadow-sm border border-brand-green/10">
+          <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-72 h-72 bg-white/50 rounded-full blur-3xl pointer-events-none" />
           <div className="relative z-10 max-w-2xl space-y-6">
-            <span className="inline-flex items-center gap-1.5 bg-brand-gold/20 text-brand-gold px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 bg-brand-green/10 text-brand-green px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
               <Award className="h-4 w-4" />
               <span>Meet Ayuri — Official AI Guide</span>
             </span>
             <h2 className="text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight md:whitespace-nowrap">
               Instant Ayurvedic Wisdom, Tailored to You
             </h2>
-            <p className="text-brand-green-light text-sm sm:text-base leading-relaxed">
+            <p className="text-brand-green/70 text-sm sm:text-base leading-relaxed">
               Not sure which product matches your body profile? Ask Ayuri about herbal ingredients, dosage plans, lifestyle guidelines, and get instant, clinically grounded guidance.
             </p>
             <div className="pt-2">

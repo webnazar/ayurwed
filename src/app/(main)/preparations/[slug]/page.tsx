@@ -48,6 +48,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     usage: product.usage,
     isSponsored: product.isSponsored,
     isFeatured: product.isFeatured,
+    isShopProduct: product.isShopProduct,
     manufacturer: product.manufacturer as any,
   };
 
@@ -57,14 +58,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-brand-foreground/60">
         <Link href="/" className="hover:text-brand-green">Home</Link>
         <ChevronRight className="h-3.5 w-3.5" />
-        <Link href="/products" className="hover:text-brand-green">Formulations</Link>
+        <Link href="/preparations" className="hover:text-brand-green">Preparations</Link>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="text-brand-green font-semibold line-clamp-1">{product.name}</span>
       </div>
 
-      <Link href="/products" className="inline-flex items-center gap-2 text-sm font-bold text-brand-green hover:text-brand-gold transition-colors">
+      <Link href="/preparations" className="inline-flex items-center gap-2 text-sm font-bold text-brand-green hover:text-brand-gold transition-colors">
         <ArrowLeft className="h-4 w-4" />
-        Back to Formulations
+        Back to Preparations
       </Link>
 
       <ProductInteraction product={productData} />
@@ -77,7 +78,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         <div className="space-y-1 text-center sm:text-left">
           <h4 className="font-bold text-brand-green">Ayurvedic Health Advisory</h4>
           <p className="text-xs sm:text-sm text-brand-foreground/70 leading-relaxed">
-            AYURWED is an information and discovery platform. We do not sell products directly. Individual body constitutions (Prakriti) respond differently to formulations. Please consult a certified Ayurvedic practitioner before use.
+            AYURWED is an information and discovery platform. We do not sell products directly. Individual body constitutions (Prakriti) respond differently to preparations. Please consult a certified Ayurvedic practitioner before use.
           </p>
         </div>
       </div>

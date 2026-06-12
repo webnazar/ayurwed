@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, description, ingredients, benefits, usage, mrp, images, categoryId, manufacturerId, isActive, isFeatured, isSponsored, indicationIds } = body;
+    const { name, description, ingredients, benefits, usage, mrp, images, categoryId, manufacturerId, isActive, isFeatured, isSponsored, isShopProduct, indicationIds } = body;
 
     if (!name || !description || !categoryId || !manufacturerId) {
       return NextResponse.json({ error: 'Required fields missing' }, { status: 400 });
@@ -87,6 +87,7 @@ export async function POST(req: Request) {
         isActive: isActive ?? true,
         isFeatured: isFeatured ?? false,
         isSponsored: isSponsored ?? false,
+        isShopProduct: isShopProduct ?? false,
         indications: indicationIds && indicationIds.length > 0
           ? { connect: indicationIds.map((id: number) => ({ id })) }
           : undefined,
@@ -115,7 +116,7 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    const { id, productId, name, description, ingredients, benefits, usage, mrp, images, categoryId, manufacturerId, isActive, isFeatured, isSponsored, indicationIds } = body;
+    const { id, productId, name, description, ingredients, benefits, usage, mrp, images, categoryId, manufacturerId, isActive, isFeatured, isSponsored, isShopProduct, indicationIds } = body;
 
     const targetId = id || productId;
     if (!targetId) {
@@ -138,6 +139,7 @@ export async function PATCH(req: Request) {
     if (isActive !== undefined) updateData.isActive = isActive;
     if (isFeatured !== undefined) updateData.isFeatured = isFeatured;
     if (isSponsored !== undefined) updateData.isSponsored = isSponsored;
+    if (isShopProduct !== undefined) updateData.isShopProduct = isShopProduct;
     if (indicationIds !== undefined) {
       updateData.indications = { set: indicationIds.map((id: number) => ({ id })) };
     }

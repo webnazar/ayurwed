@@ -7,6 +7,7 @@ import { Save, UserCircle, Stethoscope, Languages, Clock } from 'lucide-react';
 import ImageUploadCrop from '@/components/admin/ImageUploadCrop';
 
 interface ConsultantProfileProps {
+  adminTargetUserId?: number;
   user: { name: string; avatar: string | null };
   profile: {
     specialization: string;
@@ -52,6 +53,7 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          targetUserId: data.adminTargetUserId,
           name: form.name,
           avatar: form.avatar,
           specialization: form.specialization,

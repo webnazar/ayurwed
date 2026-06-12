@@ -17,6 +17,7 @@ export default async function AdminUsersPage() {
   // Fetch all users in descending order of registration date
   const users = await db.user.findMany({
     orderBy: { createdAt: 'desc' },
+    include: { manufacturerProfile: { select: { slug: true } } }
   });
 
   // Convert Date objects to ISO strings for client props
@@ -28,14 +29,15 @@ export default async function AdminUsersPage() {
     avatar: user.avatar,
     phone: user.phone,
     isActive: user.isActive,
+    manufacturerSlug: user.manufacturerProfile?.slug || null,
     createdAt: user.createdAt.toISOString(),
   }));
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 text-white border border-brand-green-border/20 shadow">
-        <h1 className="text-2xl sm:text-3xl font-extrabold">User Account Management</h1>
-        <p className="text-sm text-brand-green-light mt-2">
+      <div className="dashboard-header-card">
+        <h1 className="dashboard-header-title">User Account Management</h1>
+        <p className="dashboard-header-subtitle">
           Manage system users, change workspace credentials, modify roles, and toggle activity bans.
         </p>
       </div>

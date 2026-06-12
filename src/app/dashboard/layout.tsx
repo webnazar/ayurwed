@@ -25,7 +25,8 @@ import {
   Star,
   UserCircle,
   Inbox,
-  HeartPulse
+  HeartPulse,
+  ShoppingBag
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -51,6 +52,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     CONSUMER: [
       { name: 'My Appointments', href: '/dashboard/consumer/appointments', icon: Calendar },
       { name: 'My Courses', href: '/dashboard/consumer/courses', icon: BookOpen },
+      { name: 'My Profile', href: '/dashboard/consumer/profile', icon: UserCircle },
     ],
     CONSULTANT: [
       { name: 'Appointments Schedule', href: '/dashboard/consultant/schedule', icon: Calendar },
@@ -66,10 +68,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     ],
     ADMIN: [
       { name: 'Dashboard', href: '/dashboard/admin/stats', icon: BarChart3 },
+      { name: 'Carousel Master', href: '/dashboard/admin/carousels', icon: Sparkles },
       { name: 'User Management', href: '/dashboard/admin/users', icon: Users },
       { name: 'Category Master', href: '/dashboard/admin/categories', icon: FolderTree },
       { name: 'Indication Master', href: '/dashboard/admin/indications', icon: HeartPulse },
       { name: 'Product Master', href: '/dashboard/admin/products', icon: Package },
+      { name: 'Orders Management', href: '/dashboard/admin/orders', icon: ShoppingBag },
       { name: 'Product Approvals', href: '/dashboard/admin/approvals', icon: CheckSquare },
       { name: 'Featured & Sponsored', href: '/dashboard/admin/featured', icon: Star },
       { name: 'Enquiries', href: '/dashboard/admin/enquiries', icon: Inbox },
@@ -89,19 +93,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const currentMenu = menuItems[role as keyof typeof menuItems] || menuItems.CONSUMER;
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#124220] text-brand-green-light justify-between">
+    <div className="flex flex-col h-full bg-white text-brand-green justify-between border-r border-brand-green-border/10">
       {/* Brand & Menu */}
       <div className="flex flex-col flex-1 overflow-hidden space-y-6">
         <div className="p-6 border-b border-brand-green-border/20 flex-shrink-0">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="bg-white p-0.5 rounded-full h-8 w-8 flex items-center justify-center shadow-sm">
-              <img
-                src="/icon.png"
-                alt="AYURWED Icon"
-                className="h-7 w-7 object-contain"
-              />
-            </div>
-            <span className="text-xl font-bold tracking-wider text-white">AYURWED</span>
+          <Link href="/" className="flex items-center">
+            <img
+              src="/ayurwed-logo-2.webp"
+              alt="AYURWED"
+              className="h-10 sm:h-12 w-auto object-contain transition-transform duration-300 hover:scale-105"
+            />
           </Link>
         </div>
 
@@ -117,7 +118,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
                     ? 'bg-brand-gold text-brand-green font-bold shadow'
-                    : 'hover:bg-brand-green-border/25 hover:text-white'
+                    : 'text-brand-green/70 hover:bg-brand-green-light/50 hover:text-brand-green'
                 }`}
               >
                 <Icon className="h-5 w-5 flex-shrink-0" />
@@ -131,14 +132,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Profile & Logout Footer */}
       <div className="p-4 border-t border-brand-green-border/20 space-y-4">
         {/* Profile Card */}
-        <div className="px-4 py-3 bg-[#1a5c2e]/40 border border-brand-green-border/20 rounded-2xl">
+        <div className="px-4 py-3 bg-brand-green-light/50 border border-brand-green/10 rounded-2xl">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 bg-brand-gold text-brand-green font-bold rounded-full flex items-center justify-center text-sm shadow flex-shrink-0">
               {name.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-bold text-white truncate">{name}</p>
-              <p className="text-[10px] font-semibold text-brand-gold uppercase tracking-wider">
+              <p className="text-sm font-bold text-brand-green truncate">{name}</p>
+              <p className="text-[10px] font-semibold text-brand-green/70 uppercase tracking-wider">
                 {getRoleLabel(role)}
               </p>
             </div>
@@ -148,7 +149,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Logout Button */}
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-300 hover:bg-brand-green-border/25 hover:text-white transition-colors duration-200 text-left"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors duration-200 text-left"
         >
           <LogOut className="h-5 w-5" />
           <span>Sign Out</span>
@@ -160,7 +161,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="h-screen bg-brand-gold-light flex overflow-hidden">
       {/* Desktop Sidebar */}
-      <aside className={`hidden lg:block transition-all duration-300 flex-shrink-0 bg-[#124220] overflow-hidden h-full ${
+      <aside className={`hidden lg:block transition-all duration-300 flex-shrink-0 bg-white overflow-hidden h-full ${
         desktopCollapsed ? 'w-0 border-r-0' : 'w-64 border-r border-brand-green-border/10'
       }`}>
         <div className="w-64 h-full">
@@ -207,11 +208,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             onClick={() => setMobileOpen(false)}
           />
           {/* Drawer container */}
-          <div className="relative w-64 max-w-xs flex-col flex bg-[#124220] h-full shadow-2xl animate-in slide-in-from-left duration-300">
+          <div className="relative w-64 max-w-xs flex-col flex bg-white h-full shadow-2xl animate-in slide-in-from-left duration-300">
             <div className="absolute top-4 right-4 z-10">
               <button
                 onClick={() => setMobileOpen(false)}
-                className="p-1.5 bg-[#1a5c2e]/60 rounded-full text-white hover:bg-[#1a5c2e] focus:outline-none"
+                className="p-1.5 bg-brand-green-light rounded-full text-brand-green hover:bg-brand-gold focus:outline-none"
               >
                 <X className="h-5 w-5" />
               </button>

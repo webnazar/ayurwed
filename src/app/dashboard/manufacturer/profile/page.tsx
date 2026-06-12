@@ -26,9 +26,9 @@ export default async function ManufacturerProfilePage() {
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto w-full">
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 text-white border border-brand-green-border/20 shadow">
-        <h1 className="text-2xl sm:text-3xl font-extrabold">My Profile</h1>
-        <p className="text-sm text-brand-green-light mt-2">
+      <div className="dashboard-header-card">
+        <h1 className="dashboard-header-title">My Profile</h1>
+        <p className="dashboard-header-subtitle">
           Manage your public listing on AYURWED. A complete profile improves your discovery visibility.
         </p>
       </div>

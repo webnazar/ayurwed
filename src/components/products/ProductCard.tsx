@@ -77,10 +77,10 @@ export default function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
           <Link
-            href={`/products/${product.slug}`}
+            href={`/preparations/${product.slug}`}
             className="bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green text-xs font-bold px-4 py-2 rounded-full flex items-center gap-1.5 transition-colors duration-200"
           >
-            Explore <ArrowRight className="h-3.5 w-3.5" />
+            {(product as any).isShopProduct ? 'Buy Now' : 'Explore'} <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
       </div>

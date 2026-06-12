@@ -33,6 +33,7 @@ export async function PATCH(req: Request) {
     console.error('[ADMIN_USERS_PATCH_ERROR]', err);
     return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
   }
+}
 
 export async function POST(req: Request) {
   try {

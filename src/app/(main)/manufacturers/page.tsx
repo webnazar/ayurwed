@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import Link from 'next/link';
 import { Building2, CheckCircle2, Sparkles, Search, SlidersHorizontal } from 'lucide-react';
 import { Metadata } from 'next';
+import ManufacturerFilterSidebarClient from '@/components/manufacturers/ManufacturerFilterSidebarClient';
 
 export const revalidate = 0;
 export const metadata: Metadata = {
@@ -11,16 +12,21 @@ export const metadata: Metadata = {
 };
 
 interface ManufacturersPageProps {
-  searchParams: { search?: string; tier?: string };
+  searchParams: { search?: string; category?: string };
 }
 
 export default async function ManufacturersPage({ searchParams }: ManufacturersPageProps) {
   const search = searchParams.search || '';
-  const tier = searchParams.tier || '';
+  const selectedCategorySlugs = searchParams.category ? searchParams.category.split(',') : [];
+
+  const categories = await db.category.findMany({ orderBy: { name: 'asc' } });
 
   const where: any = { user: { isActive: true } };
   if (search) where.companyName = { contains: search };
-  if (tier) where.listingTier = tier;
+  
+  if (selectedCategorySlugs.length > 0) {
+    where.products = { some: { category: { slug: { in: selectedCategorySlugs } } } };
+  }
 
   const manufacturers = await db.manufacturerProfile.findMany({
     where,
@@ -34,50 +40,41 @@ export default async function ManufacturersPage({ searchParams }: ManufacturersP
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Header */}
-      <div className="space-y-3 border-b border-brand-green-border/10 pb-8 mb-10">
+      <div className="space-y-3">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-brand-green tracking-tight">
           Ayurvedic Manufacturers
         </h1>
-        <p className="text-sm sm:text-base text-brand-foreground/70 max-w-2xl">
-          Discover verified Ayurvedic manufacturers, explore their product catalogs, certifications, and connect with them directly — no intermediaries.
+        <p className="text-sm sm:text-base text-brand-foreground/70 whitespace-nowrap overflow-hidden text-ellipsis">
+          Discover verified manufacturers, explore catalogs, and connect directly — no intermediaries.
         </p>
       </div>
 
+      {/* Global Search */}
+      <form method="GET" action="/manufacturers" className="relative mt-8 w-full mb-10">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-foreground/40" />
+        <input
+          type="text"
+          name="search"
+          defaultValue={search}
+          placeholder="Search manufacturers by company name..."
+          className="w-full bg-white text-brand-foreground text-sm sm:text-base border border-brand-green-border/20 rounded-full py-4 pl-12 pr-6 shadow-sm focus:outline-none focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/10 transition-all"
+        />
+        {selectedCategorySlugs.length > 0 && (
+          <input type="hidden" name="category" value={selectedCategorySlugs.join(',')} />
+        )}
+        <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 bg-brand-green text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-brand-gold hover:text-brand-green transition-colors">
+          Search
+        </button>
+      </form>
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar Filters */}
-        <aside className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-3xl p-6 border border-brand-green-border/10 shadow-sm space-y-5">
-            <div className="flex items-center gap-2 text-brand-green font-bold border-b border-brand-green-light pb-3">
-              <SlidersHorizontal className="h-5 w-5" />
-              <span>Filters</span>
-            </div>
-            <form method="GET" action="/manufacturers" className="relative">
-              <input
-                type="text" name="search" defaultValue={search}
-                placeholder="Search manufacturers..."
-                className="w-full bg-brand-green-light/40 text-brand-foreground placeholder-brand-foreground/40 text-sm border border-brand-green-border/10 rounded-full py-2.5 pl-4 pr-10 focus:outline-none focus:border-brand-gold"
-              />
-              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-green">
-                <Search className="h-4 w-4" />
-              </button>
-            </form>
-            <div className="space-y-2">
-              <h3 className="text-sm font-bold text-brand-green">Listing Tier</h3>
-              {[
-                { label: 'All', value: '' },
-                { label: 'Featured', value: 'featured' },
-                { label: 'Premium', value: 'premium' },
-                { label: 'Basic', value: 'basic' },
-              ].map(({ label, value }) => (
-                <Link key={value} href={`/manufacturers?tier=${value}${search ? `&search=${search}` : ''}`}
-                  className={`block text-sm py-1.5 px-3 rounded-full transition-colors ${
-                    tier === value ? 'bg-brand-green text-white font-semibold' : 'text-brand-foreground/80 hover:bg-brand-green-light hover:text-brand-green'
-                  }`}>
-                  {label}
-                </Link>
-              ))}
-            </div>
-          </div>
+        <aside className="lg:col-span-1">
+          <ManufacturerFilterSidebarClient
+            categories={categories}
+            initialSearch={search}
+            initialCategories={selectedCategorySlugs}
+          />
         </aside>
 
         {/* Manufacturer Grid */}
@@ -105,7 +102,7 @@ export default async function ManufacturersPage({ searchParams }: ManufacturersP
                     <p className="text-xs text-brand-foreground/60 line-clamp-3">{mfr.description}</p>
                   </div>
                   <div className="flex items-center justify-between pt-3 border-t border-brand-green-light text-xs">
-                    <span className="text-brand-foreground/50 font-medium">{mfr._count.products} formulation{mfr._count.products !== 1 ? 's' : ''}</span>
+                    <span className="text-brand-foreground/50 font-medium">{mfr._count.products} preparation{mfr._count.products !== 1 ? 's' : ''}</span>
                     <span className="text-brand-gold font-bold group-hover:text-brand-green">View Profile →</span>
                   </div>
                 </Link>

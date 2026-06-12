@@ -17,9 +17,9 @@ export default async function ConsultantDashboard() {
 
   return (
     <div className="space-y-8">
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 text-white border border-brand-green-border/20 shadow">
-        <h1 className="text-2xl sm:text-3xl font-extrabold">Namaste, {session?.user?.name}!</h1>
-        <p className="text-sm text-brand-green-light mt-2">
+      <div className="dashboard-header-card">
+        <h1 className="dashboard-header-title">Namaste, {session?.user?.name}!</h1>
+        <p className="dashboard-header-subtitle">
           Workspace for managing virtual diagnostic routines, Prakriti balance charts, and video logs.
         </p>
       </div>
@@ -27,7 +27,7 @@ export default async function ConsultantDashboard() {
       {/* Profile Overview Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="bg-white rounded-3xl p-6 border border-brand-green-border/10 shadow-sm flex items-center gap-4">
-          <div className="bg-brand-green-light p-3 rounded-2xl text-brand-green">
+          <div className="dashboard-header-card">
             <Star className="h-6 w-6" />
           </div>
           <div>

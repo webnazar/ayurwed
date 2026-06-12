@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Simple Ayurveda-themed fallback answers when Gemini API key is missing or calls fail
 const AYURVEDA_FALLBACKS = [
-  "Based on Ayurvedic principles, this formulation matches a Vata-balancing routine. Try consuming it with warm water or milk.",
+  "Based on Ayurvedic principles, this preparation matches a Vata-balancing routine. Try consuming it with warm water or milk.",
   "Ayurveda recommends avoiding raw foods or cold drinks if you are experiencing Vata imbalance. Root vegetables and warm ghee are beneficial.",
   "For hair health, Bringadi oil is excellent. Ensure you massage it into the scalp twice a week, leaving it for 30 minutes before washing.",
   "Ashwagandha is an adaptogen that helps with stress and sleep quality. It is best consumed at night with warm milk.",

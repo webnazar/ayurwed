@@ -24,9 +24,9 @@ export default async function ManufacturerEnquiriesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 text-white border border-brand-green-border/20 shadow">
-        <h1 className="text-2xl sm:text-3xl font-extrabold">Enquiries Received</h1>
-        <p className="text-sm text-brand-green-light mt-2">
+      <div className="dashboard-header-card">
+        <h1 className="dashboard-header-title">Enquiries Received</h1>
+        <p className="dashboard-header-subtitle">
           Consumer enquiries sent to your company through AYURWED.
         </p>
       </div>
@@ -68,7 +68,7 @@ export default async function ManufacturerEnquiriesPage() {
                   <span>About: <span className="font-semibold text-brand-green">{enq.product.name}</span></span>
                 </div>
               )}
-              <div className="bg-brand-green-light/30 rounded-2xl p-4 text-sm text-brand-foreground/80 leading-relaxed">
+              <div className="dashboard-header-card">
                 {enq.message}
               </div>
             </div>

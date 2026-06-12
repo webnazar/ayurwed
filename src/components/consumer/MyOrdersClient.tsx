@@ -89,8 +89,8 @@ export default function MyOrdersClient({ initialOrders }: { initialOrders: Order
           <div className="py-20 text-center space-y-4">
             <ShoppingBag className="h-14 w-14 text-brand-gold mx-auto animate-pulse-slow" />
             <h3 className="text-xl font-bold text-brand-green">No Orders Yet</h3>
-            <p className="text-sm text-brand-foreground/60">Explore our Ayurvedic formulations and place your first order.</p>
-            <Link href="/products" className="inline-block bg-brand-green text-white px-6 py-2.5 rounded-full text-sm font-semibold">Shop Now</Link>
+            <p className="text-sm text-brand-foreground/60">Explore our Ayurvedic preparations and place your first order.</p>
+            <Link href="/preparations" className="inline-block bg-brand-green text-white px-6 py-2.5 rounded-full text-sm font-semibold">Shop Now</Link>
           </div>
         ) : (
           <div className="divide-y divide-brand-green-border/10">
@@ -120,7 +120,7 @@ export default function MyOrdersClient({ initialOrders }: { initialOrders: Order
                     className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-brand-green border border-brand-green/20 hover:bg-brand-green-light text-sm font-bold transition-colors">
                     <Eye className="h-3.5 w-3.5" /> View
                   </button>
-                  <Link href="/products"
+                  <Link href="/preparations"
                     className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green text-sm font-bold transition-colors">
                     Reorder
                   </Link>

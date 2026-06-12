@@ -57,7 +57,7 @@ export default async function ManufacturerProfilePage({ params }: ManufacturerPr
       </Link>
 
       {/* Hero */}
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 text-white relative overflow-hidden">
+      <div className="dashboard-header-card">
         <div className="relative z-10 flex flex-col sm:flex-row gap-6 items-start sm:items-center">
           <div className="h-20 w-20 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0">
             <Building2 className="h-10 w-10 text-white" />
@@ -174,7 +174,7 @@ export default async function ManufacturerProfilePage({ params }: ManufacturerPr
           <div className="bg-white rounded-3xl p-6 border border-brand-green-border/10 shadow-sm space-y-6">
             <h2 className="font-extrabold text-brand-green text-base border-b border-brand-green-light pb-3 flex items-center gap-2">
               <Leaf className="h-4 w-4" /> Product Catalog
-              <span className="ml-auto text-xs font-medium text-brand-foreground/50">{mfr.products.length} formulation{mfr.products.length !== 1 ? 's' : ''}</span>
+              <span className="ml-auto text-xs font-medium text-brand-foreground/50">{mfr.products.length} preparation{mfr.products.length !== 1 ? 's' : ''}</span>
             </h2>
 
             {mfr.products.length > 0 ? (
@@ -182,7 +182,7 @@ export default async function ManufacturerProfilePage({ params }: ManufacturerPr
                 {mfr.products.map((product) => {
                   const thumbnail = Array.isArray(product.images) ? (product.images as string[])[0] : null;
                   return (
-                    <Link key={product.id} href={`/products/${product.slug}`}
+                    <Link key={product.id} href={`/preparations/${product.slug}`}
                       className="flex items-start gap-4 p-4 rounded-2xl border border-brand-green-border/10 hover:border-brand-gold/30 hover:shadow-md transition-all duration-200 group bg-brand-gold-light/20">
                       <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-white flex-shrink-0">
                         {thumbnail ? (

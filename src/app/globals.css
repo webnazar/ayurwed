@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #fdf6e3; /* Light gold background */
+  --background: #e8f5ee; /* Light green background */
   --foreground: #1a1a1a;
   
   --brand-green: #1a5c2e;
@@ -60,4 +60,21 @@ body {
 
 .gold-gradient {
   background: linear-gradient(135deg, var(--brand-gold) 0%, var(--brand-gold-dark) 100%);
+}
+
+/* Ensure select elements have enough right padding for the dropdown arrow */
+select {
+  padding-right: 2.5rem !important;
+}
+
+@layer components {
+  .dashboard-header-card {
+    @apply bg-brand-green-light rounded-3xl p-8 text-brand-green border border-brand-green/10 shadow-sm relative overflow-hidden;
+  }
+  .dashboard-header-title {
+    @apply text-2xl font-extrabold flex items-center gap-3;
+  }
+  .dashboard-header-subtitle {
+    @apply text-brand-green/70 mt-1 text-sm;
+  }
 }

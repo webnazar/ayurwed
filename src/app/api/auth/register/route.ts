@@ -52,7 +52,7 @@ export async function POST(req: Request) {
           manufacturerProfile: {
             create: {
               companyName: `${name} Ltd`,
-              description: 'Ayurvedic formulations manufacturing factory.',
+              description: 'Ayurvedic preparations manufacturing factory.',
               certifications: ['GMP Compliant'],
               gstNumber: '',
               address: {

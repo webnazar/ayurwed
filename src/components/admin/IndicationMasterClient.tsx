@@ -174,7 +174,7 @@ export default function IndicationMasterClient({ initialIndications }: { initial
   return (
     <div className="space-y-6">
       {/* Stats row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: 'Total Indications', value: stats.total, icon: HeartPulse, color: 'text-brand-green bg-brand-green-light' },
           { label: 'Active', value: stats.active, icon: Activity, color: 'text-emerald-600 bg-emerald-50' },

@@ -13,6 +13,7 @@ interface UserItem {
   phone: string | null;
   isActive: boolean;
   createdAt: string;
+  manufacturerSlug?: string | null;
 }
 
 export default function UserListClient({ initialUsers }: { initialUsers: UserItem[] }) {
@@ -170,16 +171,9 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
       {/* Action Filters Panel */}
       <div className="bg-white rounded-3xl p-6 border border-brand-green-border/10 shadow-sm space-y-4">
         <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="flex-shrink-0 bg-brand-green text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-sm hover:bg-brand-gold hover:text-brand-green transition-colors flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" /> Create User
-          </button>
           
-          <div className="flex flex-col lg:flex-row gap-4 flex-grow w-full justify-end">
           {/* Search Box */}
-          <div className="relative flex-grow max-w-xl">
+          <div className="relative w-full flex-grow">
             <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-brand-foreground/40">
               <Search className="h-5 w-5" />
             </span>
@@ -193,7 +187,7 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
           </div>
 
           {/* Quick Filters */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-start lg:justify-end flex-shrink-0">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-brand-green" />
               <select
@@ -230,8 +224,14 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
               <option value="name-za">Name Z-A</option>
             </select>
           </div>
+
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="flex-shrink-0 bg-brand-green text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-sm hover:bg-brand-gold hover:text-brand-green transition-colors flex items-center gap-2 w-full lg:w-auto justify-center"
+          >
+            <Plus className="h-4 w-4" /> Create User
+          </button>
         </div>
-      </div>
 
         {/* Responsive Table */}
         <div className="overflow-x-auto rounded-2xl border border-brand-green-border/10">
@@ -428,13 +428,13 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
               {/* Advanced Controls */}
               <div className="pt-4 border-t border-brand-green-border/10 space-y-3">
                 <span className="text-xs font-bold text-brand-green uppercase tracking-wide block">Administrative Actions</span>
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3">
                   <button
                     onClick={() => {
                       handleUpdateUser(selectedUser.id, { isActive: !selectedUser.isActive });
                       setSelectedUser(prev => prev ? { ...prev, isActive: !prev.isActive } : null);
                     }}
-                    className={`flex-grow text-center text-xs font-bold py-3 px-4 rounded-xl shadow-sm transition-all ${
+                    className={`w-full text-center text-xs font-bold py-3 px-4 rounded-xl shadow-sm transition-all ${
                       selectedUser.isActive
                         ? 'bg-rose-100 text-rose-800 hover:bg-rose-200'
                         : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
@@ -442,6 +442,24 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
                   >
                     {selectedUser.isActive ? 'Suspend User' : 'Activate User'}
                   </button>
+
+                  {(selectedUser.role === 'MANUFACTURER' || selectedUser.role === 'CONSULTANT') && (
+                    <div className="flex gap-3">
+                      {selectedUser.role === 'MANUFACTURER' && selectedUser.manufacturerSlug && (
+                        <a href={`/manufacturers/${selectedUser.manufacturerSlug}`} target="_blank" rel="noreferrer" className="flex-1 text-center text-xs font-bold py-3 px-4 rounded-xl shadow-sm transition-all bg-brand-gold-light/40 text-brand-gold-dark hover:bg-brand-gold/20">
+                          View Public Profile
+                        </a>
+                      )}
+                      {selectedUser.role === 'CONSULTANT' && (
+                        <a href={`/consultants/${selectedUser.id}`} target="_blank" rel="noreferrer" className="flex-1 text-center text-xs font-bold py-3 px-4 rounded-xl shadow-sm transition-all bg-brand-gold-light/40 text-brand-gold-dark hover:bg-brand-gold/20">
+                          View Public Profile
+                        </a>
+                      )}
+                      <a href={`/dashboard/admin/users/${selectedUser.id}/edit-profile`} className="flex-1 text-center text-xs font-bold py-3 px-4 rounded-xl shadow-sm transition-all bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green">
+                        Edit Profile Details
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

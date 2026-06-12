@@ -28,10 +28,10 @@ export default async function AdminProductsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 text-white border border-brand-green-border/20 shadow">
-        <h1 className="text-2xl sm:text-3xl font-extrabold">Product Master</h1>
-        <p className="text-sm text-brand-green-light mt-2">
-          Create, edit, and manage all Ayurvedic formulations listed on the platform.
+      <div className="dashboard-header-card">
+        <h1 className="dashboard-header-title">Product Master</h1>
+        <p className="dashboard-header-subtitle">
+          Create, edit, and manage all Ayurvedic preparations listed on the platform.
         </p>
       </div>
       <ProductMasterClient

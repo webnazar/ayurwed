@@ -9,6 +9,7 @@ import ImageUploadCrop from '@/components/admin/ImageUploadCrop';
 interface Cert { name: string; url: string; }
 
 interface ProfileFormProps {
+  adminTargetUserId?: number;
   profile: {
     id: number;
     companyName: string;
@@ -24,7 +25,7 @@ interface ProfileFormProps {
   };
 }
 
-export default function ManufacturerProfileForm({ profile }: ProfileFormProps) {
+export default function ManufacturerProfileForm({ profile, adminTargetUserId }: ProfileFormProps) {
   const router = useRouter();
   const [form, setForm] = useState({
     description: profile.description || '',
@@ -56,6 +57,7 @@ export default function ManufacturerProfileForm({ profile }: ProfileFormProps) {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          targetUserId: adminTargetUserId,
           description: form.description,
           website: form.website,
           contactEmail: form.contactEmail,

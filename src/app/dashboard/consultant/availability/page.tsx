@@ -27,9 +27,9 @@ export default async function ConsultantAvailabilityPage() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 text-white border border-brand-green-border/20 shadow">
-        <h1 className="text-2xl sm:text-3xl font-extrabold">Availability Slots</h1>
-        <p className="text-sm text-brand-green-light mt-2">
+      <div className="dashboard-header-card">
+        <h1 className="dashboard-header-title">Availability Slots</h1>
+        <p className="dashboard-header-subtitle">
           Set your weekly working days, time slots, and consultation fee.
         </p>
       </div>

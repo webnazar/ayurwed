@@ -16,7 +16,7 @@ interface Product {
   ingredients: string[]; benefits: string[]; usage: string;
   mrp: string | null;
   images: string[]; categoryId: number; isActive: boolean;
-  isFeatured: boolean; isSponsored: boolean;
+  isFeatured: boolean; isSponsored: boolean; isShopProduct: boolean;
   category: { id: number; name: string };
   indications?: { id: number; name: string }[];
   _count: { reviews: number; enquiries: number };
@@ -27,6 +27,7 @@ interface FormState {
   categoryId: string; images: string[];
   indicationIds: string[];
   ingredients: string; benefits: string;
+  isShopProduct: boolean;
 }
 
 const emptyForm: FormState = {
@@ -35,6 +36,7 @@ const emptyForm: FormState = {
   categoryId: '', images: [],
   indicationIds: [],
   ingredients: '', benefits: '',
+  isShopProduct: false,
 };
 
 const inp = "w-full border border-brand-green-border/20 rounded-2xl py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/25 bg-brand-gold-light/20";
@@ -79,6 +81,7 @@ export default function ManufacturerProductsClient({
       images: p.images || [],
       ingredients: Array.isArray(p.ingredients) ? p.ingredients.join('\n') : '',
       benefits: Array.isArray(p.benefits) ? p.benefits.join('\n') : '',
+      isShopProduct: p.isShopProduct || false,
     });
     setShowForm(true);
     setSearchIndication('');
@@ -97,6 +100,7 @@ export default function ManufacturerProductsClient({
         indicationIds: form.indicationIds,
         ingredients: form.ingredients.split('\n').map(s => s.trim()).filter(Boolean),
         benefits: form.benefits.split('\n').map(s => s.trim()).filter(Boolean),
+        isShopProduct: form.isShopProduct,
       };
       const method = editing ? 'PATCH' : 'POST';
       if (editing) (payload as any).id = editing.id;
@@ -105,10 +109,10 @@ export default function ManufacturerProductsClient({
       const saved: Product = await res.json();
       if (editing) {
         setProducts(prev => prev.map(p => p.id === saved.id ? saved : p));
-        toast.success('Formulation updated!');
+        toast.success('Preparation updated!');
       } else {
         setProducts(prev => [saved, ...prev]);
-        toast.success('Formulation submitted for approval!');
+        toast.success('Preparation submitted for approval!');
       }
       closeForm();
     } catch (err: any) { toast.error(err.message); }
@@ -121,7 +125,7 @@ export default function ManufacturerProductsClient({
       const res = await fetch(`/api/manufacturer/products?id=${id}`, { method: 'DELETE' });
       if (!res.ok) { const e = await res.json(); throw new Error(e.error); }
       setProducts(prev => prev.filter(p => p.id !== id));
-      toast.success('Formulation deleted');
+      toast.success('Preparation deleted');
     } catch (err: any) { toast.error(err.message); }
     finally { setLoading(false); setDeleteConfirmId(null); }
   };
@@ -134,7 +138,7 @@ export default function ManufacturerProductsClient({
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'My Formulations', value: stats.total, icon: Package, color: 'text-brand-green bg-brand-green-light' },
+          { label: 'My Preparations', value: stats.total, icon: Package, color: 'text-brand-green bg-brand-green-light' },
           { label: 'Pending Approval', value: stats.pending, icon: Clock, color: 'text-amber-600 bg-amber-50' },
           { label: 'Live & Active', value: stats.active, icon: ToggleRight, color: 'text-emerald-600 bg-emerald-50' },
           { label: 'Sponsored', value: stats.sponsored, icon: Star, color: 'text-indigo-600 bg-indigo-50' },
@@ -155,7 +159,7 @@ export default function ManufacturerProductsClient({
           <div className="flex flex-wrap gap-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/40" />
-              <input type="text" placeholder="Search formulations..." value={search} onChange={e => setSearch(e.target.value)}
+              <input type="text" placeholder="Search preparations..." value={search} onChange={e => setSearch(e.target.value)}
                 className="pl-9 bg-brand-gold-light/40 border border-brand-green-border/10 rounded-2xl py-2.5 px-4 text-sm focus:outline-none w-56" />
             </div>
             <div className="relative">
@@ -170,7 +174,7 @@ export default function ManufacturerProductsClient({
           </div>
           <button onClick={openCreate}
             className="flex items-center gap-2 bg-brand-green text-white px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-brand-green/90 transition-colors shadow-sm flex-shrink-0">
-            <Plus className="h-4 w-4" /> Submit Formulation
+            <Plus className="h-4 w-4" /> Submit Preparation
           </button>
         </div>
 
@@ -186,7 +190,7 @@ export default function ManufacturerProductsClient({
             <tbody className="divide-y divide-brand-green-border/10 text-sm">
               {filtered.length === 0 ? (
                 <tr><td colSpan={7} className="py-16 text-center text-brand-foreground/40 font-medium">
-                  No formulations yet. Click <strong>Submit Formulation</strong> to add your first product.
+                  No preparations yet. Click <strong>Submit Preparation</strong> to add your first product.
                 </td></tr>
               ) : filtered.map(p => (
                 <tr key={p.id} className="hover:bg-brand-gold-light/10 transition-colors">
@@ -201,7 +205,8 @@ export default function ManufacturerProductsClient({
                       )}
                       <div>
                         <div className="font-bold text-brand-green line-clamp-1 max-w-[160px]">{p.name}</div>
-                        {p.isFeatured && <span className="text-[10px] bg-brand-gold/15 text-brand-gold-dark px-1.5 py-0.5 rounded-full font-semibold">Featured</span>}
+                        {p.isFeatured && <span className="text-[10px] bg-brand-gold/15 text-brand-gold-dark px-1.5 py-0.5 rounded-full font-semibold mr-1">Featured</span>}
+                        {p.isShopProduct && <span className="text-[10px] bg-brand-green/15 text-brand-green px-1.5 py-0.5 rounded-full font-semibold">In Shop</span>}
                         {p.indications && p.indications.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1">
                             {p.indications.map(ind => (
@@ -263,7 +268,7 @@ export default function ManufacturerProductsClient({
           <div className="bg-white rounded-[28px] shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
             <div className="bg-gradient-to-r from-brand-green to-[#0f381b] p-6 text-white flex items-center justify-between flex-shrink-0">
               <div>
-                <h3 className="font-extrabold text-lg">{editing ? 'Edit Formulation' : 'Submit New Formulation'}</h3>
+                <h3 className="font-extrabold text-lg">{editing ? 'Edit Preparation' : 'Submit New Preparation'}</h3>
                 <p className="text-xs text-brand-green-light mt-0.5">{editing ? `Editing: ${editing.name}` : 'Will be live after admin approval'}</p>
               </div>
               <button onClick={closeForm} className="p-1.5 bg-white/10 hover:bg-white/20 rounded-full"><X className="h-5 w-5" /></button>
@@ -366,6 +371,20 @@ export default function ManufacturerProductsClient({
                   ))}
                   {form.images.length < 5 && <ImageUploadCrop value="" onChange={addImage} folder="products" label="" />}
                 </div>
+              </div>
+              
+              <div className="bg-brand-green-light/30 border border-brand-green/20 rounded-2xl p-4">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <div className="relative flex items-center justify-center">
+                    <input type="checkbox" checked={form.isShopProduct} onChange={e => setForm(f => ({ ...f, isShopProduct: e.target.checked }))} className="peer sr-only" />
+                    <div className="h-6 w-11 rounded-full bg-brand-green-border/20 peer-checked:bg-brand-green transition-colors"></div>
+                    <div className="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-transform peer-checked:translate-x-5 shadow-sm"></div>
+                  </div>
+                  <div>
+                    <span className="text-sm font-extrabold text-brand-green block leading-none mb-1">AYURWED Shop Integration</span>
+                    <span className="text-[10px] font-bold text-brand-foreground/60 leading-tight block">Opt-in to make this preparation available for direct sale on the official AYURWED Storefront.</span>
+                  </div>
+                </label>
               </div>
               <div className="flex gap-3 pt-2 sticky bottom-0 bg-white pb-1">
                 <button type="button" onClick={closeForm}

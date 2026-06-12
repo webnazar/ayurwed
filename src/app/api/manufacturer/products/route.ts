@@ -32,7 +32,7 @@ export async function GET(req: Request) {
   }
 }
 
-// POST — create formulation (inactive by default, pending admin approval)
+// POST — create preparation (inactive by default, pending admin approval)
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     if (!profile) return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
 
     const body = await req.json();
-    const { name, description, ingredients, benefits, usage, mrp, categoryId, images, indicationIds } = body;
+    const { name, description, ingredients, benefits, usage, mrp, categoryId, images, indicationIds, isShopProduct } = body;
     if (!name || !mrp || !categoryId) return NextResponse.json({ error: 'Required fields missing' }, { status: 400 });
 
     let slug = slugify(name);
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
         ingredients: ingredients || [], benefits: benefits || [],
         mrp: Number(mrp), images: images || [],
         categoryId: Number(categoryId), manufacturerId: profile.id,
-        isActive: false, isFeatured: false, isSponsored: false,
+        isActive: false, isFeatured: false, isSponsored: false, isShopProduct: isShopProduct || false,
         indications: indicationIds?.length > 0 ? {
           connect: indicationIds.map((id: string) => ({ id: Number(id) }))
         } : undefined,
@@ -93,6 +93,7 @@ export async function PATCH(req: Request) {
     if (rest.categoryId !== undefined) updateData.categoryId = Number(rest.categoryId);
     if (rest.ingredients !== undefined) updateData.ingredients = rest.ingredients;
     if (rest.benefits !== undefined) updateData.benefits = rest.benefits;
+    if (rest.isShopProduct !== undefined) updateData.isShopProduct = rest.isShopProduct;
     
     if (rest.indicationIds !== undefined) {
       updateData.indications = {

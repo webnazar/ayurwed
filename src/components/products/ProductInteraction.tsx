@@ -3,8 +3,11 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Building2, Globe, Mail, Phone, Leaf, CheckCircle2, MessageSquare, Calendar, ShieldAlert, Sparkles } from 'lucide-react';
+import { Building2, Globe, Mail, Phone, Leaf, CheckCircle2, MessageSquare, Calendar, ShieldAlert, Sparkles, ShoppingCart, CreditCard } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useCartStore } from '@/store/cartStore';
 
 interface ProductInteractionProps {
   product: {
@@ -18,6 +21,7 @@ interface ProductInteractionProps {
     usage: string;
     isSponsored?: boolean;
     isFeatured?: boolean;
+    isShopProduct?: boolean;
     manufacturer?: {
       id: number;
       companyName: string;
@@ -127,22 +131,56 @@ export default function ProductInteraction({ product }: ProductInteractionProps)
           </div>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <button
-              onClick={() => setShowEnquiry(!showEnquiry)}
-              className="flex-1 bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green font-bold py-3.5 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow hover:shadow-lg text-sm"
-            >
-              <MessageSquare className="h-4 w-4" />
-              Contact Manufacturer
-            </button>
-            <Link
-              href="/consultants"
-              className="flex-1 bg-white border border-brand-green text-brand-green hover:bg-brand-green hover:text-white font-bold py-3.5 rounded-full flex items-center justify-center gap-2 transition-all duration-300 text-sm"
-            >
-              <Calendar className="h-4 w-4" />
-              Book Consultation
-            </Link>
-          </div>
+          {product.isShopProduct ? (
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                onClick={() => {
+                  useCartStore.getState().addItem({
+                    id: product.id,
+                    name: product.name,
+                    mrp: product.mrp || 0,
+                    image: product.images[0] || ''
+                  });
+                  toast.success('Added to Cart!');
+                }}
+                className="flex-1 bg-white border-2 border-brand-green text-brand-green hover:bg-brand-green-light font-bold py-3.5 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow hover:shadow-lg text-sm"
+              >
+                <ShoppingCart className="h-4 w-4" /> Add to Cart
+              </button>
+              <button
+                onClick={() => {
+                  useCartStore.getState().addItem({
+                    id: product.id,
+                    name: product.name,
+                    mrp: product.mrp || 0,
+                    image: product.images[0] || ''
+                  });
+                  toast.success('Added to Cart! Redirecting...');
+                  window.location.href = '/cart';
+                }}
+                className="flex-1 bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green font-bold py-3.5 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow hover:shadow-lg text-sm"
+              >
+                <CreditCard className="h-4 w-4" /> Buy Now
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                onClick={() => setShowEnquiry(!showEnquiry)}
+                className="flex-1 bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green font-bold py-3.5 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow hover:shadow-lg text-sm"
+              >
+                <MessageSquare className="h-4 w-4" />
+                Contact Manufacturer
+              </button>
+              <Link
+                href="/consultants"
+                className="flex-1 bg-white border border-brand-green text-brand-green hover:bg-brand-green hover:text-white font-bold py-3.5 rounded-full flex items-center justify-center gap-2 transition-all duration-300 text-sm"
+              >
+                <Calendar className="h-4 w-4" />
+                Book Consultation
+              </Link>
+            </div>
+          )}
 
           {/* Enquiry Form */}
           {showEnquiry && (

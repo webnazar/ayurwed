@@ -1,0 +1,90 @@
+
+> ayurwed@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.16
+  - Local:        http://localhost:3000
+  - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 5.5s
+ ○ Compiling /login ...
+ ✓ Compiled /login in 6.5s (655 modules)
+ GET /login?email=webnazar%40gmail.com&password=Admin%402025%23 200 in 7258ms
+ ✓ Compiled in 741ms (319 modules)
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 5.6s (566 modules)
+ GET /api/auth/session 200 in 6491ms
+ GET /api/auth/session 200 in 47ms
+ GET /api/auth/session 200 in 22ms
+ ✓ Compiled /_not-found in 444ms (874 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /login?email=webnazar%40gmail.com&password=Admin%402025%23 404 in 902ms
+ GET /_next/static/webpack/32cdf6cb1810d99c.webpack.hot-update.json 404 in 408ms
+ GET /login?email=webnazar%40gmail.com&password=Admin%402025%23 200 in 140ms
+ GET /_next/static/css/app/layout.css?v=1781079368613 404 in 73ms
+ GET /_next/static/chunks/main-app.js?v=1781079368613 404 in 79ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 78ms
+ GET /_next/static/chunks/app/(auth)/login/page.js 404 in 74ms
+ GET /_next/static/chunks/app/layout.js 404 in 74ms
+ ✓ Compiled /favicon.ico in 398ms (596 modules)
+ GET /favicon.ico 200 in 502ms
+ GET /login?email=webnazar%40gmail.com&password=Admin%402025%23 200 in 179ms
+ GET /_next/static/css/app/layout.css?v=1781079370782 404 in 78ms
+ GET /_next/static/chunks/main-app.js?v=1781079370782 404 in 85ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 85ms
+ GET /_next/static/chunks/app/(auth)/login/page.js 404 in 85ms
+ GET /_next/static/chunks/app/layout.js 404 in 81ms
+ GET /favicon.ico 200 in 24ms
+ GET /login?email=webnazar%40gmail.com&password=Admin%402025%23 200 in 50ms
+ GET /_next/static/css/app/layout.css?v=1781079371541 404 in 56ms
+ GET /_next/static/chunks/main-app.js?v=1781079371541 404 in 85ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 78ms
+ GET /_next/static/chunks/app/layout.js 404 in 72ms
+ GET /_next/static/chunks/app/(auth)/login/page.js 404 in 75ms
+ GET /favicon.ico 200 in 22ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 2.2s (1128 modules)
+ GET /login?email=webnazar%40gmail.com&password=Admin%402025%23 404 in 2424ms
+ GET /favicon.ico 404 in 21ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1344ms (1244 modules)
+ GET / 200 in 1713ms
+ GET /_next/static/css/app/layout.css?v=1781079394912 404 in 29ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 74ms
+ GET /_next/static/chunks/app/layout.js 404 in 70ms
+ GET /_next/static/chunks/main-app.js?v=1781079394912 404 in 74ms
+ GET /placeholder-user.png 404 in 88ms
+ GET /placeholder-product.png 404 in 17ms
+ ⨯ The requested resource isn't a valid image for /placeholder-product.png received text/html; charset=utf-8
+ ⨯ upstream image response failed for https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&w=150&q=80 404
+ GET / 200 in 132ms
+ GET /_next/static/css/app/layout.css?v=1781079415532 404 in 33ms
+ GET /_next/static/chunks/main-app.js?v=1781079415532 404 in 88ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 82ms
+ GET /placeholder-user.png 404 in 45ms
+ GET /_next/static/chunks/app/layout.js 404 in 88ms
+ GET /placeholder-product.png 404 in 19ms
+ ⨯ The requested resource isn't a valid image for /placeholder-product.png received text/html; charset=utf-8
+ ⨯ upstream image response failed for https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&w=150&q=80 404
+ GET / 200 in 95ms
+ GET /_next/static/css/app/layout.css?v=1781079418123 404 in 524ms
+ GET /_next/static/chunks/main-app.js?v=1781079418123 404 in 56ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 52ms
+ GET /_next/static/chunks/app/layout.js 404 in 53ms
+ ⨯ upstream image response failed for https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&w=150&q=80 404
+ GET /placeholder-product.png 404 in 27ms
+ ⨯ The requested resource isn't a valid image for /placeholder-product.png received text/html; charset=utf-8
+ GET /placeholder-user.png 404 in 31ms
+ GET /favicon.ico 404 in 24ms
+ GET / 200 in 113ms
+ GET /_next/static/css/app/layout.css?v=1781079425577 404 in 33ms
+ ⨯ upstream image response failed for https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&w=150&q=80 404
+ GET /_next/static/chunks/main-app.js?v=1781079425577 404 in 71ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 70ms
+ GET /_next/static/chunks/app/layout.js 404 in 58ms
+ GET /placeholder-product.png 404 in 32ms
+ ⨯ The requested resource isn't a valid image for /placeholder-product.png received text/html; charset=utf-8
+ GET /placeholder-user.png 404 in 37ms
+ GET /favicon.ico 404 in 23ms
+[?25h

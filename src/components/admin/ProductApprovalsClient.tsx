@@ -174,7 +174,7 @@ export default function ProductApprovalsClient({ initialProducts }: { initialPro
             </span>
             <input
               type="text"
-              placeholder="Search formulations by name, manufacturer, description..."
+              placeholder="Search preparations by name, manufacturer, description..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 w-full bg-brand-gold-light/40 border border-brand-green-border/10 rounded-2xl py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20"
@@ -307,7 +307,7 @@ export default function ProductApprovalsClient({ initialProducts }: { initialPro
                         className="text-brand-green hover:text-brand-gold font-bold inline-flex items-center gap-1 border border-brand-green/30 hover:border-brand-gold px-2.5 py-1.5 rounded-xl transition-all"
                       >
                         <Info className="h-3.5 w-3.5" />
-                        <span>Formulation</span>
+                        <span>Preparation</span>
                       </button>
                     </td>
                   </tr>

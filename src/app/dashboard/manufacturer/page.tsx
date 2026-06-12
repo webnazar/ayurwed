@@ -42,11 +42,11 @@ export default async function ManufacturerDashboard() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 text-white border border-brand-green-border/20 shadow">
+      <div className="dashboard-header-card">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold">{profile.companyName}</h1>
-            <p className="text-sm text-brand-green-light mt-2">Your listing on India's Ayurveda Discovery Platform</p>
+            <h1 className="dashboard-header-title">{profile.companyName}</h1>
+            <p className="dashboard-header-subtitle">Your listing on India's Ayurveda Discovery Platform</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <span className={`text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider ${
@@ -75,7 +75,7 @@ export default async function ManufacturerDashboard() {
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {[
-          { label: 'Active Formulations', value: `${activeProducts}`, icon: Layers, color: 'text-brand-green', bg: 'bg-brand-green-light' },
+          { label: 'Active Preparations', value: `${activeProducts}`, icon: Layers, color: 'text-brand-green', bg: 'bg-brand-green-light' },
           { label: 'Certifications', value: `${certifications.length} verified`, icon: Award, color: 'text-brand-gold-dark', bg: 'bg-brand-gold/15' },
           { label: 'Total Enquiries', value: `${totalEnquiries}`, icon: Inbox, color: 'text-blue-700', bg: 'bg-blue-50' },
           { label: 'Unread Enquiries', value: `${unreadEnquiries}`, icon: CheckSquare, color: 'text-emerald-700', bg: 'bg-emerald-100' },

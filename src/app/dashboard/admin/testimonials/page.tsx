@@ -10,9 +10,9 @@ export default async function TestimonialsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-brand-green to-[#0f381b] rounded-3xl p-8 text-white">
-        <h1 className="text-2xl font-extrabold">Testimonial Manager</h1>
-        <p className="text-brand-green-light mt-1 text-sm">
+      <div className="dashboard-header-card">
+        <h1 className="dashboard-header-title">Testimonial Manager</h1>
+        <p className="dashboard-header-subtitle">
           Manage the "What Our Wellness Circle Says" section on the homepage.
         </p>
       </div>

@@ -129,7 +129,7 @@ export default function SearchSelect({
         className={[
           'w-full flex items-center gap-2 border rounded-2xl py-2.5 px-4 text-sm transition-all',
           'focus:outline-none focus:ring-2 focus:ring-brand-green/25',
-          'bg-brand-gold-light/20 border-brand-green-border/20',
+          'bg-brand-gold-light/20 border-border',
           open ? 'ring-2 ring-brand-green/25 border-brand-green/30' : 'hover:border-brand-green/30',
           disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
         ].join(' ')}
@@ -157,14 +157,14 @@ export default function SearchSelect({
       {open && (
         <div
           className={[
-            'absolute z-50 mt-1.5 w-full bg-white border border-brand-green-border/20',
+            'absolute z-50 mt-1.5 w-full bg-card border border-border',
             'rounded-2xl shadow-xl overflow-hidden',
             'animate-in fade-in slide-in-from-top-1 duration-150',
           ].join(' ')}
           style={{ minWidth: '180px' }}
         >
           {/* Search input */}
-          <div className="p-2 border-b border-brand-green-border/10">
+          <div className="p-2 border-b border-border">
             <div className="flex items-center gap-2 bg-brand-gold-light/40 rounded-xl px-3 py-2">
               <Search className="h-3.5 w-3.5 text-brand-foreground/40 flex-shrink-0" />
               <input
@@ -221,7 +221,7 @@ export default function SearchSelect({
           </ul>
 
           {/* Keyboard hint footer */}
-          <div className="px-4 py-2 border-t border-brand-green-border/10 flex items-center gap-3 text-[10px] text-brand-foreground/35 font-medium">
+          <div className="px-4 py-2 border-t border-border flex items-center gap-3 text-[10px] text-brand-foreground/35 font-medium">
             <span>↑↓ navigate</span>
             <span>↵ select</span>
             <span>Esc close</span>

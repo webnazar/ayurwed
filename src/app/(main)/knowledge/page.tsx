@@ -7,20 +7,21 @@ import { fetchBloggerPosts } from '@/lib/blogger';
 export const revalidate = 60; // Revalidate every minute
 
 interface KnowledgePageProps {
-  searchParams: { category?: string; search?: string };
+  searchParams: Promise<{ category?: string; search?: string }>;
 }
 
-export default async function KnowledgePage({ searchParams }: KnowledgePageProps) {
+export default async function KnowledgePage(props: KnowledgePageProps) {
+  const searchParams = await props.searchParams;
   const selectedCategory = searchParams.category || '';
   const searchKeyword = searchParams.search || '';
 
   const { posts, allLabels } = await fetchBloggerPosts(selectedCategory, searchKeyword);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="max-w-7xl mx-auto layout-padding-minimal py-10">
       {/* Header */}
       <div className="text-center sm:text-left pb-8 space-y-2">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-brand-green tracking-tight">Ayurveda Library</h1>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-brand-green tracking-tight">Ayurveda Knowledge Hub</h1>
         <p className="text-sm sm:text-base text-brand-foreground/70">
           Clinical research, herbal guides, dietary wisdom, and lifestyle routines from certified Ayurvedic experts.
         </p>
@@ -33,7 +34,7 @@ export default async function KnowledgePage({ searchParams }: KnowledgePageProps
             name="search"
             defaultValue={searchKeyword}
             placeholder="Search articles..."
-            className="w-full bg-white text-brand-foreground text-sm sm:text-base border border-brand-green-border/20 rounded-full py-4 pl-12 pr-6 shadow-sm focus:outline-none focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/10 transition-all"
+            className="w-full bg-card text-brand-foreground text-sm sm:text-base border border-border rounded-full py-4 pl-12 pr-6 shadow-sm focus:outline-none focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/10 transition-all"
           />
           {selectedCategory && (
             <input type="hidden" name="category" value={selectedCategory} />
@@ -47,7 +48,7 @@ export default async function KnowledgePage({ searchParams }: KnowledgePageProps
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-10">
         {/* Sidebar */}
         <aside className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-3xl p-6 border border-brand-green-border/10 shadow-sm space-y-5">
+          <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-5">
             <div className="flex items-center gap-2 text-brand-green font-bold border-b border-brand-green-light pb-3">
               <Filter className="h-5 w-5" />
               <span>Filter</span>
@@ -73,7 +74,7 @@ export default async function KnowledgePage({ searchParams }: KnowledgePageProps
         {/* Grid */}
         <main className="lg:col-span-3">
           {posts.length === 0 ? (
-            <div className="bg-white rounded-3xl p-16 text-center border border-brand-green-border/10 shadow-sm space-y-4">
+            <div className="bg-card rounded-3xl p-16 text-center border border-border shadow-sm space-y-4">
               <BookOpen className="h-12 w-12 text-brand-gold mx-auto animate-pulse-slow" />
               <h3 className="text-xl font-bold text-brand-green">No Articles Found</h3>
               <p className="text-sm text-brand-foreground/60 max-w-sm mx-auto">Try adjusting your search or category filter.</p>
@@ -84,7 +85,7 @@ export default async function KnowledgePage({ searchParams }: KnowledgePageProps
               {posts.map(art => {
                 return (
                   <a key={art.id} href={art.url} target="_blank" rel="noopener noreferrer"
-                    className="bg-white rounded-3xl overflow-hidden border border-brand-green-border/10 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col group">
+                    className="bg-card rounded-3xl overflow-hidden border border-border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col group">
                     <div className="relative h-48 bg-slate-100 overflow-hidden flex-shrink-0">
                       <Image
                         src={art.featuredImage || 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80'}
@@ -96,7 +97,7 @@ export default async function KnowledgePage({ searchParams }: KnowledgePageProps
                         {art.labels.length > 0 && (
                           <div className="flex flex-wrap gap-1 mb-2">
                             {art.labels.slice(0, 2).map(label => (
-                              <span key={label} className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider bg-brand-gold-light/40 text-brand-green border border-brand-green-border/10">
+                              <span key={label} className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider bg-brand-gold-light/40 text-brand-green border border-border">
                                 {label}
                               </span>
                             ))}

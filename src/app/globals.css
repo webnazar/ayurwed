@@ -4,31 +4,59 @@
 
 @layer base {
   :root {
-    --background: #e8f5ee; /* Light green background */
-    --foreground: #1a1a1a;
+    /* Theme Base */
+    --background: 245 247 246; /* Premium light off-white with hint of green #f5f7f6 */
+    --foreground: 26 38 31; /* Charcoal green-black #1a261f */
     
-    --brand-green: #1a5c2e;
-    --brand-green-light: #e8f5ee;
-    --brand-gold: #c9a227;
-    --brand-gold-light: #fdf6e3;
-    --brand-gold-dark: #7a5d10;
+    --card: 255 255 255; /* Pure white #ffffff */
+    --card-foreground: 26 38 31;
+
+    --muted: 236 240 238; /* Light gray-green #ecf0ee */
+    --muted-foreground: 100 116 107; /* Medium gray-green #64746b */
+    
+    --border: 224 231 227; /* Light border #e0e7e3 */
+    --input: 224 231 227;
+    --ring: 4 88 41; /* Brand green */
+
+    /* Brand Logo Colors: Green (#045829) and Gold (#f0b836) */
+    --brand-green: 4 88 41; /* #045829 */
+    --brand-green-light: 233 246 239; /* Very light tint of brand green */
+    --brand-green-border: 197 217 206; /* Soft green border */
+    
+    --brand-gold: 240 184 54; /* #f0b836 */
+    --brand-gold-light: 254 248 232; /* Very light tint of brand gold */
+    --brand-gold-dark: 180 130 20; /* Darker shade of brand gold for text contrast */
   }
 
   .dark {
-    --background: #020617; /* Deep slate background */
-    --foreground: #f8fafc; /* Light text */
+    /* Theme Base */
+    --background: 8 15 11; /* Deep dark forest-green slate #080f0b */
+    --foreground: 240 245 242; /* Clean off-white #f0f5f2 */
     
-    --brand-green: #34d399; /* Brighter green for contrast */
-    --brand-green-light: #064e3b; /* Deep green */
-    --brand-gold: #fbbf24; /* Brighter gold */
-    --brand-gold-light: #451a03; /* Deep amber/gold background */
-    --brand-gold-dark: #fde68a; /* Light gold for text/borders in dark mode */
+    --card: 15 26 20; /* Dark forest card #0f1a14 */
+    --card-foreground: 240 245 242;
+
+    --muted: 24 38 30; /* Dark green muted background #18261e */
+    --muted-foreground: 140 155 147; /* Soft gray-green text #8c9b93 */
+    
+    --border: 28 43 35; /* Dark forest border #1c2b23 */
+    --input: 28 43 35;
+    --ring: 46 176 96; /* Vibrant brand green for dark mode focus */
+    
+    /* Brand Logo Colors: Green (#045829) and Gold (#f0b836) */
+    --brand-green: 46 176 96; /* Vibrant brand green for dark mode visibility #2eb060 */
+    --brand-green-light: 10 36 21; /* Very dark green badge bg */
+    --brand-green-border: 20 54 36; /* Dark green border */
+    
+    --brand-gold: 240 184 54; /* Exact brand gold (#f0b836) is bright enough for dark mode */
+    --brand-gold-light: 56 43 12; /* Dark gold badge background #382b0c */
+    --brand-gold-dark: 253 230 138; /* Light gold for high contrast text #fde68a */
   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: rgb(var(--foreground));
+  background: rgb(var(--background));
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
@@ -39,16 +67,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--brand-green-light);
+  background: rgb(var(--card));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--brand-green);
+  background: rgb(var(--brand-green));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--brand-gold-dark);
+  background: rgb(var(--brand-gold-dark));
 }
 
 /* Smooth transitions */
@@ -68,19 +96,27 @@ body {
 
 /* Card gradients */
 .green-gold-gradient {
-  background: linear-gradient(135deg, var(--brand-green) 0%, #0e3a1b 100%);
+  background: linear-gradient(135deg, rgb(var(--brand-green)) 0%, #0e3a1b 100%);
 }
 
 .gold-gradient {
-  background: linear-gradient(135deg, var(--brand-gold) 0%, var(--brand-gold-dark) 100%);
+  background: linear-gradient(135deg, rgb(var(--brand-gold)) 0%, rgb(var(--brand-gold-dark)) 100%);
 }
 
-/* Ensure select elements have enough right padding for the dropdown arrow */
+/* Ensure select elements have enough right padding for the dropdown arrow and respect theme colors */
 select {
   padding-right: 2.5rem !important;
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+}
+
+select option {
+  background-color: rgb(var(--card));
+  color: rgb(var(--foreground));
 }
 
 @layer components {
+  /* Layout Headers */
   .dashboard-header-card {
     @apply bg-brand-green-light rounded-3xl p-8 text-brand-green border border-brand-green/10 shadow-sm relative overflow-hidden;
   }
@@ -89,5 +125,83 @@ select {
   }
   .dashboard-header-subtitle {
     @apply text-brand-green/70 mt-1 text-sm;
+  }
+
+  /* Component Utility Cards */
+  .card-premium {
+    @apply bg-card text-card-foreground rounded-3xl border border-border shadow-sm hover:shadow-md hover:border-brand-green/20 dark:hover:border-brand-gold/20 transition-all duration-300;
+  }
+
+  /* Typography Standard Class Names */
+  .text-title-primary {
+    @apply text-brand-green dark:text-foreground font-bold tracking-tight;
+  }
+  .text-title-secondary {
+    @apply text-brand-gold-dark dark:text-brand-gold font-bold tracking-wide;
+  }
+  .text-body-custom {
+    @apply text-foreground/80 dark:text-foreground/90 leading-relaxed;
+  }
+  .text-muted-custom {
+    @apply text-muted-foreground/80 dark:text-muted-foreground/90;
+  }
+
+  /* Reusable Buttons */
+  .btn-primary {
+    @apply bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green dark:hover:text-black font-bold px-6 py-3 rounded-full transition-all duration-300 shadow hover:shadow-md flex items-center justify-center gap-2;
+  }
+  .btn-secondary {
+    @apply bg-brand-gold text-brand-green dark:text-brand-green-light hover:bg-brand-green hover:text-white dark:hover:text-black font-bold px-6 py-3 rounded-full transition-all duration-300 shadow hover:shadow-md flex items-center justify-center gap-2;
+  }
+  .btn-outline {
+    @apply bg-transparent text-brand-green dark:text-brand-gold border border-brand-green/20 dark:border-brand-gold/20 hover:bg-brand-green-light dark:hover:bg-brand-gold-light/10 font-bold px-6 py-3 rounded-full transition-all duration-300 flex items-center justify-center gap-2;
+  }
+
+  /* Legacy Buttons Map (to ensure stability of existing components) */
+  .btn-gold {
+    @apply bg-brand-gold text-brand-green dark:text-brand-green-light hover:bg-brand-green hover:text-white dark:hover:text-black font-bold transition-all duration-300;
+  }
+  .btn-green {
+    @apply bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green dark:hover:text-brand-green-light font-bold transition-all duration-300;
+  }
+  .btn-book {
+    @apply bg-brand-gold text-brand-green dark:text-black hover:bg-brand-green hover:text-brand-gold px-4 py-2 rounded-full text-xs font-extrabold transition-all duration-300 shadow flex items-center gap-1;
+  }
+  .btn-search {
+    @apply bg-brand-gold text-brand-green dark:text-black hover:bg-brand-green hover:text-brand-gold px-6 py-2.5 rounded-full text-sm font-extrabold transition-all duration-300 shadow;
+  }
+
+  /* Legacy Badges & Tags */
+  .badge-gold {
+    @apply bg-brand-gold text-brand-green dark:text-brand-green-light font-bold uppercase;
+  }
+  .badge-success {
+    @apply bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors;
+  }
+  .badge-danger {
+    @apply bg-rose-100 dark:bg-rose-900/30 text-rose-800 dark:text-rose-400 hover:bg-rose-200 dark:hover:bg-rose-900/50 transition-colors;
+  }
+  .badge-neutral {
+    @apply bg-muted text-foreground border border-border;
+  }
+
+  /* Role Badges */
+  .badge-role-admin {
+    @apply bg-brand-gold/15 dark:bg-brand-gold/20 text-brand-gold-dark dark:text-brand-gold border border-brand-gold/30 dark:border-brand-gold/50;
+  }
+  .badge-role-consultant {
+    @apply bg-brand-green-light/80 dark:bg-brand-green-light/50 text-brand-green dark:text-brand-green border border-brand-green/30 dark:border-brand-green/50;
+  }
+  .badge-role-manufacturer {
+    @apply bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/50;
+  }
+}
+
+@layer utilities {
+  .layout-padding-minimal {
+    @apply px-3 sm:px-4 lg:px-6;
+  }
+  .layout-padding-minimal-all {
+    @apply p-3 sm:p-4 lg:p-6;
   }
 }

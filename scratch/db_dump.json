@@ -1,0 +1,1571 @@
+{
+  "preparations": [
+    {
+      "id": 1,
+      "name": "Ginger Berry Extract (Batch 1)",
+      "description": "A potent, purely natural Ginger Berry Extract (Batch 1) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Ginger"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 2,
+      "name": "Licorice Whole Plant Extract (Batch 2)",
+      "description": "A potent, purely natural Licorice Whole Plant Extract (Batch 2) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Licorice"
+      ],
+      "benefits": [
+        "Vitality",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 3,
+      "name": "Arjuna Resin Extract (Batch 3)",
+      "description": "A potent, purely natural Arjuna Resin Extract (Batch 3) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Arjuna"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 4,
+      "name": "Triphala Root Extract (Batch 4)",
+      "description": "A potent, purely natural Triphala Root Extract (Batch 4) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Triphala"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 5,
+      "name": "Shilajit Root Extract (Batch 5)",
+      "description": "A potent, purely natural Shilajit Root Extract (Batch 5) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Shilajit"
+      ],
+      "benefits": [
+        "Vitality",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 6,
+      "name": "Guduchi & Cinnamon Blend Extract (Batch 6)",
+      "description": "A potent, purely natural Guduchi & Cinnamon Blend Extract (Batch 6) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guduchi",
+        "Cinnamon"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 7,
+      "name": "Amalaki & Licorice Blend Extract (Batch 7)",
+      "description": "A potent, purely natural Amalaki & Licorice Blend Extract (Batch 7) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Amalaki",
+        "Licorice"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 8,
+      "name": "Cardamom Berry Extract (Batch 8)",
+      "description": "A potent, purely natural Cardamom Berry Extract (Batch 8) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Cardamom"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 9,
+      "name": "Coriander & Bhringraj Blend Extract (Batch 9)",
+      "description": "A potent, purely natural Coriander & Bhringraj Blend Extract (Batch 9) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Coriander",
+        "Bhringraj"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 10,
+      "name": "Bhringraj & Clove Blend Extract (Batch 10)",
+      "description": "A potent, purely natural Bhringraj & Clove Blend Extract (Batch 10) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Bhringraj",
+        "Clove"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 11,
+      "name": "Punarnava & Guggulu Blend Extract (Batch 11)",
+      "description": "A potent, purely natural Punarnava & Guggulu Blend Extract (Batch 11) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Punarnava",
+        "Guggulu"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 12,
+      "name": "Cinnamon Root Extract (Batch 12)",
+      "description": "A potent, purely natural Cinnamon Root Extract (Batch 12) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Cinnamon"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 13,
+      "name": "Cinnamon Whole Plant Extract (Batch 13)",
+      "description": "A potent, purely natural Cinnamon Whole Plant Extract (Batch 13) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Cinnamon"
+      ],
+      "benefits": [
+        "Digestion",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 14,
+      "name": "Guduchi Berry Extract (Batch 14)",
+      "description": "A potent, purely natural Guduchi Berry Extract (Batch 14) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guduchi"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 15,
+      "name": "Coriander & Pippali Blend Extract (Batch 15)",
+      "description": "A potent, purely natural Coriander & Pippali Blend Extract (Batch 15) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Coriander",
+        "Pippali"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 16,
+      "name": "Kutki & Haritaki Blend Extract (Batch 16)",
+      "description": "A potent, purely natural Kutki & Haritaki Blend Extract (Batch 16) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Kutki",
+        "Haritaki"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 17,
+      "name": "Turmeric Leaf Extract (Batch 17)",
+      "description": "A potent, purely natural Turmeric Leaf Extract (Batch 17) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Turmeric"
+      ],
+      "benefits": [
+        "Digestion",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 18,
+      "name": "Guggulu Whole Plant Extract (Batch 18)",
+      "description": "A potent, purely natural Guggulu Whole Plant Extract (Batch 18) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guggulu"
+      ],
+      "benefits": [
+        "Vitality",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 19,
+      "name": "Cinnamon Berry Extract (Batch 19)",
+      "description": "A potent, purely natural Cinnamon Berry Extract (Batch 19) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Cinnamon"
+      ],
+      "benefits": [
+        "Immunity",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 20,
+      "name": "Clove & Brahmi Blend Extract (Batch 20)",
+      "description": "A potent, purely natural Clove & Brahmi Blend Extract (Batch 20) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Clove",
+        "Brahmi"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 21,
+      "name": "Guduchi & Fennel Blend Extract (Batch 21)",
+      "description": "A potent, purely natural Guduchi & Fennel Blend Extract (Batch 21) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guduchi",
+        "Fennel"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 22,
+      "name": "Shilajit Root Extract (Batch 22)",
+      "description": "A potent, purely natural Shilajit Root Extract (Batch 22) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Shilajit"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 23,
+      "name": "Kutki & Neem Blend Extract (Batch 23)",
+      "description": "A potent, purely natural Kutki & Neem Blend Extract (Batch 23) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Kutki",
+        "Neem"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 24,
+      "name": "Gotu Kola Resin Extract (Batch 24)",
+      "description": "A potent, purely natural Gotu Kola Resin Extract (Batch 24) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Gotu Kola"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 25,
+      "name": "Brahmi Stem Extract (Batch 25)",
+      "description": "A potent, purely natural Brahmi Stem Extract (Batch 25) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Brahmi"
+      ],
+      "benefits": [
+        "Digestion",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 26,
+      "name": "Brahmi Resin Extract (Batch 26)",
+      "description": "A potent, purely natural Brahmi Resin Extract (Batch 26) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Brahmi"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 27,
+      "name": "Guggulu Root Extract (Batch 27)",
+      "description": "A potent, purely natural Guggulu Root Extract (Batch 27) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guggulu"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 28,
+      "name": "Clove & Tulsi Blend Extract (Batch 28)",
+      "description": "A potent, purely natural Clove & Tulsi Blend Extract (Batch 28) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Clove",
+        "Tulsi"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 29,
+      "name": "Vibhitaki Resin Extract (Batch 29)",
+      "description": "A potent, purely natural Vibhitaki Resin Extract (Batch 29) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Vibhitaki"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 30,
+      "name": "Brahmi & Bhringraj Blend Extract (Batch 30)",
+      "description": "A potent, purely natural Brahmi & Bhringraj Blend Extract (Batch 30) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Brahmi",
+        "Bhringraj"
+      ],
+      "benefits": [
+        "Vitality",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 31,
+      "name": "Shatavari & Bhringraj Blend Extract (Batch 31)",
+      "description": "A potent, purely natural Shatavari & Bhringraj Blend Extract (Batch 31) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Shatavari",
+        "Bhringraj"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 32,
+      "name": "Cumin & Aloe Vera Blend Extract (Batch 32)",
+      "description": "A potent, purely natural Cumin & Aloe Vera Blend Extract (Batch 32) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Cumin",
+        "Aloe Vera"
+      ],
+      "benefits": [
+        "Digestion",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 33,
+      "name": "Neem Stem Extract (Batch 33)",
+      "description": "A potent, purely natural Neem Stem Extract (Batch 33) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Neem"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 34,
+      "name": "Guduchi Stem Extract (Batch 34)",
+      "description": "A potent, purely natural Guduchi Stem Extract (Batch 34) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guduchi"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 35,
+      "name": "Cardamom & Arjuna Blend Extract (Batch 35)",
+      "description": "A potent, purely natural Cardamom & Arjuna Blend Extract (Batch 35) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Cardamom",
+        "Arjuna"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 36,
+      "name": "Arjuna & Manjistha Blend Extract (Batch 36)",
+      "description": "A potent, purely natural Arjuna & Manjistha Blend Extract (Batch 36) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Arjuna",
+        "Manjistha"
+      ],
+      "benefits": [
+        "Digestion",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 37,
+      "name": "Cardamom Stem Extract (Batch 37)",
+      "description": "A potent, purely natural Cardamom Stem Extract (Batch 37) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Cardamom"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 38,
+      "name": "Clove Stem Extract (Batch 38)",
+      "description": "A potent, purely natural Clove Stem Extract (Batch 38) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Clove"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 39,
+      "name": "Guggulu & Clove Blend Extract (Batch 39)",
+      "description": "A potent, purely natural Guggulu & Clove Blend Extract (Batch 39) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guggulu",
+        "Clove"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 40,
+      "name": "Punarnava & Cinnamon Blend Extract (Batch 40)",
+      "description": "A potent, purely natural Punarnava & Cinnamon Blend Extract (Batch 40) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Punarnava",
+        "Cinnamon"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 41,
+      "name": "Ashwagandha & Kutki Blend Extract (Batch 41)",
+      "description": "A potent, purely natural Ashwagandha & Kutki Blend Extract (Batch 41) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Ashwagandha",
+        "Kutki"
+      ],
+      "benefits": [
+        "Digestion",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 42,
+      "name": "Arjuna Whole Plant Extract (Batch 42)",
+      "description": "A potent, purely natural Arjuna Whole Plant Extract (Batch 42) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Arjuna"
+      ],
+      "benefits": [
+        "Digestion",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 43,
+      "name": "Musta & Gotu Kola Blend Extract (Batch 43)",
+      "description": "A potent, purely natural Musta & Gotu Kola Blend Extract (Batch 43) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Musta",
+        "Gotu Kola"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 44,
+      "name": "Guduchi Whole Plant Extract (Batch 44)",
+      "description": "A potent, purely natural Guduchi Whole Plant Extract (Batch 44) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guduchi"
+      ],
+      "benefits": [
+        "Vitality",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 45,
+      "name": "Kalmegh & Kutki Blend Extract (Batch 45)",
+      "description": "A potent, purely natural Kalmegh & Kutki Blend Extract (Batch 45) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Kalmegh",
+        "Kutki"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 46,
+      "name": "Guggulu Whole Plant Extract (Batch 46)",
+      "description": "A potent, purely natural Guggulu Whole Plant Extract (Batch 46) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guggulu"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 47,
+      "name": "Guduchi & Kalmegh Blend Extract (Batch 47)",
+      "description": "A potent, purely natural Guduchi & Kalmegh Blend Extract (Batch 47) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guduchi",
+        "Kalmegh"
+      ],
+      "benefits": [
+        "Immunity",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 48,
+      "name": "Guduchi & Ashwagandha Blend Extract (Batch 48)",
+      "description": "A potent, purely natural Guduchi & Ashwagandha Blend Extract (Batch 48) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guduchi",
+        "Ashwagandha"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 49,
+      "name": "Kalmegh & Guggulu Blend Extract (Batch 49)",
+      "description": "A potent, purely natural Kalmegh & Guggulu Blend Extract (Batch 49) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Kalmegh",
+        "Guggulu"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 50,
+      "name": "Punarnava & Turmeric Blend Extract (Batch 50)",
+      "description": "A potent, purely natural Punarnava & Turmeric Blend Extract (Batch 50) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Punarnava",
+        "Turmeric"
+      ],
+      "benefits": [
+        "Vitality",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 51,
+      "name": "Amalaki & Bhringraj Blend Extract (Batch 51)",
+      "description": "A potent, purely natural Amalaki & Bhringraj Blend Extract (Batch 51) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Amalaki",
+        "Bhringraj"
+      ],
+      "benefits": [
+        "Vitality",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 52,
+      "name": "Pippali & Brahmi Blend Extract (Batch 52)",
+      "description": "A potent, purely natural Pippali & Brahmi Blend Extract (Batch 52) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Pippali",
+        "Brahmi"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 53,
+      "name": "Shilajit & Gokshura Blend Extract (Batch 53)",
+      "description": "A potent, purely natural Shilajit & Gokshura Blend Extract (Batch 53) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Shilajit",
+        "Gokshura"
+      ],
+      "benefits": [
+        "Digestion",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 54,
+      "name": "Clove & Bhringraj Blend Extract (Batch 54)",
+      "description": "A potent, purely natural Clove & Bhringraj Blend Extract (Batch 54) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Clove",
+        "Bhringraj"
+      ],
+      "benefits": [
+        "Immunity",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 55,
+      "name": "Shatavari Resin Extract (Batch 55)",
+      "description": "A potent, purely natural Shatavari Resin Extract (Batch 55) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Shatavari"
+      ],
+      "benefits": [
+        "Immunity",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 56,
+      "name": "Arjuna & Musta Blend Extract (Batch 56)",
+      "description": "A potent, purely natural Arjuna & Musta Blend Extract (Batch 56) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Arjuna",
+        "Musta"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 57,
+      "name": "Kalmegh Root Extract (Batch 57)",
+      "description": "A potent, purely natural Kalmegh Root Extract (Batch 57) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Kalmegh"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 58,
+      "name": "Haritaki & Clove Blend Extract (Batch 58)",
+      "description": "A potent, purely natural Haritaki & Clove Blend Extract (Batch 58) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Haritaki",
+        "Clove"
+      ],
+      "benefits": [
+        "Vitality",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 59,
+      "name": "Musta & Arjuna Blend Extract (Batch 59)",
+      "description": "A potent, purely natural Musta & Arjuna Blend Extract (Batch 59) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Musta",
+        "Arjuna"
+      ],
+      "benefits": [
+        "Digestion",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 60,
+      "name": "Cinnamon Leaf Extract (Batch 60)",
+      "description": "A potent, purely natural Cinnamon Leaf Extract (Batch 60) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Cinnamon"
+      ],
+      "benefits": [
+        "Digestion",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 61,
+      "name": "Vibhitaki & Guggulu Blend Extract (Batch 61)",
+      "description": "A potent, purely natural Vibhitaki & Guggulu Blend Extract (Batch 61) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Vibhitaki",
+        "Guggulu"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 62,
+      "name": "Shilajit & Haritaki Blend Extract (Batch 62)",
+      "description": "A potent, purely natural Shilajit & Haritaki Blend Extract (Batch 62) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Shilajit",
+        "Haritaki"
+      ],
+      "benefits": [
+        "Digestion",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 63,
+      "name": "Triphala & Kalmegh Blend Extract (Batch 63)",
+      "description": "A potent, purely natural Triphala & Kalmegh Blend Extract (Batch 63) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Triphala",
+        "Kalmegh"
+      ],
+      "benefits": [
+        "Immunity",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 64,
+      "name": "Shatavari & Kalmegh Blend Extract (Batch 64)",
+      "description": "A potent, purely natural Shatavari & Kalmegh Blend Extract (Batch 64) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Shatavari",
+        "Kalmegh"
+      ],
+      "benefits": [
+        "Vitality",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 65,
+      "name": "Tulsi & Amalaki Blend Extract (Batch 65)",
+      "description": "A potent, purely natural Tulsi & Amalaki Blend Extract (Batch 65) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Tulsi",
+        "Amalaki"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 66,
+      "name": "Bhringraj Root Extract (Batch 66)",
+      "description": "A potent, purely natural Bhringraj Root Extract (Batch 66) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Bhringraj"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 67,
+      "name": "Licorice & Shatavari Blend Extract (Batch 67)",
+      "description": "A potent, purely natural Licorice & Shatavari Blend Extract (Batch 67) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Licorice",
+        "Shatavari"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 68,
+      "name": "Fennel & Punarnava Blend Extract (Batch 68)",
+      "description": "A potent, purely natural Fennel & Punarnava Blend Extract (Batch 68) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Fennel",
+        "Punarnava"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 69,
+      "name": "Kutki & Musta Blend Extract (Batch 69)",
+      "description": "A potent, purely natural Kutki & Musta Blend Extract (Batch 69) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Kutki",
+        "Musta"
+      ],
+      "benefits": [
+        "Digestion",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 70,
+      "name": "Cumin Whole Plant Extract (Batch 70)",
+      "description": "A potent, purely natural Cumin Whole Plant Extract (Batch 70) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Cumin"
+      ],
+      "benefits": [
+        "Vitality",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 71,
+      "name": "Cinnamon Berry Extract (Batch 71)",
+      "description": "A potent, purely natural Cinnamon Berry Extract (Batch 71) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Cinnamon"
+      ],
+      "benefits": [
+        "Digestion",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 72,
+      "name": "Clove Leaf Extract (Batch 72)",
+      "description": "A potent, purely natural Clove Leaf Extract (Batch 72) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Clove"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 73,
+      "name": "Turmeric & Brahmi Blend Extract (Batch 73)",
+      "description": "A potent, purely natural Turmeric & Brahmi Blend Extract (Batch 73) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Turmeric",
+        "Brahmi"
+      ],
+      "benefits": [
+        "Immunity",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 74,
+      "name": "Haritaki Whole Plant Extract (Batch 74)",
+      "description": "A potent, purely natural Haritaki Whole Plant Extract (Batch 74) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Haritaki"
+      ],
+      "benefits": [
+        "Immunity",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 75,
+      "name": "Ashwagandha Berry Extract (Batch 75)",
+      "description": "A potent, purely natural Ashwagandha Berry Extract (Batch 75) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Ashwagandha"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 76,
+      "name": "Turmeric Whole Plant Extract (Batch 76)",
+      "description": "A potent, purely natural Turmeric Whole Plant Extract (Batch 76) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Turmeric"
+      ],
+      "benefits": [
+        "Vitality",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 77,
+      "name": "Manjistha Berry Extract (Batch 77)",
+      "description": "A potent, purely natural Manjistha Berry Extract (Batch 77) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Manjistha"
+      ],
+      "benefits": [
+        "Digestion",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 78,
+      "name": "Ashwagandha & Pippali Blend Extract (Batch 78)",
+      "description": "A potent, purely natural Ashwagandha & Pippali Blend Extract (Batch 78) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Ashwagandha",
+        "Pippali"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 79,
+      "name": "Kutki & Bhringraj Blend Extract (Batch 79)",
+      "description": "A potent, purely natural Kutki & Bhringraj Blend Extract (Batch 79) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Kutki",
+        "Bhringraj"
+      ],
+      "benefits": [
+        "Digestion",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 80,
+      "name": "Coriander & Punarnava Blend Extract (Batch 80)",
+      "description": "A potent, purely natural Coriander & Punarnava Blend Extract (Batch 80) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Coriander",
+        "Punarnava"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 81,
+      "name": "Kutki Root Extract (Batch 81)",
+      "description": "A potent, purely natural Kutki Root Extract (Batch 81) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Kutki"
+      ],
+      "benefits": [
+        "Immunity",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 82,
+      "name": "Guduchi & Shatavari Blend Extract (Batch 82)",
+      "description": "A potent, purely natural Guduchi & Shatavari Blend Extract (Batch 82) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guduchi",
+        "Shatavari"
+      ],
+      "benefits": [
+        "Digestion",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 83,
+      "name": "Tulsi Resin Extract (Batch 83)",
+      "description": "A potent, purely natural Tulsi Resin Extract (Batch 83) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Tulsi"
+      ],
+      "benefits": [
+        "Vitality",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 84,
+      "name": "Triphala Whole Plant Extract (Batch 84)",
+      "description": "A potent, purely natural Triphala Whole Plant Extract (Batch 84) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Triphala"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 85,
+      "name": "Cinnamon & Turmeric Blend Extract (Batch 85)",
+      "description": "A potent, purely natural Cinnamon & Turmeric Blend Extract (Batch 85) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Cinnamon",
+        "Turmeric"
+      ],
+      "benefits": [
+        "Immunity",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 86,
+      "name": "Clove & Vibhitaki Blend Extract (Batch 86)",
+      "description": "A potent, purely natural Clove & Vibhitaki Blend Extract (Batch 86) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Clove",
+        "Vibhitaki"
+      ],
+      "benefits": [
+        "Immunity",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 87,
+      "name": "Pippali & Punarnava Blend Extract (Batch 87)",
+      "description": "A potent, purely natural Pippali & Punarnava Blend Extract (Batch 87) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Pippali",
+        "Punarnava"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Immunity"
+      ],
+      "indications": []
+    },
+    {
+      "id": 88,
+      "name": "Bhringraj Resin Extract (Batch 88)",
+      "description": "A potent, purely natural Bhringraj Resin Extract (Batch 88) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Bhringraj"
+      ],
+      "benefits": [
+        "Digestion",
+        "Stress Relief"
+      ],
+      "indications": []
+    },
+    {
+      "id": 89,
+      "name": "Ginger & Guduchi Blend Extract (Batch 89)",
+      "description": "A potent, purely natural Ginger & Guduchi Blend Extract (Batch 89) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Ginger",
+        "Guduchi"
+      ],
+      "benefits": [
+        "Digestion",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 90,
+      "name": "Guduchi & Aloe Vera Blend Extract (Batch 90)",
+      "description": "A potent, purely natural Guduchi & Aloe Vera Blend Extract (Batch 90) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guduchi",
+        "Aloe Vera"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 91,
+      "name": "Haritaki & Tulsi Blend Extract (Batch 91)",
+      "description": "A potent, purely natural Haritaki & Tulsi Blend Extract (Batch 91) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Haritaki",
+        "Tulsi"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 92,
+      "name": "Musta Stem Extract (Batch 92)",
+      "description": "A potent, purely natural Musta Stem Extract (Batch 92) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Musta"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 93,
+      "name": "Guggulu Berry Extract (Batch 93)",
+      "description": "A potent, purely natural Guggulu Berry Extract (Batch 93) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Guggulu"
+      ],
+      "benefits": [
+        "Digestion",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 94,
+      "name": "Vibhitaki & Pippali Blend Extract (Batch 94)",
+      "description": "A potent, purely natural Vibhitaki & Pippali Blend Extract (Batch 94) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Vibhitaki",
+        "Pippali"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 95,
+      "name": "Vibhitaki Whole Plant Extract (Batch 95)",
+      "description": "A potent, purely natural Vibhitaki Whole Plant Extract (Batch 95) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Vibhitaki"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 96,
+      "name": "Gotu Kola Whole Plant Extract (Batch 96)",
+      "description": "A potent, purely natural Gotu Kola Whole Plant Extract (Batch 96) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Gotu Kola"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 97,
+      "name": "Triphala Stem Extract (Batch 97)",
+      "description": "A potent, purely natural Triphala Stem Extract (Batch 97) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Triphala"
+      ],
+      "benefits": [
+        "Digestion",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 98,
+      "name": "Amalaki & Guduchi Blend Extract (Batch 98)",
+      "description": "A potent, purely natural Amalaki & Guduchi Blend Extract (Batch 98) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Amalaki",
+        "Guduchi"
+      ],
+      "benefits": [
+        "Immunity",
+        "Vitality"
+      ],
+      "indications": []
+    },
+    {
+      "id": 99,
+      "name": "Triphala Root Extract (Batch 99)",
+      "description": "A potent, purely natural Triphala Root Extract (Batch 99) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Triphala"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    },
+    {
+      "id": 100,
+      "name": "Aloe Vera Resin Extract (Batch 100)",
+      "description": "A potent, purely natural Aloe Vera Resin Extract (Batch 100) prepared using classical Ayurvedic extraction methods to preserve the full spectrum of active compounds.",
+      "ingredients": [
+        "Aloe Vera"
+      ],
+      "benefits": [
+        "Stress Relief",
+        "Digestion"
+      ],
+      "indications": []
+    }
+  ],
+  "indications": [
+    {
+      "id": 2,
+      "name": "Acid Reflux (Amlapitta)"
+    },
+    {
+      "id": 24,
+      "name": "Acne & Pimples (Yauvana Pidika)"
+    },
+    {
+      "id": 11,
+      "name": "Allergies (Hay Fever)"
+    },
+    {
+      "id": 36,
+      "name": "Anemia (Pandu Roga)"
+    },
+    {
+      "id": 9,
+      "name": "Asthma & Bronchitis (Shwasa Roga)"
+    },
+    {
+      "id": 13,
+      "name": "Back Pain (Kati Shoola)"
+    },
+    {
+      "id": 35,
+      "name": "Blood Pressure Support"
+    },
+    {
+      "id": 52,
+      "name": "Bone Health & Osteoporosis"
+    },
+    {
+      "id": 51,
+      "name": "Children's Health"
+    },
+    {
+      "id": 33,
+      "name": "Cholesterol & Lipid Balance"
+    },
+    {
+      "id": 3,
+      "name": "Constipation (Vibandha)"
+    },
+    {
+      "id": 8,
+      "name": "Cough & Cold"
+    },
+    {
+      "id": 22,
+      "name": "Dandruff & Scalp Issues"
+    },
+    {
+      "id": 18,
+      "name": "Depression & Low Mood"
+    },
+    {
+      "id": 53,
+      "name": "Detoxification (Panchakarma Support)"
+    },
+    {
+      "id": 32,
+      "name": "Diabetes Care (Madhumeha)"
+    },
+    {
+      "id": 4,
+      "name": "Diarrhea & Loose Motions (Atisara)"
+    },
+    {
+      "id": 1,
+      "name": "Digestive Issues (Agnimandya)"
+    },
+    {
+      "id": 28,
+      "name": "Dry Skin"
+    },
+    {
+      "id": 47,
+      "name": "Ear"
+    },
+    {
+      "id": 26,
+      "name": "Eczema & Psoriasis (Kushtha)"
+    },
+    {
+      "id": 46,
+      "name": "Eye Care (Netra Roga)"
+    },
+    {
+      "id": 50,
+      "name": "Fatigue & Low Energy"
+    },
+    {
+      "id": 44,
+      "name": "Fertility & Reproductive Health"
+    },
+    {
+      "id": 49,
+      "name": "Fever (Jwara)"
+    },
+    {
+      "id": 5,
+      "name": "Gas & Bloating (Adhmana)"
+    },
+    {
+      "id": 15,
+      "name": "Gout (Vatarakta)"
+    },
+    {
+      "id": 21,
+      "name": "Hair Loss (Khalitya)"
+    },
+    {
+      "id": 20,
+      "name": "Headache & Migraine (Shirashoola)"
+    },
+    {
+      "id": 34,
+      "name": "Heart Health (Hridroga)"
+    },
+    {
+      "id": 6,
+      "name": "Hyperacidity & Ulcers"
+    },
+    {
+      "id": 7,
+      "name": "Immunity Support"
+    },
+    {
+      "id": 17,
+      "name": "Insomnia (Anidra)"
+    },
+    {
+      "id": 12,
+      "name": "Joint Pain & Arthritis (Sandhivata)"
+    },
+    {
+      "id": 38,
+      "name": "Kidney & Urinary Health"
+    },
+    {
+      "id": 37,
+      "name": "Liver Health & Detox"
+    },
+    {
+      "id": 19,
+      "name": "Memory & Concentration (Medhya)"
+    },
+    {
+      "id": 45,
+      "name": "Men's Vitality & Stamina"
+    },
+    {
+      "id": 43,
+      "name": "Menopause Support"
+    },
+    {
+      "id": 41,
+      "name": "Menstrual Cramps (Kashtartava)"
+    },
+    {
+      "id": 14,
+      "name": "Muscle Pain & Stiffness"
+    },
+    {
+      "id": 31,
+      "name": "Obesity (Sthaulya)"
+    },
+    {
+      "id": 48,
+      "name": "Oral & Dental Health"
+    },
+    {
+      "id": 42,
+      "name": "PCOS/PCOD Support"
+    },
+    {
+      "id": 27,
+      "name": "Pigmentation & Dark Spots"
+    },
+    {
+      "id": 23,
+      "name": "Premature Greying"
+    },
+    {
+      "id": 10,
+      "name": "Sinusitis"
+    },
+    {
+      "id": 25,
+      "name": "Skin Care & Glow"
+    },
+    {
+      "id": 16,
+      "name": "Stress & Anxiety"
+    },
+    {
+      "id": 39,
+      "name": "Urinary Tract Infections (Mutrakrichha)"
+    },
+    {
+      "id": 30,
+      "name": "Weight Management"
+    },
+    {
+      "id": 40,
+      "name": "Women's Hormonal Balance"
+    },
+    {
+      "id": 29,
+      "name": "Wound Healing"
+    }
+  ]
+}

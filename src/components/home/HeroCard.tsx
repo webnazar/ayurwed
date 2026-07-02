@@ -4,7 +4,7 @@ import React from 'react';
 
 export default function HeroCard() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div className="max-w-7xl mx-auto layout-padding-minimal relative z-10">
 
       {/* Brand-green-light Full-Width Card */}
       <div className="bg-brand-green-light rounded-[32px] sm:rounded-[48px] shadow-2xl overflow-hidden border border-brand-gold/15 w-full mx-auto">
@@ -24,7 +24,7 @@ export default function HeroCard() {
             </div>
 
             <p className="text-base sm:text-lg text-brand-green/80 leading-relaxed font-medium max-w-2xl mx-auto">
-              India's complete Ayurveda ecosystem connecting consumers, clinical consultants, premium manufacturers, and AI-driven personalized wellness.
+              India's complete Ayurveda ecosystem connecting consumers, clinical consultants, and AI-driven personalized wellness based on custom formulations of generic extracts, powders, capsules, and tablets.
             </p>
             
           </div>

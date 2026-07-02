@@ -37,13 +37,13 @@ export async function fetchBloggerPosts(category?: string, search?: string): Pro
     const entries = data.feed?.entry || [];
     const feedCategories = data.feed?.category || [];
     
-    // Extract global labels available on the blog
+    // Preparation global labels available on the blog
     const allLabels = feedCategories.map((c: any) => c.term);
 
     const posts: BloggerPost[] = entries.map((e: any) => {
       const link = e.link?.find((l: any) => l.rel === 'alternate')?.href || '#';
       
-      // Extract a clean excerpt from the HTML content
+      // Preparation a clean excerpt from the HTML content
       const rawContent = e.content?.$t || e.summary?.$t || '';
       const textOnly = rawContent.replace(/<[^>]+>/g, '').trim();
       const excerpt = textOnly.length > 120 ? textOnly.substring(0, 120) + '...' : textOnly;

@@ -4,9 +4,50 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { UserCircle, MapPin, Activity, Save, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import SearchSelect from '@/components/ui/SearchSelect';
+
+const INDIAN_STATES = [
+  { value: 'Andhra Pradesh', label: 'Andhra Pradesh' },
+  { value: 'Arunachal Pradesh', label: 'Arunachal Pradesh' },
+  { value: 'Assam', label: 'Assam' },
+  { value: 'Bihar', label: 'Bihar' },
+  { value: 'Chhattisgarh', label: 'Chhattisgarh' },
+  { value: 'Goa', label: 'Goa' },
+  { value: 'Gujarat', label: 'Gujarat' },
+  { value: 'Haryana', label: 'Haryana' },
+  { value: 'Himachal Pradesh', label: 'Himachal Pradesh' },
+  { value: 'Jharkhand', label: 'Jharkhand' },
+  { value: 'Karnataka', label: 'Karnataka' },
+  { value: 'Kerala', label: 'Kerala' },
+  { value: 'Madhya Pradesh', label: 'Madhya Pradesh' },
+  { value: 'Maharashtra', label: 'Maharashtra' },
+  { value: 'Manipur', label: 'Manipur' },
+  { value: 'Meghalaya', label: 'Meghalaya' },
+  { value: 'Mizoram', label: 'Mizoram' },
+  { value: 'Nagaland', label: 'Nagaland' },
+  { value: 'Odisha', label: 'Odisha' },
+  { value: 'Punjab', label: 'Punjab' },
+  { value: 'Rajasthan', label: 'Rajasthan' },
+  { value: 'Sikkim', label: 'Sikkim' },
+  { value: 'Tamil Nadu', label: 'Tamil Nadu' },
+  { value: 'Telangana', label: 'Telangana' },
+  { value: 'Tripura', label: 'Tripura' },
+  { value: 'Uttar Pradesh', label: 'Uttar Pradesh' },
+  { value: 'Uttarakhand', label: 'Uttarakhand' },
+  { value: 'West Bengal', label: 'West Bengal' },
+  { value: 'Andaman and Nicobar Islands', label: 'Andaman and Nicobar Islands', meta: 'UT' },
+  { value: 'Chandigarh', label: 'Chandigarh', meta: 'UT' },
+  { value: 'Dadra and Nagar Haveli and Daman and Diu', label: 'Dadra and Nagar Haveli and Daman and Diu', meta: 'UT' },
+  { value: 'Delhi', label: 'Delhi', meta: 'UT' },
+  { value: 'Jammu and Kashmir', label: 'Jammu and Kashmir', meta: 'UT' },
+  { value: 'Ladakh', label: 'Ladakh', meta: 'UT' },
+  { value: 'Lakshadweep', label: 'Lakshadweep', meta: 'UT' },
+  { value: 'Puducherry', label: 'Puducherry', meta: 'UT' }
+];
 
 interface ProfileData {
   address?: string;
+  landmark?: string;
   city?: string;
   state?: string;
   pincode?: string;
@@ -29,6 +70,7 @@ export default function ConsumerProfileForm() {
     email: '',
     phone: '',
     address: '',
+    landmark: '',
     city: '',
     state: '',
     pincode: '',
@@ -40,6 +82,20 @@ export default function ConsumerProfileForm() {
   useEffect(() => {
     fetchProfile();
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        if (!saving) {
+          const form = document.getElementById('consumer-profile-form') as HTMLFormElement;
+          if (form) form.requestSubmit();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [saving]);
 
   const fetchProfile = async () => {
     try {
@@ -53,6 +109,7 @@ export default function ConsumerProfileForm() {
           email: p.user?.email || session?.user?.email || '',
           phone: p.user?.phone || '',
           address: p.address || '',
+          landmark: p.landmark || '',
           city: p.city || '',
           state: p.state || '',
           pincode: p.pincode || '',
@@ -104,10 +161,10 @@ export default function ConsumerProfileForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
+    <form id="consumer-profile-form" onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
       
       {/* Personal Information */}
-      <div className="bg-white rounded-[2rem] p-8 border border-brand-green-border/10 shadow-sm space-y-6">
+      <div className="bg-card rounded-[2rem] p-8 border border-border shadow-sm space-y-6">
         <div className="flex items-center gap-3 pb-4 border-b border-brand-green-light">
           <div className="bg-brand-green/10 p-2.5 rounded-xl">
             <UserCircle className="h-6 w-6 text-brand-green" />
@@ -123,7 +180,7 @@ export default function ConsumerProfileForm() {
               name="name" 
               value={formData.name} 
               disabled
-              className="w-full bg-slate-50 border border-brand-green-border/20 rounded-xl px-4 py-3 text-brand-foreground/60 cursor-not-allowed" 
+              className="w-full bg-slate-50 border border-border rounded-xl px-4 py-3 text-brand-foreground/60 cursor-not-allowed" 
             />
             <p className="text-[10px] text-brand-foreground/40">Name cannot be changed directly.</p>
           </div>
@@ -135,7 +192,7 @@ export default function ConsumerProfileForm() {
               name="email" 
               value={formData.email} 
               disabled
-              className="w-full bg-slate-50 border border-brand-green-border/20 rounded-xl px-4 py-3 text-brand-foreground/60 cursor-not-allowed" 
+              className="w-full bg-slate-50 border border-border rounded-xl px-4 py-3 text-brand-foreground/60 cursor-not-allowed" 
             />
           </div>
 
@@ -146,7 +203,7 @@ export default function ConsumerProfileForm() {
               name="phone" 
               value={formData.phone} 
               onChange={handleChange}
-              className="w-full bg-white border border-brand-green-border/20 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
+              className="w-full bg-card border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
               placeholder="+91 "
             />
           </div>
@@ -158,7 +215,7 @@ export default function ConsumerProfileForm() {
               name="dateOfBirth" 
               value={formData.dateOfBirth} 
               onChange={handleChange}
-              className="w-full bg-white border border-brand-green-border/20 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
+              className="w-full bg-card border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
             />
           </div>
 
@@ -183,15 +240,15 @@ export default function ConsumerProfileForm() {
         </div>
       </div>
 
-      {/* eCommerce Delivery Address */}
-      <div className="bg-white rounded-[2rem] p-8 border border-brand-green-border/10 shadow-sm space-y-6">
+      {/* Delivery Address */}
+      <div className="bg-card rounded-[2rem] p-8 border border-border shadow-sm space-y-6">
         <div className="flex items-center gap-3 pb-4 border-b border-brand-green-light">
           <div className="bg-brand-gold/10 p-2.5 rounded-xl">
             <MapPin className="h-6 w-6 text-brand-gold-dark" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-brand-green">Delivery Address</h2>
-            <p className="text-xs text-brand-foreground/50 mt-1">This address will be used as default for eCommerce orders.</p>
+            <p className="text-xs text-brand-foreground/50 mt-1">This address will be used to deliver prescribed medicines.</p>
           </div>
         </div>
 
@@ -203,31 +260,43 @@ export default function ConsumerProfileForm() {
               value={formData.address} 
               onChange={handleChange}
               rows={2}
-              className="w-full bg-white border border-brand-green-border/20 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold resize-none" 
+              className="w-full bg-card border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold resize-none" 
               placeholder="House/Flat No., Building Name, Street"
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-semibold text-brand-foreground/80">Landmark (Optional)</label>
+            <input 
+              type="text" 
+              name="landmark" 
+              value={formData.landmark} 
+              onChange={handleChange}
+              className="w-full bg-card border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
+              placeholder="Near Apollo Hospital"
+            />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
             <label className="text-sm font-semibold text-brand-foreground/80">City / District</label>
             <input 
               type="text" 
               name="city" 
               value={formData.city} 
               onChange={handleChange}
-              className="w-full bg-white border border-brand-green-border/20 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
+              className="w-full bg-card border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
             <div className="space-y-2">
               <label className="text-sm font-semibold text-brand-foreground/80">State</label>
-              <input 
-                type="text" 
-                name="state" 
-                value={formData.state} 
-                onChange={handleChange}
-                className="w-full bg-white border border-brand-green-border/20 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
+              <SearchSelect
+                options={INDIAN_STATES}
+                value={formData.state}
+                onChange={(val) => setFormData(prev => ({ ...prev, state: val }))}
+                placeholder="Select State"
+                className="w-full bg-card"
               />
             </div>
             <div className="space-y-2">
@@ -237,36 +306,11 @@ export default function ConsumerProfileForm() {
                 name="pincode" 
                 value={formData.pincode} 
                 onChange={handleChange}
-                className="w-full bg-white border border-brand-green-border/20 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
+                className="w-full bg-card border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
                 placeholder="6 Digits"
               />
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Health Overview */}
-      <div className="bg-white rounded-[2rem] p-8 border border-brand-green-border/10 shadow-sm space-y-6">
-        <div className="flex items-center gap-3 pb-4 border-b border-brand-green-light">
-          <div className="bg-emerald-500/10 p-2.5 rounded-xl">
-            <Activity className="h-6 w-6 text-emerald-600" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-brand-green">Health Overview</h2>
-            <p className="text-xs text-brand-foreground/50 mt-1">Helps practitioners personalize your consultations.</p>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-brand-foreground/80">Medical History & Allergies (Optional)</label>
-          <textarea 
-            name="medicalHistory" 
-            value={formData.medicalHistory} 
-            onChange={handleChange}
-            rows={4}
-            className="w-full bg-white border border-brand-green-border/20 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold resize-none" 
-            placeholder="Please briefly describe any known allergies, chronic conditions, or ongoing treatments..."
-          />
         </div>
       </div>
 
@@ -279,7 +323,7 @@ export default function ConsumerProfileForm() {
           {saving ? (
             <><Loader2 className="h-5 w-5 animate-spin" /> Saving...</>
           ) : (
-            <><Save className="h-5 w-5" /> Save Profile</>
+            <><Save className="h-5 w-5" /> Save Profile <span className="hidden sm:inline-flex ml-2 text-[10px] bg-white/20 px-2 py-0.5 rounded border border-white/30 font-medium">Alt+S</span></>
           )}
         </button>
       </div>

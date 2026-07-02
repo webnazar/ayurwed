@@ -1,14 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Leaf, Lock, Mail, Sparkles, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,7 +40,7 @@ export default function LoginPage() {
         toast.error(res.error || 'Authentication failed');
       } else {
         toast.success('Welcome back to Ayurwed!');
-        router.push('/dashboard');
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch (err) {
@@ -49,19 +53,22 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-gold-light flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-4">
-        <Link href="/" className="inline-block">
-          <img
-            src="/ayurwed.webp"
-            alt="AYURWED Logo"
-            className="h-40 sm:h-44 w-auto object-contain mx-auto transition-transform duration-300 hover:scale-[1.02]"
-          />
-        </Link>
+    <div className="min-h-screen bg-brand-gold-light flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <ThemeToggle />
       </div>
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-card py-8 px-4 border border-border shadow-xl rounded-3xl sm:px-10">
+          <div className="text-center mb-8">
+            <Link href="/" className="inline-block">
+              <img
+                src="/ayurwed.webp"
+                alt="AYURWED Logo"
+                className="h-40 sm:h-44 w-auto object-contain mx-auto transition-transform duration-300 hover:scale-[1.02]"
+              />
+            </Link>
+          </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 border border-brand-green-border/10 shadow-xl rounded-3xl sm:px-10">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-xs font-bold text-brand-green uppercase tracking-wider">
@@ -117,10 +124,10 @@ export default function LoginPage() {
             {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-brand-green-border/20"></div>
+                <div className="w-full border-t border-border"></div>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-brand-foreground/50 font-bold">Or continue with</span>
+                <span className="bg-card px-2 text-brand-foreground/50 font-bold">Or continue with</span>
               </div>
             </div>
 
@@ -128,8 +135,8 @@ export default function LoginPage() {
             <div>
               <button
                 type="button"
-                onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
-                className="w-full bg-white hover:bg-gray-50 text-gray-700 font-bold py-3.5 px-4 rounded-full border border-gray-300 hover:border-gray-400 transition-all duration-300 flex items-center justify-center gap-3 shadow-sm"
+                onClick={() => signIn('google', { callbackUrl })}
+                className="w-full bg-card hover:bg-muted text-gray-700 font-bold py-3.5 px-4 rounded-full border border-border hover:border-gray-400 transition-all duration-300 flex items-center justify-center gap-3 shadow-sm"
               >
                 <img
                   src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -152,5 +159,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-brand-gold-light flex items-center justify-center">
+        <div className="text-brand-green font-bold animate-pulse">Loading Ayurwed Login...</div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }

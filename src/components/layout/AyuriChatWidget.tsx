@@ -79,7 +79,7 @@ export default function AyuriChatWidget() {
         <button
           id="ayuri-chat-widget-trigger"
           onClick={() => setIsOpen(true)}
-          className="bg-brand-green hover:bg-brand-gold text-white hover:text-brand-green p-4 rounded-full shadow-2xl transition-all duration-300 flex items-center justify-center group hover:scale-105 border border-brand-green-border/20"
+          className="btn-green p-4 rounded-full shadow-2xl flex items-center justify-center group hover:scale-105 border border-border"
           title="Ask Ayuri AI"
         >
           <MessageSquare className="h-6 w-6 group-hover:rotate-12 transition-transform duration-300" />
@@ -93,12 +93,12 @@ export default function AyuriChatWidget() {
       {isOpen && (
         <div
           id="ayuri-chat-widget"
-          className="bg-white rounded-3xl shadow-2xl border border-brand-green-border/10 w-[340px] sm:w-[400px] h-[500px] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300"
+          className="bg-card rounded-3xl shadow-2xl border border-border w-[340px] sm:w-[400px] h-[500px] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300"
         >
           {/* Header */}
           <div className="bg-brand-green text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="bg-brand-gold p-1.5 rounded-full text-brand-green">
+              <div className="bg-brand-gold p-1.5 rounded-full text-brand-green dark:text-black">
                 <Sparkles className="h-4.5 w-4.5 animate-pulse-slow" />
               </div>
               <div>
@@ -125,7 +125,7 @@ export default function AyuriChatWidget() {
               >
                 <div
                   className={`p-1.5 rounded-full h-8 w-8 flex items-center justify-center flex-shrink-0 ${
-                    msg.role === 'user' ? 'bg-brand-gold text-brand-green' : 'bg-brand-green text-white'
+                    msg.role === 'user' ? 'bg-brand-gold text-brand-green dark:text-black' : 'bg-brand-green text-white'
                   }`}
                 >
                   {msg.role === 'user' ? <User className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
@@ -134,7 +134,7 @@ export default function AyuriChatWidget() {
                   className={`rounded-2xl p-3 text-xs leading-relaxed ${
                     msg.role === 'user'
                       ? 'bg-brand-gold/15 text-brand-gold-dark font-medium rounded-tr-none'
-                      : 'bg-white text-brand-foreground border border-brand-green-border/10 shadow-sm rounded-tl-none'
+                      : 'bg-card text-brand-foreground border border-border shadow-sm rounded-tl-none'
                   }`}
                 >
                   {msg.content}
@@ -147,7 +147,7 @@ export default function AyuriChatWidget() {
                 <div className="p-1.5 rounded-full h-8 w-8 bg-brand-green text-white flex items-center justify-center flex-shrink-0">
                   <Sparkles className="h-4 w-4 animate-spin" />
                 </div>
-                <div className="rounded-2xl p-3 text-xs bg-white text-brand-foreground/50 border border-brand-green-border/10 shadow-sm rounded-tl-none">
+                <div className="rounded-2xl p-3 text-xs bg-card text-brand-foreground/50 border border-border shadow-sm rounded-tl-none">
                   Ayuri is exploring the wellness library...
                 </div>
               </div>
@@ -162,7 +162,7 @@ export default function AyuriChatWidget() {
                 <button
                   key={i}
                   onClick={() => handleSend(reply)}
-                  className="bg-white border border-brand-green-border/10 text-brand-green text-[10px] font-bold px-3 py-1.5 rounded-full hover:border-brand-gold transition-colors"
+                  className="bg-card border border-border text-brand-green text-[10px] font-bold px-3 py-1.5 rounded-full hover:border-brand-gold transition-colors"
                 >
                   {reply}
                 </button>
@@ -182,20 +182,20 @@ export default function AyuriChatWidget() {
               e.preventDefault();
               handleSend(input);
             }}
-            className="p-3 border-t border-brand-green-light flex gap-2 bg-white"
+            className="p-3 border-t border-brand-green-light flex gap-2 bg-card"
           >
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about Doshas, oils, or herbs..."
-              className="flex-grow bg-brand-green-light/40 text-xs border border-brand-green-border/10 rounded-full py-2 px-4 focus:outline-none focus:border-brand-gold"
+              className="flex-grow bg-brand-green-light/40 text-xs border border-border rounded-full py-2 px-4 focus:outline-none focus:border-brand-gold"
               required
             />
             <button
               type="submit"
               disabled={loading}
-              className="bg-brand-green hover:bg-brand-gold hover:text-brand-green text-white p-2 rounded-full transition-colors flex-shrink-0"
+              className="btn-green p-2 rounded-full flex-shrink-0"
             >
               <Send className="h-4 w-4" />
             </button>

@@ -10,16 +10,28 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "rgb(var(--background) / <alpha-value>)",
+        foreground: "rgb(var(--foreground) / <alpha-value>)",
+        card: "rgb(var(--card) / <alpha-value>)",
+        "card-foreground": "rgb(var(--card-foreground) / <alpha-value>)",
+        muted: "rgb(var(--muted) / <alpha-value>)",
+        "muted-foreground": "rgb(var(--muted-foreground) / <alpha-value>)",
+        border: "rgb(var(--border) / <alpha-value>)",
+        input: "rgb(var(--input) / <alpha-value>)",
+        ring: "rgb(var(--ring) / <alpha-value>)",
         brand: {
-          green: '#1a5c2e',
-          'green-light': '#e8f5ee',
-          'green-border': '#2d7a42',
-          gold: '#c9a227',
-          'gold-light': '#fdf6e3',
-          'gold-dark': '#7a5d10',
+          green: 'rgb(var(--brand-green) / <alpha-value>)',
+          'green-light': 'rgb(var(--brand-green-light) / <alpha-value>)',
+          'green-border': 'rgb(var(--brand-green-border) / <alpha-value>)',
+          gold: 'rgb(var(--brand-gold) / <alpha-value>)',
+          'gold-light': 'rgb(var(--brand-gold-light) / <alpha-value>)',
+          'gold-dark': 'rgb(var(--brand-gold-dark) / <alpha-value>)',
+          foreground: 'rgb(var(--foreground) / <alpha-value>)',
         }
+      },
+      boxShadow: {
+        'premium': '0 10px 40px -10px rgba(0,0,0,0.08)',
+        'glow': '0 0 20px rgba(251, 191, 36, 0.15)',
       },
     },
   },

@@ -56,47 +56,14 @@ async function main() {
         specialization: c.spec,
         experience: 10,
         bio: `${c.name} is a highly experienced Ayurvedic consultant.`,
-        languages: ['English', 'Hindi'],
+        languages: JSON.stringify(['English', 'Hindi']),
         consultationFee: c.fee,
         isVerified: true,
-        availability: [],
+        availability: JSON.stringify([]),
       },
     });
   }
 
-  // 3. Manufacturers
-  const manufacturers = [
-    { email: 'contact@himalayawellness.com', name: 'Himalaya Wellness Rep', phone: '9876543215', companyName: 'Himalaya Wellness', slug: 'himalaya-wellness' },
-    { email: 'sales@patanjali.com', name: 'Patanjali Rep', phone: '9876543216', companyName: 'Patanjali Ayurved', slug: 'patanjali-ayurved' },
-  ];
-
-  for (const m of manufacturers) {
-    const user = await prisma.user.upsert({
-      where: { email: m.email },
-      update: {},
-      create: {
-        email: m.email,
-        name: m.name,
-        password: defaultPassword,
-        phone: m.phone,
-        role: 'MANUFACTURER',
-      },
-    });
-
-    await prisma.manufacturerProfile.upsert({
-      where: { slug: m.slug },
-      update: {},
-      create: {
-        userId: user.id,
-        companyName: m.companyName,
-        slug: m.slug,
-        description: `Official profile for ${m.companyName}.`,
-        certifications: ['GMP Certified'],
-        address: { city: 'New Delhi', state: 'Delhi' },
-        isVerified: true,
-      },
-    });
-  }
 
   console.log('Dummy users seeded successfully.');
 }

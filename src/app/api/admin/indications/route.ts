@@ -22,7 +22,7 @@ export async function GET() {
     const indications = await db.indication.findMany({
       orderBy: { name: 'asc' },
       include: {
-        _count: { select: { products: true } }
+        _count: { select: { preparations: true } }
       }
     });
 
@@ -41,6 +41,48 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+
+    if (Array.isArray(body)) {
+      const results = { successful: 0, failed: 0, errors: [] as string[] };
+      for (const item of body) {
+        try {
+          const { name, description, isActive } = item;
+          if (!name) throw new Error("Name is required");
+          
+          const existing = await db.indication.findUnique({ where: { name } });
+          if (existing) {
+            await db.indication.update({
+              where: { id: existing.id },
+              data: {
+                description: description !== undefined ? description : existing.description,
+                isActive: isActive !== undefined ? (String(isActive).toLowerCase() === 'true' || isActive === true) : existing.isActive,
+              }
+            });
+          } else {
+            let baseSlug = slugify(name);
+            let slug = baseSlug;
+            let suffix = 1;
+            while (await db.indication.findUnique({ where: { slug } })) {
+              slug = `${baseSlug}-${suffix++}`;
+            }
+            await db.indication.create({
+              data: {
+                name,
+                slug,
+                description: description || null,
+                isActive: isActive !== undefined ? (String(isActive).toLowerCase() === 'true' || isActive === true) : true,
+              }
+            });
+          }
+          results.successful++;
+        } catch (e: any) {
+          results.failed++;
+          results.errors.push(`Row error (${item.name || 'Unknown'}): ${e.message}`);
+        }
+      }
+      return NextResponse.json({ success: true, ...results }, { status: 201 });
+    }
+
     const { name, description, isActive } = body;
 
     if (!name) {
@@ -62,7 +104,7 @@ export async function POST(req: Request) {
         isActive: isActive ?? true,
       },
       include: {
-        _count: { select: { products: true } }
+        _count: { select: { preparations: true } }
       }
     });
 
@@ -99,7 +141,7 @@ export async function PATCH(req: Request) {
       where: { id: Number(id) },
       data: updateData,
       include: {
-        _count: { select: { products: true } }
+        _count: { select: { preparations: true } }
       }
     });
 

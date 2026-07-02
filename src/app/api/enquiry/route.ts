@@ -7,16 +7,16 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     const body = await req.json();
-    const { manufacturerId, productId, name, email, phone, message } = body;
+    const { manufacturerId, extractId, name, email, phone, message } = body;
 
-    if (!manufacturerId || !name || !email || !message) {
+    if (!name || !email || !message) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     const enquiry = await db.enquiry.create({
       data: {
-        manufacturerId: Number(manufacturerId),
-        productId: productId ? Number(productId) : null,
+        manufacturerId: manufacturerId ? Number(manufacturerId) : undefined,
+        extractId: extractId ? Number(extractId) : null,
         userId: session ? Number((session.user as any).id) : null,
         name,
         email,

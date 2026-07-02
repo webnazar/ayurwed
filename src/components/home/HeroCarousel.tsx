@@ -80,7 +80,7 @@ export default function HeroCarousel({ carousels }: { carousels: CarouselItem[] 
                 className={`transition-all duration-300 rounded-full ${
                   idx === currentIndex 
                     ? 'w-8 h-2.5 bg-brand-gold shadow-[0_0_10px_rgba(234,179,8,0.5)]' 
-                    : 'w-2.5 h-2.5 bg-white/50 hover:bg-white/80'
+                    : 'w-2.5 h-2.5 bg-card/50 hover:bg-card/80'
                 }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />

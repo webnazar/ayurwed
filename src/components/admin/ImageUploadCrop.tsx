@@ -6,39 +6,51 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { Upload, CropIcon, Check, X, ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-// Always square (1:1)
-const ASPECT = 1;
-// Output is always a fixed-size square
-const OUTPUT_SIZE = 400;
+// Configurable output size, defaulting to square
+const DEFAULT_ASPECT = 1;
+const DEFAULT_WIDTH = 400;
+const DEFAULT_HEIGHT = 400;
 
 interface ImageUploadCropProps {
   value: string;
   onChange: (url: string) => void;
   folder?: string;
   label?: string;
+  children?: React.ReactNode;
+  aspect?: number;
+  outputWidth?: number;
+  outputHeight?: number;
 }
 
-// Create a pixel-unit square crop centered on the image
-function makeSquareCropPx(imgWidth: number, imgHeight: number): Crop {
-  const size = Math.floor(Math.min(imgWidth, imgHeight) * 0.8);
+// Create a pixel-unit crop centered on the image matching the aspect ratio
+function makeCropPx(imgWidth: number, imgHeight: number, aspect: number): Crop {
+  let width, height;
+  if (imgWidth / imgHeight > aspect) {
+    height = Math.floor(imgHeight * 0.8);
+    width = Math.floor(height * aspect);
+  } else {
+    width = Math.floor(imgWidth * 0.8);
+    height = Math.floor(width / aspect);
+  }
   return {
     unit: 'px',
-    width: size,
-    height: size,
-    x: Math.floor((imgWidth - size) / 2),
-    y: Math.floor((imgHeight - size) / 2),
+    width,
+    height,
+    x: Math.floor((imgWidth - width) / 2),
+    y: Math.floor((imgHeight - height) / 2),
   };
 }
 
-async function getCroppedSquareBlob(
+async function getCroppedBlob(
   imageEl: HTMLImageElement,
   pixelCrop: PixelCrop,
   filename: string,
+  outputWidth: number,
+  outputHeight: number
 ): Promise<File> {
   const canvas = document.createElement('canvas');
-  // Always render into a perfect square canvas
-  canvas.width = OUTPUT_SIZE;
-  canvas.height = OUTPUT_SIZE;
+  canvas.width = outputWidth;
+  canvas.height = outputHeight;
 
   const scaleX = imageEl.naturalWidth / imageEl.width;
   const scaleY = imageEl.naturalHeight / imageEl.height;
@@ -53,15 +65,24 @@ async function getCroppedSquareBlob(
     pixelCrop.height * scaleY,
     0,
     0,
-    OUTPUT_SIZE,
-    OUTPUT_SIZE,
+    outputWidth,
+    outputHeight,
   );
 
   return new Promise((resolve, reject) => {
-    canvas.toBlob(blob => {
-      if (!blob) return reject(new Error('Canvas is empty'));
-      resolve(new File([blob], filename.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
-    }, 'image/jpeg', 0.92);
+    let quality = 0.92;
+    const attempt = () => {
+      canvas.toBlob(blob => {
+        if (!blob) return reject(new Error('Canvas is empty'));
+        if (blob.size > 100 * 1024 && quality > 0.1) {
+          quality -= 0.1;
+          attempt();
+        } else {
+          resolve(new File([blob], filename.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+        }
+      }, 'image/jpeg', quality);
+    };
+    attempt();
   });
 }
 
@@ -70,6 +91,10 @@ export default function ImageUploadCrop({
   onChange,
   folder = 'categories',
   label = 'Category Image',
+  children,
+  aspect = DEFAULT_ASPECT,
+  outputWidth = DEFAULT_WIDTH,
+  outputHeight = DEFAULT_HEIGHT,
 }: ImageUploadCropProps) {
   const [srcImg, setSrcImg] = useState<string | null>(null);
   const [crop, setCrop] = useState<Crop>();
@@ -107,8 +132,8 @@ export default function ImageUploadCrop({
 
   const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
-    setCrop(makeSquareCropPx(width, height));
-  }, []);
+    setCrop(makeCropPx(width, height, aspect));
+  }, [aspect]);
 
   const handleCropConfirm = async () => {
     if (!imgRef.current || !completedCrop || completedCrop.width === 0) {
@@ -118,7 +143,7 @@ export default function ImageUploadCrop({
 
     setUploading(true);
     try {
-      const croppedFile = await getCroppedSquareBlob(imgRef.current, completedCrop, originalFilename);
+      const croppedFile = await getCroppedBlob(imgRef.current, completedCrop, originalFilename, outputWidth, outputHeight);
       const formData = new FormData();
       formData.append('file', croppedFile);
       formData.append('folder', folder);
@@ -149,46 +174,54 @@ export default function ImageUploadCrop({
 
   return (
     <div>
-      <label className="text-xs font-bold text-brand-foreground/60 uppercase tracking-wider block mb-1.5">
-        {label}
-      </label>
+      {!children && (
+        <label className="text-xs font-bold text-brand-foreground/60 uppercase tracking-wider block mb-1.5">
+          {label}
+        </label>
+      )}
 
       {/* Preview + Upload trigger */}
-      <div className="flex items-center gap-4">
-        {/* Square preview */}
-        <div className="h-20 w-20 rounded-2xl border-2 border-dashed border-brand-green-border/30 flex items-center justify-center overflow-hidden bg-brand-gold-light/30 flex-shrink-0">
-          {value ? (
-            <img src={value} alt="Preview" className="h-full w-full object-cover" />
-          ) : (
-            <ImageIcon className="h-8 w-8 text-brand-foreground/25" />
-          )}
-        </div>
+      {!children ? (
+        <div className="flex items-center gap-4">
+          {/* Square preview */}
+          <div className="h-20 w-20 rounded-2xl border-2 border-dashed border-brand-green-border/30 flex items-center justify-center overflow-hidden bg-brand-gold-light/30 flex-shrink-0">
+            {value ? (
+              <img src={value} alt="Preview" className="h-full w-full object-cover" />
+            ) : (
+              <ImageIcon className="h-8 w-8 text-brand-foreground/25" />
+            )}
+          </div>
 
-        {/* Buttons */}
-        <div className="flex flex-col gap-2 flex-grow">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 bg-brand-green text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-brand-green/90 transition-colors shadow-sm"
-          >
-            <Upload className="h-3.5 w-3.5" />
-            {value ? 'Change Image' : 'Upload & Crop'}
-          </button>
-          {value && (
+          {/* Buttons */}
+          <div className="flex flex-col gap-2 flex-grow">
             <button
               type="button"
-              onClick={() => onChange('')}
-              className="flex items-center gap-2 text-rose-500 text-xs font-bold px-4 py-2 rounded-xl hover:bg-rose-50 transition-colors border border-rose-200"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 bg-brand-green text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-brand-green/90 transition-colors shadow-sm"
             >
-              <X className="h-3.5 w-3.5" />
-              Remove Image
+              <Upload className="h-3.5 w-3.5" />
+              {value ? 'Change Image' : 'Upload & Crop'}
             </button>
-          )}
-          <p className="text-[10px] text-brand-foreground/40 leading-tight">
-            Square crop · JPEG, PNG or WebP · Max 5MB
-          </p>
+            {value && (
+              <button
+                type="button"
+                onClick={() => onChange('')}
+                className="flex items-center gap-2 text-rose-500 text-xs font-bold px-4 py-2 rounded-xl hover:bg-rose-50 transition-colors border border-rose-200"
+              >
+                <X className="h-3.5 w-3.5" />
+                Remove Image
+              </button>
+            )}
+            <p className="text-[10px] text-brand-foreground/40 leading-tight">
+              Square crop · JPEG, PNG or WebP · Max 5MB
+            </p>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div onClick={() => fileInputRef.current?.click()} className="cursor-pointer inline-block">
+          {children}
+        </div>
+      )}
 
       <input
         ref={fileInputRef}
@@ -201,22 +234,22 @@ export default function ImageUploadCrop({
       {/* Crop modal */}
       {showCropper && srcImg && (
         <div className="fixed inset-0 bg-black/75 z-[100] flex items-center justify-center p-4">
-        <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-xl overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="bg-card rounded-[24px] shadow-2xl w-full max-w-xl overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Header */}
             <div className="bg-gradient-to-r from-brand-green to-[#0f381b] px-6 py-4 flex items-center justify-between text-white">
               <div className="flex items-center gap-2">
                 <CropIcon className="h-5 w-5" />
                 <div>
-                  <span className="font-bold text-base block">Square Crop</span>
+                  <span className="font-bold text-base block">Crop Image</span>
                   <span className="text-[10px] text-brand-green-light">
-                    Output: {OUTPUT_SIZE}×{OUTPUT_SIZE}px · 1:1 ratio locked
+                    Output: {outputWidth}×{outputHeight}px
                   </span>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={handleCancel}
-                className="p-1.5 bg-white/10 hover:bg-white/20 rounded-full"
+                className="p-1.5 bg-card/10 hover:bg-card/20 rounded-full"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -225,14 +258,14 @@ export default function ImageUploadCrop({
             {/* Crop area — no scroll, image self-constrains via viewport height */}
             <div className="p-5 space-y-3">
               <p className="text-xs text-brand-foreground/50 text-center font-medium">
-                Drag and resize the square handle. Ratio is locked to 1:1.
+                Drag and resize the handle. Aspect ratio is locked.
               </p>
               <div className="flex justify-center rounded-xl bg-[#1a1a1a]">
                 <ReactCrop
                   crop={crop}
                   onChange={(_, pc) => setCrop(pc)}
                   onComplete={c => setCompletedCrop(c)}
-                  aspect={ASPECT}
+                  aspect={aspect}
                   minWidth={60}
                   minHeight={60}
                   keepSelection
@@ -251,7 +284,7 @@ export default function ImageUploadCrop({
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="flex-1 py-3 rounded-2xl border border-brand-green-border/20 text-sm font-bold text-brand-foreground/60 hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-3 rounded-2xl border border-border text-sm font-bold text-brand-foreground/60 hover:bg-muted transition-colors"
                 >
                   Cancel
                 </button>

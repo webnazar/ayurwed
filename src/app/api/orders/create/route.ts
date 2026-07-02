@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     }
 
     // Calculate subtotal from trusted server side? 
-    // Ideally, we'd fetch the DB products and sum their MRP. 
+    // Ideally, we'd fetch the DB preparations and sum their MRP. 
     // For now, we trust the client items array for the sake of the prototype.
     const subtotal = items.reduce((sum: number, item: any) => sum + (item.mrp * item.quantity), 0);
     const shipping = subtotal > 999 ? 0 : 50;
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
         paymentStatus: 'PENDING',
         items: {
           create: items.map((item: any) => ({
-            productId: item.id,
+            extractId: item.id,
             quantity: item.quantity,
             price: item.mrp,
             total: item.mrp * item.quantity

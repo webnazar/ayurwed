@@ -57,7 +57,7 @@ export default function MyOrdersClient({ initialOrders }: { initialOrders: Order
           { label: 'Delivered', value: stats.delivered, icon: CheckCircle2, color: 'text-emerald-600 bg-emerald-50' },
           { label: 'Total Spent', value: formatPrice(stats.spent), icon: DollarSign, color: 'text-indigo-600 bg-indigo-50' },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl p-5 border border-brand-green-border/10 shadow-sm flex items-center gap-4">
+          <div key={s.label} className="bg-card rounded-2xl p-5 border border-border shadow-sm flex items-center gap-4">
             <div className={`p-3 rounded-2xl ${s.color}`}><s.icon className="h-5 w-5" /></div>
             <div>
               <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">{s.label}</span>
@@ -68,17 +68,17 @@ export default function MyOrdersClient({ initialOrders }: { initialOrders: Order
       </div>
 
       {/* Orders Panel */}
-      <div className="bg-white rounded-3xl border border-brand-green-border/10 shadow-sm overflow-hidden">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6 border-b border-brand-green-border/10">
+      <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6 border-b border-border">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/40" />
             <input type="text" placeholder="Search order number..." value={search} onChange={e => setSearch(e.target.value)}
-              className="pl-9 bg-brand-gold-light/40 border border-brand-green-border/10 rounded-2xl py-2.5 px-4 text-sm focus:outline-none w-56" />
+              className="pl-9 bg-brand-gold-light/40 border border-border rounded-2xl py-2.5 px-4 text-sm focus:outline-none w-56" />
           </div>
           <div className="relative">
             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/40" />
             <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-              className="pl-9 bg-brand-gold-light/40 border border-brand-green-border/10 rounded-2xl py-2.5 pr-4 text-sm focus:outline-none appearance-none">
+              className="pl-9 bg-brand-gold-light/40 border border-border rounded-2xl py-2.5 pr-4 text-sm focus:outline-none appearance-none">
               <option value="">All Statuses</option>
               {(['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'] as OrderStatus[]).map(s => <option key={s} value={s}>{s}</option>)}
             </select>
@@ -90,7 +90,7 @@ export default function MyOrdersClient({ initialOrders }: { initialOrders: Order
             <ShoppingBag className="h-14 w-14 text-brand-gold mx-auto animate-pulse-slow" />
             <h3 className="text-xl font-bold text-brand-green">No Orders Yet</h3>
             <p className="text-sm text-brand-foreground/60">Explore our Ayurvedic preparations and place your first order.</p>
-            <Link href="/preparations" className="inline-block bg-brand-green text-white px-6 py-2.5 rounded-full text-sm font-semibold">Shop Now</Link>
+            <Link href="/shop" className="inline-block bg-brand-green text-white px-6 py-2.5 rounded-full text-sm font-semibold">Shop Now</Link>
           </div>
         ) : (
           <div className="divide-y divide-brand-green-border/10">
@@ -120,7 +120,7 @@ export default function MyOrdersClient({ initialOrders }: { initialOrders: Order
                     className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-brand-green border border-brand-green/20 hover:bg-brand-green-light text-sm font-bold transition-colors">
                     <Eye className="h-3.5 w-3.5" /> View
                   </button>
-                  <Link href="/preparations"
+                  <Link href="/shop"
                     className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green text-sm font-bold transition-colors">
                     Reorder
                   </Link>
@@ -134,13 +134,13 @@ export default function MyOrdersClient({ initialOrders }: { initialOrders: Order
       {/* Detail Drawer */}
       {selected && (
         <div className="fixed inset-0 bg-black/60 z-50 flex justify-end">
-          <div className="bg-white w-full max-w-md h-full overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-300">
+          <div className="bg-card w-full max-w-md h-full overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-300">
             <div className="bg-gradient-to-r from-brand-green to-[#0f381b] p-6 text-white flex items-center justify-between sticky top-0 z-10">
               <div>
                 <h3 className="font-extrabold text-lg">Order #{selected.orderNumber}</h3>
                 <p className="text-xs text-brand-green-light mt-0.5">{new Date(selected.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
               </div>
-              <button onClick={() => setSelected(null)} className="p-1.5 bg-white/10 hover:bg-white/20 rounded-full"><X className="h-5 w-5" /></button>
+              <button onClick={() => setSelected(null)} className="p-1.5 bg-card/10 hover:bg-card/20 rounded-full"><X className="h-5 w-5" /></button>
             </div>
             <div className="p-6 space-y-5">
               <span className={`text-sm font-bold px-3 py-1.5 rounded-full ${statusStyles[selected.status]}`}>{selected.status}</span>
@@ -162,14 +162,14 @@ export default function MyOrdersClient({ initialOrders }: { initialOrders: Order
               <div className="bg-brand-green-light/40 rounded-2xl p-4 space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-brand-foreground/70">Subtotal</span><span>{formatPrice(Number(selected.subtotal))}</span></div>
                 <div className="flex justify-between"><span className="text-brand-foreground/70">Shipping</span><span>{Number(selected.shipping) === 0 ? 'Free' : formatPrice(Number(selected.shipping))}</span></div>
-                <div className="flex justify-between font-bold text-brand-green border-t border-brand-green-border/20 pt-2">
+                <div className="flex justify-between font-bold text-brand-green border-t border-border pt-2">
                   <span>Total</span><span>{formatPrice(Number(selected.total))}</span>
                 </div>
               </div>
               {selected.shippingAddress && (
                 <div>
                   <p className="text-xs font-bold text-brand-foreground/60 uppercase tracking-wider mb-2">Delivery Address</p>
-                  <div className="bg-white border border-brand-green-border/10 rounded-2xl p-4 text-sm text-brand-foreground/70 space-y-1">
+                  <div className="bg-card border border-border rounded-2xl p-4 text-sm text-brand-foreground/70 space-y-1">
                     {Object.entries(selected.shippingAddress).map(([k, v]) => <div key={k}><span className="font-semibold capitalize">{k}:</span> {String(v)}</div>)}
                   </div>
                 </div>

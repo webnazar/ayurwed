@@ -66,12 +66,16 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!existingUser) {
+          // Default new Google sign-in users to CONSUMER.
+          // Role can be changed by an admin in the dashboard.
+          const assignedRole: any = 'CONSUMER';
+
           existingUser = await db.user.create({
             data: {
               email: user.email,
               name: user.name || 'Google User',
               avatar: user.image,
-              role: 'CONSUMER',
+              role: assignedRole,
               isActive: true,
             },
           });

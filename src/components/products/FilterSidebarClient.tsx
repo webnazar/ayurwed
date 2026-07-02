@@ -56,7 +56,7 @@ export default function FilterSidebarClient({
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 border border-brand-green-border/10 shadow-sm space-y-6">
+    <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-6">
       <div className="flex items-center gap-2 text-brand-green font-bold border-b border-brand-green-light pb-3">
         <SlidersHorizontal className="h-5 w-5" />
         <span>Filters</span>
@@ -75,7 +75,7 @@ export default function FilterSidebarClient({
                 className={`flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-full transition-all duration-200 border ${
                   isSelected
                     ? 'bg-brand-green text-white border-brand-green shadow-md'
-                    : 'bg-transparent text-brand-foreground/70 border-brand-green-border/20 hover:border-brand-green/50 hover:text-brand-green'
+                    : 'bg-transparent text-brand-foreground/70 border-border hover:border-brand-green/50 hover:text-brand-green'
                 }`}
               >
                 {isSelected && <Check className="h-3 w-3" />}
@@ -98,7 +98,7 @@ export default function FilterSidebarClient({
             placeholder="Find indications..."
             value={indSearch}
             onChange={(e) => setIndSearch(e.target.value)}
-            className="w-full bg-brand-green-light/20 text-brand-foreground text-xs border border-brand-green-border/10 rounded-lg py-1.5 pl-8 pr-3 focus:outline-none focus:border-brand-gold transition-colors"
+            className="w-full bg-brand-green-light/20 text-brand-foreground text-xs border border-border rounded-lg py-1.5 pl-8 pr-3 focus:outline-none focus:border-brand-gold transition-colors"
           />
         </div>
         <div className="flex flex-wrap gap-2">
@@ -111,7 +111,7 @@ export default function FilterSidebarClient({
                 className={`flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-full transition-all duration-200 border ${
                   isSelected
                     ? 'bg-brand-green text-white border-brand-green shadow-md'
-                    : 'bg-transparent text-brand-foreground/70 border-brand-green-border/20 hover:border-brand-green/50 hover:text-brand-green'
+                    : 'bg-transparent text-brand-foreground/70 border-border hover:border-brand-green/50 hover:text-brand-green'
                 }`}
               >
                 {isSelected && <Check className="h-3 w-3" />}

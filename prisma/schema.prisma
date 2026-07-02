@@ -7,71 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  CONSUMER
-  CONSULTANT
-  MANUFACTURER
-  ADMIN
-}
-
-enum ArticleType {
-  HERB
-  CONDITION
-  DIET
-  LIFESTYLE
-  RESEARCH
-}
-
-enum AppointmentStatus {
-  PENDING
-  CONFIRMED
-  COMPLETED
-  CANCELLED
-}
-
-enum ConsultationType {
-  CHAT
-  AUDIO
-  VIDEO
-}
-
-enum OrderStatus {
-  PENDING
-  PROCESSING
-  SHIPPED
-  DELIVERED
-  CANCELLED
-}
-
-enum PaymentStatus {
-  PENDING
-  PAID
-  FAILED
-  REFUNDED
-}
-
 model User {
-  id                  Int                  @id @default(autoincrement())
-  name                String
-  email               String               @unique
-  password            String?
-  role                Role                 @default(CONSUMER)
-  avatar              String?
-  phone               String?
-  isActive            Boolean              @default(true)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  consultantProfile   ConsultantProfile?
-  manufacturerProfile ManufacturerProfile?
-  consumerProfile     ConsumerProfile?
-  appointments        Appointment[]
-  reviews             Review[]
-  articles            KnowledgeArticle[]
-  enrollments         Enrollment[]
-  accounts            Account[]
-  sessions            Session[]
-  enquiries           Enquiry[]
-  orders              Order[]
+  id                Int                @id @default(autoincrement())
+  name              String
+  email             String             @unique
+  password          String?
+  role              Role               @default(CONSUMER)
+  avatar            String?
+  phone             String?
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  accounts          Account[]
+  appointments      Appointment[]
+  consultantProfile ConsultantProfile?
+  consumerProfile   ConsumerProfile?
+  enquiries         Enquiry[]
+  enrollments       Enrollment[]
+  articles          KnowledgeArticle[]
+  orders            Order[]
+  prescriptions     Prescription[]     @relation("PatientPrescriptions")
+  reviews           Review[]
+  notifications     Notification[]
+  fulfillments      Fulfillment[]      @relation("PatientFulfillments")
+  sessions          Session[]
 
   @@map("users")
 }
@@ -92,6 +51,7 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId], map: "accounts_userId_fkey")
   @@map("accounts")
 }
 
@@ -102,179 +62,187 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId], map: "sessions_userId_fkey")
   @@map("sessions")
 }
 
 model ConsultantProfile {
-  id               Int           @id @default(autoincrement())
-  userId           Int           @unique
-  specialization   String
-  experience       Int
-  bio              String        @db.Text
-  languages        Json
-  consultationFee  Decimal       @db.Decimal(10, 2)
-  isVerified       Boolean       @default(false)
-  isFeatured       Boolean       @default(false)
-  subscriptionTier String        @default("basic") // basic | premium
-  rating           Decimal       @default(0) @db.Decimal(3, 2)
-  totalReviews     Int           @default(0)
-  availability     Json
-  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  appointments     Appointment[]
+  id                 Int            @id @default(autoincrement())
+  userId             Int            @unique
+  specialization     String
+  experience         Int
+  bio                String         @db.Text
+  languages          String         @db.LongText
+  consultationFee    Decimal        @db.Decimal(10, 2)
+  followUpFee        Decimal        @default(150.00) @db.Decimal(10, 2)
+  isVerified         Boolean        @default(false)
+  rating             Decimal        @default(0.00) @db.Decimal(3, 2)
+  totalReviews       Int            @default(0)
+  availability       String         @db.LongText
+  degree             String?
+  registrationNumber String?        @db.VarChar(100)
+  isCaiCertified     Boolean        @default(false)
+  isAcfp             Boolean        @default(false)
+  acfpVerifiedAt     DateTime?
+  fulfillmentMethod  String         @default("COURIER")
+  hasOnline          Boolean        @default(true)
+  hasOffline         Boolean        @default(false)
+  hasFulfillment     Boolean        @default(false)
+  hasHomeDelivery    Boolean        @default(false)
+  appointments       Appointment[]
+  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prescriptions      Prescription[]
+  fulfillments       Fulfillment[]  @relation("ConsultantFulfillments")
 
   @@map("consultant_profiles")
 }
 
-model ManufacturerProfile {
+model ConsumerProfile {
   id             Int       @id @default(autoincrement())
   userId         Int       @unique
-  companyName    String
-  slug           String    @unique
-  description    String    @db.Text
-  logo           String?
-  manufacturingLicense String?
-  certifications Json
-  gstNumber      String?
-  address        Json
-  website        String?
-  contactEmail   String?
-  contactPhone   String?
-  distributorInfo Json?    // Info about distributors/how to reach products
-  isVerified     Boolean   @default(false)
-  isPremium      Boolean   @default(false)
-  isFeatured     Boolean   @default(false)
-  listingTier    String    @default("basic") // basic | premium | featured
+  address        String?   @db.Text
+  city           String?
+  state          String?
+  pincode        String?
+  dateOfBirth    DateTime?
+  gender         String?
+  medicalHistory String?   @db.Text
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  weight         Decimal?  @db.Decimal(5, 2)
+  landmark       String?
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  products       Product[]
-  enquiries      Enquiry[]
-
-  @@map("manufacturer_profiles")
-}
-
-model ConsumerProfile {
-  id              Int       @id @default(autoincrement())
-  userId          Int       @unique
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  address         String?   @db.Text
-  city            String?
-  state           String?
-  pincode         String?
-  dateOfBirth     DateTime?
-  gender          String?
-  medicalHistory  String?   @db.Text
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
 
   @@map("consumer_profiles")
 }
 
-model Category {
-  id          Int        @id @default(autoincrement())
-  name        String
-  slug        String     @unique
-  description String?
-  image       String?
-  parentId    Int?
-  parent      Category?  @relation("SubCategory", fields: [parentId], references: [id])
-  children    Category[] @relation("SubCategory")
-  products    Product[]
-
-  @@map("categories")
-}
-
-model Product {
-  id             Int                 @id @default(autoincrement())
-  name           String
-  slug           String              @unique
-  description    String              @db.Text
-  ingredients    Json
-  benefits       Json
-  usage          String              @db.Text
-  mrp            Decimal?            @db.Decimal(10, 2) // Reference MRP only — not for purchase
-  images         Json
-  categoryId     Int
-  manufacturerId Int
-  isActive       Boolean             @default(true)
-  isFeatured     Boolean             @default(false)
-  isSponsored    Boolean             @default(false)
-  isShopProduct  Boolean             @default(false)
-  rating         Decimal             @default(0) @db.Decimal(3, 2)
-  totalReviews   Int                 @default(0)
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @updatedAt
-  category       Category            @relation(fields: [categoryId], references: [id])
-  manufacturer   ManufacturerProfile @relation(fields: [manufacturerId], references: [id])
-  reviews        Review[]
-  enquiries      Enquiry[]
-  indications    Indication[]
-  orderItems     OrderItem[]
+model Preparation {
+  id                Int                @id @default(autoincrement())
+  type              PreparationType    @default(LIQUID_EXTRACT)
+  name              String
+  botanicalName     String?
+  volume            Int?
+  volumeUnit        String?
+  weight            Int?
+  weightUnit        String?
+  count             Int?
+  countUnit         String?
+  stock             Int                @default(0)
+  slug              String             @unique
+  description       String             @db.Text
+  ingredients       String?            @db.LongText
+  benefits          String             @db.LongText
+  usage             String             @db.Text
+  mrp               Decimal?           @db.Decimal(10, 2)
+  images            String             @db.LongText
+  isActive          Boolean            @default(true)
+  isFeatured        Boolean            @default(false)
+  isSponsored       Boolean            @default(false)
+  rating            Decimal            @default(0.00) @db.Decimal(3, 2)
+  totalReviews      Int                @default(0)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  enquiries         Enquiry[]
+  orderItems        OrderItem[]
+  prescriptionItems PrescriptionItem[]
+  reviews           Review[]
+  indications       Indication[]       @relation("IndicationToPreparation")
+  protocols         Protocol[]         @relation("PreparationToProtocol")
 
   @@index([slug])
-  @@index([categoryId])
-  @@map("products")
+  @@map("preparations")
+}
+
+model Protocol {
+  id           Int           @id @default(autoincrement())
+  name         String
+  slug         String        @unique
+  description  String        @db.Text
+  indicationId Int
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  indication   Indication    @relation(fields: [indicationId], references: [id])
+  preparations Preparation[] @relation("PreparationToProtocol")
+
+  @@index([indicationId], map: "protocols_indicationId_fkey")
+  @@map("protocols")
 }
 
 model Indication {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  slug        String    @unique
-  description String?   @db.Text
-  isActive    Boolean   @default(true)
-  products    Product[]
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  slug          String         @unique
+  description   String?        @db.Text
+  isActive      Boolean        @default(true)
+  protocols     Protocol[]
+  preparations  Preparation[]  @relation("IndicationToPreparation")
+  prescriptions Prescription[] @relation("IndicationToPrescription")
 
   @@map("indications")
 }
 
 model Review {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  productId Int
-  rating    Int
-  comment   String   @db.Text
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  rating      Int
+  comment     String      @db.Text
+  createdAt   DateTime    @default(now())
+  extractId   Int
+  preparation Preparation @relation(fields: [extractId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id])
 
+  @@index([extractId], map: "reviews_extractId_fkey")
+  @@index([userId], map: "reviews_userId_fkey")
   @@map("reviews")
 }
 
-// Lead Generation — consumer enquiries to manufacturers
 model Enquiry {
-  id             Int                 @id @default(autoincrement())
-  manufacturerId Int
-  userId         Int?
-  productId      Int?
-  name           String
-  email          String
-  phone          String?
-  message        String              @db.Text
-  isRead         Boolean             @default(false)
-  createdAt      DateTime            @default(now())
-  manufacturer   ManufacturerProfile @relation(fields: [manufacturerId], references: [id])
-  user           User?               @relation(fields: [userId], references: [id])
-  product        Product?            @relation(fields: [productId], references: [id])
+  id          Int          @id @default(autoincrement())
+  userId      Int?
+  name        String
+  email       String
+  phone       String?
+  message     String       @db.Text
+  isRead      Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  extractId   Int?
+  preparation Preparation? @relation(fields: [extractId], references: [id])
+  user        User?        @relation(fields: [userId], references: [id])
 
+  @@index([extractId], map: "enquiries_extractId_fkey")
+  @@index([userId], map: "enquiries_userId_fkey")
   @@map("enquiries")
 }
 
 model Appointment {
-  id           Int               @id @default(autoincrement())
-  consultantId Int
-  userId       Int
-  scheduledAt  DateTime
-  duration     Int               @default(30)
-  status       AppointmentStatus @default(PENDING)
-  type         ConsultationType
-  concern      String            @db.Text
-  notes        String?           @db.Text
-  fee          Decimal           @db.Decimal(10, 2)
-  paymentId    String?
-  meetingLink  String?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  consultant   ConsultantProfile @relation(fields: [consultantId], references: [id])
-  user         User              @relation(fields: [userId], references: [id])
+  id              Int               @id @default(autoincrement())
+  consultantId    Int
+  userId          Int
+  scheduledAt     DateTime
+  duration        Int               @default(30)
+  status          AppointmentStatus @default(PENDING)
+  type            ConsultationType
+  concern         String            @db.Text
+  notes           String?           @db.Text
+  fee             Decimal           @db.Decimal(10, 2)
+  paymentId       String?
+  meetingLink     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  patientAge      Int?
+  patientGender   String?
+  patientName     String?
+  patientRelation String?
+  allergies       String?
+  chronicDiseases String?
+  patientPhone    String?
+  consultant      ConsultantProfile @relation(fields: [consultantId], references: [id])
+  user            User              @relation(fields: [userId], references: [id])
+  prescription    Prescription?
 
+  @@index([consultantId], map: "appointments_consultantId_fkey")
+  @@index([userId], map: "appointments_userId_fkey")
   @@map("appointments")
 }
 
@@ -285,7 +253,7 @@ model KnowledgeArticle {
   excerpt       String
   content       String      @db.LongText
   type          ArticleType
-  tags          Json
+  tags          String      @db.LongText
   featuredImage String?
   authorId      Int
   isPublished   Boolean     @default(false)
@@ -300,6 +268,7 @@ model KnowledgeArticle {
 
   @@index([slug])
   @@index([type])
+  @@index([authorId], map: "knowledge_articles_authorId_fkey")
   @@map("knowledge_articles")
 }
 
@@ -313,22 +282,23 @@ model Course {
   thumbnail    String
   isPublished  Boolean      @default(false)
   createdAt    DateTime     @default(now())
-  lessons      Lesson[]
   enrollments  Enrollment[]
+  lessons      Lesson[]
 
   @@map("courses")
 }
 
 model Lesson {
-  id       Int    @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   courseId Int
   title    String
-  content  String @db.LongText
+  content  String  @db.LongText
   videoUrl String?
   order    Int
   duration Int
-  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course   Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
+  @@index([courseId], map: "lessons_courseId_fkey")
   @@map("lessons")
 }
 
@@ -340,10 +310,11 @@ model Enrollment {
   completedAt    DateTime?
   certificateUrl String?
   createdAt      DateTime  @default(now())
-  user           User      @relation(fields: [userId], references: [id])
   course         Course    @relation(fields: [courseId], references: [id])
+  user           User      @relation(fields: [userId], references: [id])
 
   @@unique([userId, courseId])
+  @@index([courseId], map: "enrollments_courseId_fkey")
   @@map("enrollments")
 }
 
@@ -381,27 +352,174 @@ model Order {
   paymentStatus   PaymentStatus @default(PENDING)
   paymentMethod   String        @default("COD")
   totalAmount     Decimal       @db.Decimal(10, 2)
-  shippingAddress Json?
-  billingAddress  Json?
+  shippingAddress String?       @db.LongText
+  billingAddress  String?       @db.LongText
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-
-  user            User          @relation(fields: [userId], references: [id])
   items           OrderItem[]
+  user            User          @relation(fields: [userId], references: [id])
 
+  @@index([userId], map: "orders_userId_fkey")
   @@map("orders")
 }
 
 model OrderItem {
-  id        Int      @id @default(autoincrement())
-  orderId   Int
-  productId Int
-  quantity  Int
-  price     Decimal  @db.Decimal(10, 2)
-  total     Decimal  @db.Decimal(10, 2)
+  id          Int         @id @default(autoincrement())
+  orderId     Int
+  quantity    Int
+  price       Decimal     @db.Decimal(10, 2)
+  total       Decimal     @db.Decimal(10, 2)
+  extractId   Int
+  preparation Preparation @relation(fields: [extractId], references: [id])
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id])
-
+  @@index([extractId], map: "order_items_extractId_fkey")
+  @@index([orderId], map: "order_items_orderId_fkey")
   @@map("order_items")
+}
+
+model Prescription {
+  id                 Int                @id @default(autoincrement())
+  patientId          Int
+  consultantId       Int
+  appointmentId      Int?               @unique
+  patientAge         Int?
+  patientGender      String?
+  patientWeight      Decimal?           @db.Decimal(5, 2)
+  chronicConditions  String?            @db.Text
+  consultantJudgment String             @db.Text
+  dosageInstructions String?            @db.Text
+  followUpAdvice     String?            @db.VarChar(100)
+  isActive           Boolean            @default(true)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  status             PrescriptionStatus @default(DRAFT)
+  items              PrescriptionItem[]
+  appointment        Appointment?       @relation(fields: [appointmentId], references: [id])
+  consultant         ConsultantProfile  @relation(fields: [consultantId], references: [id])
+  patient            User               @relation("PatientPrescriptions", fields: [patientId], references: [id])
+  indications        Indication[]       @relation("IndicationToPrescription")
+  fulfillment        Fulfillment?
+
+  @@index([consultantId], map: "prescriptions_consultantId_fkey")
+  @@index([patientId], map: "prescriptions_patientId_fkey")
+  @@map("prescriptions")
+}
+
+model PrescriptionItem {
+  id             Int          @id @default(autoincrement())
+  prescriptionId Int
+  preparationId  Int
+  dosage         String
+  frequency      String
+  duration       String
+  instructions   String?      @db.Text
+  preparation    Preparation  @relation(fields: [preparationId], references: [id])
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+
+  @@index([preparationId], map: "prescription_items_preparationId_fkey")
+  @@index([prescriptionId], map: "prescription_items_prescriptionId_fkey")
+  @@map("prescription_items")
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("newsletter_subscribers")
+}
+
+enum Role {
+  CONSUMER
+  CONSULTANT
+  ADMIN
+}
+
+enum ArticleType {
+  HERB
+  CONDITION
+  DIET
+  LIFESTYLE
+  RESEARCH
+}
+
+enum PreparationType {
+  LIQUID_EXTRACT
+  POWDER
+  CAPSULE
+  TABLET
+  OIL
+  CREAM
+  READY_PRODUCT
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum PrescriptionStatus {
+  DRAFT
+  PRESCRIBED
+  FULFILLED
+  COMPLETED
+}
+
+enum ConsultationType {
+  CHAT
+  AUDIO
+  VIDEO
+  OFFLINE
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Fulfillment {
+  id             Int      @id @default(autoincrement())
+  prescriptionId Int      @unique
+  consultantId   Int
+  patientId      Int
+  method         String   @default("COURIER") // "COURIER" or "PICKUP"
+  status         String   @default("PENDING") // "PENDING", "CONFIRMED", "PACKED", "DISPATCHED", "READY_FOR_PICKUP", "COMPLETED", "CANCELLED"
+  trackingNumber String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  prescription Prescription      @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  consultant   ConsultantProfile @relation("ConsultantFulfillments", fields: [consultantId], references: [id], onDelete: Cascade)
+  patient      User              @relation("PatientFulfillments", fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@index([consultantId])
+  @@index([patientId])
+  @@map("fulfillments")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  title     String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notifications")
 }

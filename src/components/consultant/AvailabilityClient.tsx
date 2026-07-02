@@ -65,7 +65,7 @@ export default function AvailabilityClient({
           { label: 'Total Slots', value: totalSlots, icon: Clock, color: 'text-indigo-600 bg-indigo-50' },
           { label: 'Total Booked', value: totalAppointments, icon: Settings, color: 'text-amber-600 bg-amber-50' },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl p-5 border border-brand-green-border/10 shadow-sm flex items-center gap-4">
+          <div key={s.label} className="bg-card rounded-2xl p-5 border border-border shadow-sm flex items-center gap-4">
             <div className={`p-3 rounded-2xl ${s.color}`}><s.icon className="h-5 w-5" /></div>
             <div>
               <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">{s.label}</span>
@@ -75,8 +75,8 @@ export default function AvailabilityClient({
         ))}
       </div>
 
-      <div className="bg-white rounded-3xl border border-brand-green-border/10 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-brand-green-border/10 flex items-center justify-between">
+      <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-brand-green" />
             <h2 className="font-bold text-brand-green">Weekly Availability</h2>
@@ -88,13 +88,13 @@ export default function AvailabilityClient({
         </div>
         <div className="p-6 space-y-4">
           {DAYS.map(day => (
-            <div key={day} className={`rounded-2xl border transition-colors ${availability[day].enabled ? 'border-brand-green/20 bg-brand-green-light/20' : 'border-brand-green-border/10 bg-gray-50/50'}`}>
+            <div key={day} className={`rounded-2xl border transition-colors ${availability[day].enabled ? 'border-brand-green/20 bg-brand-green-light/20' : 'border-border bg-muted/50'}`}>
               <div className="flex items-center justify-between p-4">
                 <span className="font-bold text-brand-green">{day}</span>
                 <button onClick={() => toggleDay(day)}>
                   {availability[day].enabled
                     ? <ToggleRight className="h-7 w-7 text-brand-green" />
-                    : <ToggleLeft className="h-7 w-7 text-gray-400" />}
+                    : <ToggleLeft className="h-7 w-7 text-muted-foreground" />}
                 </button>
               </div>
               {availability[day].enabled && (
@@ -102,8 +102,8 @@ export default function AvailabilityClient({
                   {DEFAULT_SLOTS.map(slot => (
                     <button key={slot} onClick={() => toggleSlot(day, slot)}
                       className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all border ${availability[day].slots.includes(slot)
-                        ? 'bg-brand-green text-white border-brand-green'
-                        : 'bg-white text-brand-foreground/50 border-brand-green-border/20 hover:border-brand-green/40'}`}>
+                        ? 'bg-brand-green text-white border-brand-green shadow-sm shadow-brand-green/20'
+                        : 'bg-card text-foreground/70 border-border hover:border-brand-green/50 hover:bg-brand-green-light/20 hover:text-brand-green'}`}>
                       {slot}
                     </button>
                   ))}

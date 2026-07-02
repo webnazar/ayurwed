@@ -6,6 +6,7 @@ import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { Leaf, Lock, Mail, User, Phone, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'CONSUMER' | 'CONSULTANT' | 'MANUFACTURER'>('CONSUMER');
+  const [role, setRole] = useState<'CONSUMER' | 'CONSULTANT'>('CONSUMER');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,22 +63,25 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-gold-light flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-4">
-        <Link href="/" className="inline-block">
-          <img
-            src="/ayurwed.webp"
-            alt="AYURWED Logo"
-            className="h-40 sm:h-44 w-auto object-contain mx-auto transition-transform duration-300 hover:scale-[1.02]"
-          />
-        </Link>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-brand-green">
-          Begin Your Wellness Journey
-        </h2>
+    <div className="min-h-screen bg-brand-gold-light flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <ThemeToggle />
       </div>
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-card py-8 px-4 border border-border shadow-xl rounded-3xl sm:px-10">
+          <div className="text-center mb-8 space-y-4">
+            <Link href="/" className="inline-block">
+              <img
+                src="/ayurwed.webp"
+                alt="AYURWED Logo"
+                className="h-40 sm:h-44 w-auto object-contain mx-auto transition-transform duration-300 hover:scale-[1.02]"
+              />
+            </Link>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-brand-green">
+              Begin Your Wellness Journey
+            </h2>
+          </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 border border-brand-green-border/10 shadow-xl rounded-3xl sm:px-10">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-brand-green uppercase tracking-wider">Full Name</label>
@@ -142,11 +146,10 @@ export default function RegisterPage() {
             {/* Account Type Selection */}
             <div>
               <label className="block text-xs font-bold text-brand-green uppercase tracking-wider mb-2">Account Type</label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {([
-                  { key: 'CONSUMER', label: 'Seeker' },
+                  { key: 'CONSUMER', label: 'User' },
                   { key: 'CONSULTANT', label: 'Doctor' },
-                  { key: 'MANUFACTURER', label: 'Maker' },
                 ] as const).map((opt) => (
                   <button
                     key={opt.key}
@@ -155,7 +158,7 @@ export default function RegisterPage() {
                     className={`py-2 px-3 border rounded-xl text-xs font-bold transition-all text-center ${
                       role === opt.key
                         ? 'bg-brand-green border-brand-green text-white shadow-sm'
-                        : 'bg-white border-brand-green-border/10 text-brand-foreground/70'
+                        : 'bg-card border-border text-brand-foreground/70'
                     }`}
                   >
                     {opt.label}
@@ -178,10 +181,10 @@ export default function RegisterPage() {
             {/* Divider */}
             <div className="relative my-4">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-brand-green-border/20"></div>
+                <div className="w-full border-t border-border"></div>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-brand-foreground/50 font-bold">Or continue with</span>
+                <span className="bg-card px-2 text-brand-foreground/50 font-bold">Or continue with</span>
               </div>
             </div>
 
@@ -189,8 +192,11 @@ export default function RegisterPage() {
             <div>
               <button
                 type="button"
-                onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
-                className="w-full bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-4 rounded-full border border-gray-300 hover:border-gray-400 transition-all duration-300 flex items-center justify-center gap-3 shadow-sm text-sm"
+                onClick={() => {
+                  document.cookie = `google_auth_role=${role}; path=/; max-age=600`; // valid for 10 minutes
+                  signIn('google', { callbackUrl: '/dashboard' });
+                }}
+                className="w-full bg-card hover:bg-muted text-gray-700 font-bold py-3 px-4 rounded-full border border-border hover:border-gray-400 transition-all duration-300 flex items-center justify-center gap-3 shadow-sm text-sm"
               >
                 <img
                   src="https://www.svgrepo.com/show/475656/google-color.svg"

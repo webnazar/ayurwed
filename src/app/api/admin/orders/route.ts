@@ -16,7 +16,7 @@ export async function GET() {
         user: { select: { name: true, email: true, phone: true } },
         items: {
           include: {
-            product: { select: { name: true, images: true } }
+            preparation: { select: { name: true, images: true } }
           }
         }
       }
@@ -58,7 +58,7 @@ export async function PATCH(req: Request) {
         user: { select: { name: true, email: true, phone: true } },
         items: {
           include: {
-            product: { select: { name: true, images: true } }
+            preparation: { select: { name: true, images: true } }
           }
         }
       }

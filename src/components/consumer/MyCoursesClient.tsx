@@ -27,7 +27,7 @@ export default function MyCoursesClient({ initialEnrollments }: { initialEnrollm
           { label: 'Completed', value: stats.completed, icon: CheckCircle2, color: 'text-emerald-600 bg-emerald-50' },
           { label: 'Certificates', value: stats.certificates, icon: Trophy, color: 'text-indigo-600 bg-indigo-50' },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-2xl p-5 border border-brand-green-border/10 shadow-sm flex items-center gap-4">
+          <div key={s.label} className="bg-card rounded-2xl p-5 border border-border shadow-sm flex items-center gap-4">
             <div className={`p-3 rounded-2xl ${s.color}`}><s.icon className="h-5 w-5" /></div>
             <div>
               <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">{s.label}</span>
@@ -39,7 +39,7 @@ export default function MyCoursesClient({ initialEnrollments }: { initialEnrollm
 
       {/* Courses */}
       {initialEnrollments.length === 0 ? (
-        <div className="bg-white rounded-3xl p-20 text-center border border-brand-green-border/10 shadow-sm space-y-4">
+        <div className="bg-card rounded-3xl p-20 text-center border border-border shadow-sm space-y-4">
           <BookOpen className="h-14 w-14 text-brand-gold mx-auto animate-pulse-slow" />
           <h3 className="text-xl font-bold text-brand-green">No Courses Yet</h3>
           <p className="text-sm text-brand-foreground/60">Explore Ayurvedic wellness courses and start learning.</p>
@@ -50,7 +50,7 @@ export default function MyCoursesClient({ initialEnrollments }: { initialEnrollm
             const totalLessons = e.course.lessons?.length || 0;
             const completedLessons = Math.round((e.progress / 100) * totalLessons);
             return (
-              <div key={e.id} className="bg-white rounded-3xl overflow-hidden border border-brand-green-border/10 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group">
+              <div key={e.id} className="bg-card rounded-3xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group">
                 <div className="relative h-44 overflow-hidden bg-brand-green-light">
                   <img src={e.course.thumbnail} alt={e.course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   {e.completedAt && (

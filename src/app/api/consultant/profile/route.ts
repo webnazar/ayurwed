@@ -7,7 +7,10 @@ export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     const body = await req.json();
-    const { targetUserId, name, avatar, specialization, experience, bio, languages, consultationFee } = body;
+    const { 
+      targetUserId, name, avatar, degree, specialization, experience, bio, languages, consultationFee, followUpFee,
+      isCaiCertified, isVerified, isAcfp, fulfillmentMethod 
+    } = body;
 
     const isAdmin = session && (session.user as any).role === 'ADMIN';
     const isOwner = session && (session.user as any).role === 'CONSULTANT';
@@ -34,11 +37,19 @@ export async function PATCH(req: Request) {
       db.consultantProfile.update({
         where: { userId: profileUserId },
         data: {
+          degree: degree || undefined,
           specialization: specialization || undefined,
           experience: experience !== undefined ? experience : undefined,
           bio: bio || undefined,
           languages: languages || undefined,
           consultationFee: consultationFee !== undefined ? Number(consultationFee) : undefined,
+          followUpFee: followUpFee !== undefined ? Number(followUpFee) : undefined,
+          fulfillmentMethod: (fulfillmentMethod === 'COURIER' || fulfillmentMethod === 'PICKUP') ? fulfillmentMethod : undefined,
+          // Admin override flags
+          isCaiCertified: (isAdmin && isCaiCertified !== undefined) ? isCaiCertified : undefined,
+          isVerified: (isAdmin && isVerified !== undefined) ? isVerified : undefined,
+          isAcfp: (isAdmin && isAcfp !== undefined) ? isAcfp : undefined,
+          acfpVerifiedAt: (isAdmin && isAcfp === true) ? new Date() : (isAdmin && isAcfp === false) ? null : undefined,
         },
       })
     ]);

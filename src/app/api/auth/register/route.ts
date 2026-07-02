@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import slugify from 'slugify';
 
 export async function POST(req: Request) {
   try {
@@ -39,31 +40,13 @@ export async function POST(req: Request) {
               specialization: 'General Ayurveda Medicine',
               experience: 0,
               bio: 'Certified Ayurvedic consultant profile.',
-              languages: ['English'],
+              languages: JSON.stringify(['English']),
               consultationFee: 300.00,
+              followUpFee: 150.00,
               isVerified: false,
-              availability: {
+              availability: JSON.stringify({
                 monday: ['09:00-12:00'],
-              },
-            },
-          },
-        }),
-        ...(role === 'MANUFACTURER' && {
-          manufacturerProfile: {
-            create: {
-              companyName: `${name} Ltd`,
-              description: 'Ayurvedic preparations manufacturing factory.',
-              certifications: ['GMP Compliant'],
-              gstNumber: '',
-              address: {
-                street: '',
-                city: '',
-                state: '',
-                pincode: '',
-                country: 'India',
-              },
-              website: '',
-              isVerified: false,
+              }),
             },
           },
         }),

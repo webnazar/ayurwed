@@ -38,6 +38,7 @@ export async function PUT(req: Request) {
     const body = await req.json();
     const { 
       address, 
+      landmark,
       city, 
       state, 
       pincode, 
@@ -61,6 +62,7 @@ export async function PUT(req: Request) {
       where: { userId },
       update: {
         address,
+        landmark,
         city,
         state,
         pincode,
@@ -71,6 +73,7 @@ export async function PUT(req: Request) {
       create: {
         userId,
         address,
+        landmark,
         city,
         state,
         pincode,

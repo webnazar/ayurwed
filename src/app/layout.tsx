@@ -8,10 +8,15 @@ import { Toaster } from 'react-hot-toast';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'AYURWED — Ancient Wisdom • Modern Wellness',
-  description: "India's trusted Ayurveda ecosystem connecting consumers, consultants, manufacturers, education, and AI-powered wellness guidance.",
+  title: 'AYURWED — Ancient Intelligence • Modern Wellness',
+  description: "India's trusted Ayurveda ecosystem connecting consumers, consultants, education, and AI-powered wellness guidance based on custom formulations of generic extracts, powders, capsules, and tablets.",
   icons: {
-    icon: '/icon.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/icon.png',
   },
 };
 

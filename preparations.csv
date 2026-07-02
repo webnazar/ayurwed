@@ -1,0 +1,402 @@
+name,description
+Constipation,Difficulty passing stools or infrequent bowel movements often causing discomfort and straining.
+Gas,Excessive intestinal gas causing discomfort and pressure in the abdomen.
+Bloating,A feeling of fullness and tightness in the abdomen due to trapped gas or fluid.
+Indigestion,Poor breakdown of food causing heaviness and discomfort after meals.
+Hyperacidity,Excess stomach acid production causing burning sensation and sour belching.
+Heartburn,Burning sensation in the chest caused by stomach acid rising into the esophagus.
+Nausea,An unsettled stomach sensation with the urge to vomit.
+Vomiting,Forceful expulsion of stomach contents due to digestive disturbance or infection.
+Diarrhea,Frequent loose or watery stools causing dehydration and weakness.
+Loss of Appetite,Reduced desire to eat due to digestive or systemic imbalance.
+Stomach Cramps,Painful spasms in the abdominal region caused by gas or gut inflammation.
+Irritable Bowel,A functional gut disorder causing alternating constipation and diarrhea with cramping.
+Stomach Ulcers,Open sores in the stomach lining causing pain and burning after eating.
+Mouth Ulcers,Painful sores inside the mouth causing discomfort during eating and speaking.
+Bad Breath,Persistent unpleasant odor from the mouth linked to poor digestion or oral bacteria.
+Hiccups,Repeated involuntary contractions of the diaphragm causing characteristic sounds.
+Excessive Hunger,Abnormally increased appetite often linked to metabolic or digestive imbalance.
+Food Intolerance,Digestive sensitivity to specific foods causing discomfort and bloating after consumption.
+Piles (Haemorrhoids),Swollen veins in the rectal area causing pain, itching, and bleeding during bowel movements.
+Fissures,Small tears in the anal lining causing sharp pain and bleeding during defecation.
+Fistula,An abnormal channel between the anal canal and skin causing discharge and discomfort.
+Rectal Bleeding,Bleeding from the rectum during or after bowel movements requiring attention.
+Liver Weakness,Reduced liver function affecting digestion, detoxification, and energy levels.
+Fatty Liver,Excess fat accumulation in liver cells impairing its normal function.
+Jaundice,Yellowing of skin and eyes due to elevated bilirubin from liver dysfunction.
+Poor Detox,Accumulation of toxins in the body due to impaired liver and elimination channels.
+Worm Infestation,Presence of intestinal parasites causing digestive discomfort and nutritional deficiency.
+Colitis,Inflammation of the colon causing abdominal pain, diarrhea, and mucus in stools.
+Crohn's Disease,Chronic inflammatory bowel condition causing digestive pain and poor nutrient absorption.
+Celiac Sensitivity,Digestive intolerance to gluten causing bloating, diarrhea, and nutritional deficiency.
+Spleen Weakness,Reduced spleen function affecting blood health and immune response.
+Cold,Common viral infection causing runny nose, sneezing, and mild fever.
+Cough,Persistent throat irritation and airway clearing reflex causing discomfort.
+Dry Cough,A non-productive cough without mucus causing throat irritation and dryness.
+Wet Cough,A productive cough with mucus accumulation in the airways.
+Asthma,Chronic airway inflammation causing recurrent breathlessness and wheezing.
+Allergic Rhinitis,Immune reaction to airborne allergens causing sneezing, runny nose, and nasal congestion.
+Sinusitis,Inflammation of the sinus cavities causing facial pain, pressure, and congestion.
+Nasal Congestion,Blocked nasal passages due to inflammation or excess mucus.
+Nasal Polyps,Non-cancerous growths in the nasal passages causing obstruction and breathing difficulty.
+Sneezing,Frequent involuntary sneezing triggered by allergens or nasal irritation.
+Bronchitis,Inflammation of the bronchial tubes causing cough, mucus, and chest discomfort.
+Breathlessness,Difficulty breathing or shortness of breath during rest or exertion.
+Wheezing,A high-pitched whistling sound during breathing due to narrowed airways.
+Tonsillitis,Inflammation of the tonsils causing sore throat, difficulty swallowing, and fever.
+Sore Throat,Pain and irritation in the throat worsened by swallowing.
+Hoarseness,Loss or roughness of voice due to inflammation or strain of the vocal cords.
+Chest Congestion,Accumulation of mucus in the chest causing heaviness and breathing difficulty.
+Pneumonia,Infection causing inflammation of lung tissue with fever, cough, and breathing difficulty.
+Pleuritis,Inflammation of the tissue surrounding the lungs causing sharp chest pain with breathing.
+Acne,Inflammatory skin eruptions caused by clogged pores and bacterial activity.
+Pimples,Small inflamed bumps on the skin surface resulting from excess oil and bacteria.
+Blackheads,Clogged open pores on the skin surface appearing as dark spots.
+Eczema,Chronic inflammatory skin condition causing itching, redness, and dry patches.
+Psoriasis,Autoimmune skin condition causing thick scaly patches and skin inflammation.
+Dry Skin,Lack of moisture in the skin causing flakiness, tightness, and roughness.
+Oily Skin,Excess sebum production leading to shiny skin and clogged pores.
+Itching,Persistent skin irritation and urge to scratch without visible rash.
+Skin Rashes,Redness and eruptions on the skin caused by allergic or inflammatory reactions.
+Urticaria (Hives),Raised itchy welts on the skin triggered by allergic reactions.
+Dark Spots,Areas of excess pigmentation on the skin from sun exposure or inflammation.
+Pigmentation,Uneven skin tone and patchy discoloration on the face or body.
+Dull Skin,Lack of natural radiance and glow due to poor circulation and toxin accumulation.
+Dark Circles,Discoloration under the eyes linked to fatigue, poor sleep, and poor circulation.
+Wrinkles,Lines and creases on the skin surface caused by aging and collagen loss.
+Sagging Skin,Loss of skin firmness and elasticity due to aging or rapid weight loss.
+Stretch Marks,Linear scars on the skin from rapid stretching due to growth or weight changes.
+Fungal Skin Infection,Fungal overgrowth on the skin causing itching, redness, and scaling.
+Ringworm,A fungal infection causing circular itchy patches on the skin surface.
+Scabies,A skin infestation by mites causing intense itching and small bumps.
+Warts,Small rough growths on the skin caused by viral infection.
+Vitiligo,Loss of skin pigment causing white patches on various parts of the body.
+Rosacea,Chronic skin condition causing facial redness, flushing, and visible blood vessels.
+Wound Healing,Slow or poor recovery of cuts, abrasions, or surgical wounds.
+Burns,Skin damage from heat, chemicals, or radiation requiring soothing and healing support.
+Cracked Heels,Dry and fissured skin on the heels causing discomfort and pain when walking.
+Excessive Sweating,Abnormal or excessive perspiration beyond what is needed for temperature regulation.
+Body Odor,Persistent unpleasant body smell arising from sweat and bacterial activity.
+Skin Allergy,Allergic reaction on the skin causing redness, itching, and inflammation.
+Hair Fall,Excessive shedding or thinning of hair from the scalp.
+Dandruff,Flaky scalp condition caused by dryness or fungal overgrowth.
+Premature Greying,Early loss of hair pigmentation causing grey or white hair before age.
+Dry & Frizzy Hair,Lack of moisture and texture in hair causing roughness and breakage.
+Weak Hair,Brittle and thin hair prone to splitting and breakage.
+Scalp Itching,Persistent itching of the scalp due to dryness, dandruff, or scalp conditions.
+Scalp Psoriasis,Psoriatic condition on the scalp causing thick scaly patches and flaking.
+Alopecia,Patchy or widespread hair loss from the scalp or body due to autoimmune factors.
+Stress,Physical or emotional tension affecting daily wellbeing and mental peace.
+Anxiety,Persistent worry, nervousness, and unease affecting daily functioning.
+Depression,Persistent low mood, lack of motivation, and emotional emptiness.
+Insomnia,Difficulty falling asleep or staying asleep through the night.
+Poor Sleep Quality,Sleeping but waking unrefreshed due to light or disturbed sleep patterns.
+Brain Fog,Cognitive cloudiness and difficulty thinking, remembering, or focusing clearly.
+Poor Memory,Decline in ability to retain and recall information.
+Low Concentration,Difficulty sustaining mental focus on tasks for extended periods.
+Mood Swings,Rapid and unpredictable emotional changes affecting relationships and wellbeing.
+Irritability,Heightened emotional sensitivity and quick frustration with minor triggers.
+Panic Attacks,Sudden episodes of intense fear with physical symptoms like palpitations and sweating.
+OCD Tendencies,Recurring intrusive thoughts and compulsive behaviors causing distress.
+Phobias,Intense irrational fear of specific objects or situations affecting daily life.
+Loneliness,Persistent feeling of social isolation and lack of meaningful connection.
+Grief & Emotional Loss,Deep emotional pain and sadness following loss of a loved one or major life change.
+Burnout,Physical and emotional exhaustion from prolonged stress and overwork.
+Low Self-Esteem,Persistent negative perception of oneself affecting confidence and decisions.
+Addiction Recovery,Support for overcoming dependency on substances or compulsive behaviors.
+Headache,Pain in the head region from tension, dehydration, or systemic imbalance.
+Migraine,Intense recurring headaches with nausea and light sensitivity.
+Vertigo,Sensation of spinning or dizziness affecting balance and stability.
+Dizziness,Lightheadedness and unsteadiness often linked to low blood pressure or inner ear issues.
+Tremors,Involuntary shaking or trembling of hands, limbs, or head.
+Nerve Weakness,Reduced nerve signal strength causing weakness, numbness, or poor reflex.
+Numbness,Loss of sensation in extremities linked to nerve compression or circulation issues.
+Tingling,Pins-and-needles sensation in hands or feet due to nerve or circulatory issues.
+Epilepsy Support,Support for reducing frequency of seizures and improving neurological stability.
+Paralysis Recovery,Support for restoring movement and nerve function after paralytic stroke or injury.
+Parkinson's Support,Supportive management for tremors, rigidity, and movement challenges.
+Sciatica,Sharp radiating pain along the sciatic nerve from the lower back to the leg.
+Neuralgia,Intense burning or stabbing nerve pain along a nerve pathway.
+Multiple Sclerosis Support,Supportive care for nerve degeneration and muscular symptoms of MS.
+Tinnitus,Persistent ringing, buzzing, or hissing sounds in the ears.
+Joint Pain,Discomfort, aching, and stiffness in one or more joints.
+Knee Pain,Localized pain, swelling, or stiffness in the knee joint.
+Back Pain,Pain in the upper, middle, or lower back affecting movement.
+Lower Back Pain,Discomfort and stiffness specifically in the lumbar region of the back.
+Neck Pain,Stiffness and pain in the cervical region often worsened by posture.
+Shoulder Pain,Aching or restricted movement in the shoulder joint and surrounding muscles.
+Hip Pain,Discomfort and stiffness in the hip joint affecting walking and posture.
+Heel Pain,Pain in the heel bone area often caused by plantar fasciitis or calcaneal spur.
+Elbow Pain,Pain and tenderness around the elbow joint from strain or inflammation.
+Wrist Pain,Discomfort in the wrist joint affecting grip and fine motor movement.
+Arthritis,Inflammation of joints causing pain, swelling, and reduced range of motion.
+Rheumatoid Arthritis,Autoimmune joint inflammation causing symmetrical pain, swelling, and joint damage.
+Gout,Sudden severe joint pain from uric acid crystal deposits typically in the big toe.
+Osteoarthritis,Age-related joint cartilage degeneration causing pain and stiffness.
+Muscle Pain,Soreness and aching in muscles from overuse, injury, or systemic imbalance.
+Muscle Cramps,Sudden involuntary and painful muscle contractions often in the legs.
+Muscle Weakness,Reduced strength and power in muscles affecting physical activity.
+Body Stiffness,Generalized rigidity and reduced flexibility in the body.
+Swollen Joints,Inflammation and swelling around joints indicating active inflammatory process.
+Fibromyalgia,Widespread musculoskeletal pain with fatigue and sleep disturbances.
+Bone Loss,Gradual reduction in bone mineral density increasing fracture risk.
+Osteoporosis,Advanced bone thinning causing fragile bones prone to fractures.
+Fracture Recovery,Support for faster bone healing and recovery after bone fractures.
+Sports Injury,Musculoskeletal damage from physical activity requiring healing support.
+Carpal Tunnel,Nerve compression at the wrist causing pain, tingling, and weakness in the hand.
+Frozen Shoulder,Stiffness and pain in the shoulder joint severely restricting movement.
+Spondylosis,Age-related degeneration of spinal discs causing neck or back pain and stiffness.
+Slip Disc,Displacement of spinal disc causing nerve compression and radiating pain.
+Irregular Periods,Inconsistent or unpredictable menstrual cycles caused by hormonal imbalance.
+Painful Periods,Severe cramping and discomfort during menstruation affecting daily activities.
+Heavy Periods,Abnormally heavy menstrual bleeding causing fatigue and iron loss.
+Scanty Periods,Unusually light or infrequent menstrual flow indicating hormonal issues.
+PCOS,Hormonal disorder causing irregular cycles, cysts on ovaries, and metabolic issues.
+White Discharge,Abnormal vaginal discharge causing discomfort and indicating reproductive imbalance.
+Vaginal Infection,Microbial overgrowth in the vaginal area causing itching, discharge, and odor.
+Menopause Support,Relief from hot flashes, mood changes, and dryness during the menopausal transition.
+Pre-Menstrual Syndrome,Physical and emotional symptoms in the days before menstruation.
+Endometriosis Support,Supportive care for pain and inflammation from endometrial tissue outside the uterus.
+Uterine Fibroids,Non-cancerous uterine growths causing heavy bleeding and pelvic discomfort.
+Ovarian Cysts,Fluid-filled sacs on the ovaries causing pelvic pain and hormonal disruption.
+Female Infertility,Difficulty conceiving due to hormonal, ovarian, or uterine factors.
+Low Breast Milk,Insufficient milk production in breastfeeding mothers.
+Post-Delivery Recovery,Support for physical and hormonal restoration after childbirth.
+Pregnancy Support,Nutritional and wellness support during pregnancy for mother and baby.
+Morning Sickness,Nausea and vomiting during early pregnancy causing weakness and poor appetite.
+Hormonal Imbalance in Women,Disruption in female hormone levels affecting mood, cycle, and overall health.
+Low Libido in Women,Reduced sexual desire in women linked to hormonal or emotional factors.
+Low Energy in Men,Persistent fatigue and lack of vitality affecting daily performance in men.
+Low Testosterone,Below-normal testosterone levels causing fatigue, low libido, and mood changes.
+Erectile Dysfunction,Inability to achieve or sustain an erection affecting sexual health.
+Premature Ejaculation,Lack of ejaculatory control causing distress in sexual relationships.
+Male Infertility,Reduced sperm count or quality affecting ability to conceive.
+Prostate Enlargement,Benign enlargement of the prostate causing urinary frequency and weak flow.
+Prostate Inflammation,Inflammation of the prostate gland causing pelvic pain and urinary discomfort.
+Low Sperm Count,Reduced number of sperm in semen affecting male fertility.
+Low Libido in Men,Reduced sexual desire in men linked to hormonal decline or stress.
+Male Pattern Baldness,Genetic hair thinning and recession in men typically starting at the crown.
+Scrotal Issues,Discomfort or swelling in the scrotal region requiring attention.
+Nightfall,Involuntary ejaculation during sleep causing weakness and anxiety in men.
+Diabetes,Chronic condition of impaired blood sugar regulation causing systemic complications.
+High Blood Sugar,Elevated glucose levels in the blood requiring dietary and herbal management.
+Low Blood Sugar,Below-normal blood glucose causing dizziness, sweating, and weakness.
+High Cholesterol,Excess lipids in the bloodstream increasing cardiovascular risk.
+Triglycerides,Elevated blood triglyceride levels linked to diet and metabolic health.
+Obesity,Excess body fat accumulation increasing risk of metabolic and joint diseases.
+Weight Gain,Unintended increase in body weight from metabolic or dietary causes.
+Weight Loss,Unintended loss of body weight indicating nutritional or systemic issues.
+Belly Fat,Excess fat accumulation around the abdomen linked to metabolic risk.
+Slow Metabolism,Reduced rate of calorie processing causing weight gain and low energy.
+Low Thyroid,Underactive thyroid causing weight gain, fatigue, and cold sensitivity.
+High Thyroid,Overactive thyroid causing weight loss, anxiety, and rapid heartbeat.
+Insulin Resistance,Reduced cellular response to insulin leading toward pre-diabetes and metabolic syndrome.
+Metabolic Syndrome,Cluster of conditions including high blood sugar, cholesterol, and abdominal obesity.
+High Blood Pressure,Elevated arterial pressure increasing risk of heart and kidney damage.
+Low Blood Pressure,Below-normal blood pressure causing dizziness, fainting, and fatigue.
+Heart Palpitations,Irregular or rapid heartbeat causing awareness of the heart's rhythm.
+Chest Pain,Discomfort or tightness in the chest from cardiac, muscular, or digestive causes.
+Poor Circulation,Inadequate blood flow to extremities causing coldness, numbness, and fatigue.
+Varicose Veins,Swollen and twisted veins in the legs causing aching and heaviness.
+Anaemia,Low red blood cell count causing fatigue, pallor, and breathlessness.
+Low Haemoglobin,Reduced haemoglobin levels in blood causing weakness and poor oxygen delivery.
+Atherosclerosis Support,Supportive care for reducing arterial plaque and improving vascular flexibility.
+Heart Weakness,Reduced cardiac strength and endurance requiring tonic and lifestyle support.
+Stroke Recovery,Rehabilitation support for restoring function after a cerebrovascular stroke.
+Blood Clotting Issues,Abnormal tendency to clot or bleed affecting vascular health.
+Burning Urination,Pain or burning sensation during urination indicating urinary tract infection.
+Frequent Urination,Unusually frequent need to urinate disrupting daily life and sleep.
+Urinary Tract Infection,Bacterial infection of the urinary system causing pain and urgency.
+Kidney Stones,Mineral deposits in the kidneys causing severe flank pain and urinary blockage.
+Poor Kidney Function,Reduced filtration capacity of the kidneys affecting fluid and waste balance.
+Urinary Incontinence,Involuntary leakage of urine causing embarrassment and discomfort.
+Bladder Weakness,Poor bladder muscle tone causing incomplete emptying or urgency.
+Cloudy Urine,Turbid or discolored urine indicating infection or metabolic imbalance.
+Protein in Urine,Presence of protein in urine indicating kidney stress or damage.
+Water Retention (Edema),Accumulation of excess fluid in body tissues causing swelling and puffiness.
+Low Immunity,Reduced ability to fight infections leading to frequent illness.
+Frequent Infections,Recurring bacterial or viral infections indicating weak immune defense.
+Allergy,Immune hypersensitivity to environmental, food, or contact triggers.
+Autoimmune Support,Supportive care for conditions where the immune system attacks the body.
+Post-COVID Recovery,Regaining energy, lung function, and immunity after COVID-19 illness.
+General Weakness,Overall physical debility and lack of strength without specific disease.
+Fatigue,Persistent tiredness unrelieved by rest affecting daily functioning.
+Low Stamina,Reduced endurance and physical capacity during activity.
+Recovery Support,Rebuilding strength and vitality after illness, surgery, or prolonged stress.
+Detox Support,Cleansing the body of accumulated toxins through herbal and dietary support.
+Healthy Aging,Slowing the aging process and maintaining vitality in later years.
+Immunity Support,Strengthening the body's natural disease resistance for long-term wellness.
+Energy Support,Improving overall physical and mental energy levels for daily performance.
+Stress Management,Reducing the impact of chronic stress on the body and mind.
+Adaptogen Support,Using tonifying herbs to improve the body's resilience to physical and emotional stress.
+Antioxidant Support,Reducing oxidative damage and free radical activity in the body.
+Inflammation Support,Reducing chronic low-grade inflammation linked to multiple lifestyle diseases.
+Weight Management,Maintaining a healthy body weight through metabolic and dietary support.
+Sleep Support,Improving the quality and duration of sleep naturally.
+Concentration Support,Improving mental focus and cognitive clarity for study or work.
+Eye Strain,Tired, sore, or burning eyes from prolonged screen use or reading.
+Weak Eyesight,Declining visual acuity requiring nutritional and herbal support.
+Dry Eyes,Insufficient eye lubrication causing irritation, redness, and burning.
+Watery Eyes,Excessive tearing from eye irritation, allergy, or blocked tear ducts.
+Eye Infection,Bacterial or viral infection of the eye causing redness and discharge.
+Night Blindness,Difficulty seeing in low light conditions due to vitamin A or retinal deficiency.
+Cataract Support,Supportive care to slow the progression of lens clouding in the eye.
+Glaucoma Support,Supportive care for managing eye pressure in glaucoma.
+Ear Pain,Pain and discomfort in the ear canal from infection or inflammation.
+Ear Infection,Bacterial or viral infection of the ear causing pain and hearing disruption.
+Hearing Loss,Partial reduction in hearing ability due to age, infection, or nerve damage.
+Tinnitus,Persistent ringing, buzzing, or hissing sounds in one or both ears.
+Ear Discharge,Fluid draining from the ear indicating infection or perforation.
+Nasal Bleeding,Bleeding from the nasal passages from dryness, injury, or vascular fragility.
+Dry Nose,Lack of moisture in the nasal passages causing discomfort and crusting.
+Loss of Smell,Reduced or absent sense of smell from nasal or neurological causes.
+Tooth Pain,Pain in the tooth or gum from decay, sensitivity, or infection.
+Bleeding Gums,Gum inflammation causing bleeding during brushing indicating poor gum health.
+Gum Disease,Bacterial infection of gum tissue causing recession, pain, and tooth loosening.
+Tooth Sensitivity,Sharp pain in teeth triggered by hot, cold, or sweet stimuli.
+Jaw Pain,Discomfort in the jaw joint and surrounding muscles during chewing.
+Dry Mouth,Insufficient saliva production causing discomfort, bad breath, and swallowing difficulty.
+Child Immunity,Building strong immune defenses in children for protection against infections.
+Child Digestion,Digestive discomfort in children including colic, gas, and poor appetite.
+Low Appetite in Children,Poor food interest in children due to weak digestion or nutritional deficiency.
+Bedwetting,Involuntary nighttime urination in children beyond the expected age.
+Growth & Development,Supporting healthy physical and cognitive development in growing children.
+Teething Discomfort,Pain and irritability in infants during the emergence of new teeth.
+Childhood Cough,Persistent cough in children from infection or airway sensitivity.
+Childhood Fever,Elevated body temperature in children from infection or immune response.
+Childhood Skin Issues,Common skin conditions in children including rashes and eczema.
+Hyperactivity in Children,Excessive restlessness and poor attention span in children.
+Learning Difficulties,Challenges in reading, writing, or comprehension in school-age children.
+Childhood Anxiety,Excessive worry or fear in children affecting school and social life.
+Autism Support,Supportive care for improving communication and sensory sensitivities.
+Child Sleep Issues,Difficulty falling or staying asleep in infants and young children.
+Weakness After Illness,Persistent fatigue and debility following recovery from acute illness.
+Post-Surgery Recovery,Support for faster healing and strength restoration after surgical procedures.
+Post-Delivery Weakness,Physical and hormonal depletion in women following childbirth.
+Chemotherapy Support,Supportive care for managing side effects of chemotherapy treatment.
+Radiation Support,Supportive care for reducing tissue damage from radiation therapy.
+Nutritional Deficiency,Inadequate intake or absorption of essential nutrients causing systemic symptoms.
+Iron Deficiency,Low iron levels causing fatigue, pallor, and weak immunity.
+Calcium Deficiency,Insufficient calcium causing weak bones, muscle cramps, and poor dental health.
+Vitamin D Deficiency,Low vitamin D causing bone weakness, fatigue, and immune suppression.
+Vitamin B12 Deficiency,Deficiency causing nerve damage, fatigue, and poor cognitive function.
+Zinc Deficiency,Low zinc causing poor immunity, slow wound healing, and hair loss.
+Magnesium Deficiency,Low magnesium causing muscle cramps, anxiety, and poor sleep.
+Protein Deficiency,Insufficient protein causing muscle loss, poor immunity, and slow healing.
+Dehydration,Insufficient fluid levels in the body causing fatigue, headache, and poor function.
+Electrolyte Imbalance,Disruption in sodium, potassium, or magnesium balance affecting muscle and nerve function.
+Fever,Elevated body temperature as an immune response to infection or inflammation.
+Chills,Shivering and cold sensation accompanying fever or immune activation.
+Night Sweats,Excessive sweating during sleep causing disrupted rest and dehydration.
+Unexplained Weight Loss,Significant unintentional weight reduction without dietary change.
+Excessive Thirst,Abnormally increased thirst often indicating blood sugar or kidney imbalance.
+Frequent Hunger,Unusually frequent hunger signals often linked to insulin resistance or parasites.
+Body Ache,Generalized pain and discomfort throughout the body from infection or fatigue.
+Swollen Lymph Nodes,Enlarged lymph glands indicating active immune response or infection.
+Chronic Fatigue,Long-term debilitating fatigue unrelieved by rest affecting quality of life.
+Hypothermia Sensitivity,Excessive sensitivity to cold temperatures linked to thyroid or circulatory issues.
+Heat Sensitivity,Excessive sensitivity to heat causing discomfort linked to Pitta excess.
+Seasonal Weakness,Recurring fatigue or illness tied to specific seasons or weather changes.
+Travel Sickness,Nausea and dizziness during travel from inner ear and vestibular disturbance.
+Jet Lag,Disruption of the body's internal clock from rapid travel across time zones.
+Hangover,Physical discomfort after alcohol consumption including headache and nausea.
+Skin Darkening,Gradual darkening of skin tone from sun exposure or hormonal factors.
+Sunburn,Skin redness and damage from excessive ultraviolet radiation exposure.
+Insect Bites,Skin inflammation and itching from insect stings or bites.
+Allergic Swelling,Localized or generalized swelling from allergic reaction to food or substances.
+Food Poisoning,Nausea, vomiting, and diarrhea from consumption of contaminated food.
+Detox After Medication,Cleansing the body after prolonged use of pharmaceutical medications.
+Leaky Gut,Increased intestinal permeability causing systemic inflammation and food sensitivities.
+Candida Overgrowth,Excess growth of Candida yeast in the gut causing bloating, fatigue, and skin issues.
+H. Pylori Infection,Bacterial infection in the stomach lining causing ulcers and chronic indigestion.
+Thyroid Nodules,Lumps or growths on the thyroid gland requiring monitoring and support.
+Adrenal Fatigue,Exhaustion of the adrenal glands from chronic stress causing hormonal disruption.
+Hormonal Acne,Skin breakouts triggered by hormonal fluctuations during cycles or puberty.
+Perimenopause,Transitional phase before menopause with irregular periods and hormonal shifts.
+Breast Health,Supportive care for breast tenderness, lumps, or fibrocystic changes.
+Cervical Health,Support for maintaining healthy cervical tissue and reducing HPV risk.
+Uterine Health,General support for uterine tone, lining health, and reproductive function.
+Fallopian Tube Health,Support for maintaining healthy fallopian tube function and reducing blockage.
+Implantation Support,Nutritional and herbal support for improving endometrial receptivity for conception.
+Sperm Motility,Improving the movement and function of sperm for better fertility outcomes.
+Testicular Health,Supportive care for healthy testicular function and hormone production.
+Sexual Performance,Improving stamina, confidence, and performance in sexual activity.
+Pre-Workout Energy,Natural energy and endurance support before physical training.
+Post-Workout Recovery,Reducing muscle soreness and fatigue after intense physical exercise.
+Muscle Building,Herbal and nutritional support for lean muscle gain and strength.
+Joint Flexibility,Maintaining and improving range of motion and flexibility in joints.
+Bone Strength,Building and maintaining healthy bone density through nutrition and herbs.
+Tendon & Ligament Health,Supporting the health and elasticity of connective tissue around joints.
+Plantar Fasciitis,Pain and inflammation on the sole of the foot from fascial strain.
+Bursitis,Inflammation of the fluid-filled sacs around joints causing pain and swelling.
+Tendinitis,Inflammation of tendons causing localized pain and restricted movement.
+Brain Health,Maintaining cognitive function, neural connections, and mental sharpness over time.
+Focus & Productivity,Improving mental clarity, sustained attention, and work output.
+Creativity Support,Enhancing lateral thinking and creative cognitive function.
+Exam Stress,Anxiety and mental fatigue associated with academic examination pressure.
+Social Anxiety,Fear and discomfort in social situations affecting relationships and performance.
+Anger Management,Difficulty controlling anger and emotional reactions in daily situations.
+Grief Support,Emotional and physical support during bereavement and emotional loss.
+Relationship Stress,Emotional tension arising from interpersonal and relationship challenges.
+Work Stress,Chronic mental strain from workplace demands, deadlines, and performance pressure.
+Digital Fatigue,Mental and eye fatigue from prolonged use of digital screens and devices.
+Electromagnetic Sensitivity,Physical discomfort reported from prolonged exposure to electronic devices.
+Air Pollution Sensitivity,Respiratory and skin sensitivity to pollutants and poor air quality.
+Water Retention in Face,Puffiness and fluid accumulation in facial tissues causing swollen appearance.
+Cellulite,Dimpled skin texture on thighs and buttocks from fat and connective tissue changes.
+Lip Darkening,Darkening of lip color from dehydration, sun exposure, or hormonal factors.
+Under-Eye Puffiness,Swelling under the eyes from fluid retention, poor sleep, or allergies.
+Nail Weakness,Brittle, thin, or peeling nails indicating nutritional deficiency or poor circulation.
+Nail Fungus,Fungal infection of the nail causing discoloration, thickening, and brittleness.
+Cold Hands & Feet,Persistent coldness in extremities from poor circulation or Vata imbalance.
+Raynaud's Support,Supportive care for extreme cold sensitivity and color changes in fingers and toes.
+Lymphatic Congestion,Sluggish lymph flow causing puffiness, toxin accumulation, and immune weakness.
+Chronic Inflammation,Persistent low-grade inflammation in the body linked to lifestyle diseases.
+Oxidative Stress,Cellular damage from excess free radicals causing aging and disease risk.
+Mitochondrial Support,Improving cellular energy production for better stamina and recovery.
+Liver Detox Support,Active support for liver cleansing and enzyme optimization.
+Colon Cleanse,Support for removing accumulated waste from the large intestine.
+Kidney Cleanse,Herbal support for flushing toxins and preventing mineral deposits in kidneys.
+Blood Purification,Cleansing the blood of toxins, excess hormones, and metabolic waste.
+Lymph Cleanse,Supporting drainage of the lymphatic system for improved immunity and detox.
+Skin Purification,Cleansing the skin from within through blood purifying and detoxifying herbs.
+Lung Detox,Clearing accumulated mucus and pollutants from the respiratory tract.
+Gut Microbiome Support,Balancing beneficial gut bacteria for improved digestion and immunity.
+Prebiotic Support,Feeding beneficial gut bacteria with herbal and dietary prebiotic sources.
+Probiotic Balance,Restoring healthy microbial balance in the gut after illness or medication.
+Enzyme Support,Improving digestive enzyme production for better nutrient breakdown.
+Bile Flow,Supporting healthy bile production and flow for fat digestion and liver health.
+Pancreatic Support,Supporting healthy pancreatic function for digestion and blood sugar balance.
+Spleen Support,Strengthening spleen function for better blood health and immune response.
+Thymus Support,Stimulating thymus function for improved T-cell production and immunity.
+Adrenal Support,Nourishing the adrenal glands to improve stress response and energy levels.
+Pineal Support,Supporting healthy pineal gland function for better melatonin and sleep.
+Pituitary Support,Supporting master gland function for balanced hormone production.
+Ovarian Support,Maintaining healthy ovarian function and egg quality for fertility.
+Uterine Toning,Strengthening the uterine muscle for better menstrual health and fertility.
+Cervical Mucus Quality,Supporting healthy cervical mucus for improved conception.
+Placenta Health,Nutritional support for healthy placenta development during pregnancy.
+Colostrum Support,Enhancing colostrum production in new mothers for infant immunity.
+Lactation Support,Increasing breast milk supply in breastfeeding mothers.
+Newborn Digestive Support,Gentle herbal support for colic and gas in newborn infants.
+Toddler Immunity,Building immune resilience in children between one and three years.
+Childhood Nutrition,Ensuring adequate nutrition for healthy growth in school-age children.
+Teenage Acne,Skin breakouts in adolescents from hormonal and sebaceous changes.
+Teenage Anxiety,Emotional and social anxiety during the adolescent developmental phase.
+Menarche Support,Supporting healthy first menstruation and cycle establishment in young girls.
+Andropause Support,Managing hormonal decline symptoms in aging men similar to menopause.
+Elder Care,Comprehensive wellness support for elderly individuals managing multiple conditions.
+Palliative Support,Comfort and quality of life support for individuals with chronic terminal illness.
+Caregiver Stress,Emotional and physical exhaustion experienced by caregivers of ill individuals.
+Rehabilitation Support,Comprehensive recovery support after major illness, injury, or surgery.
+Preventive Wellness,Proactive health maintenance to prevent disease before symptoms appear.
+Annual Detox,Seasonal whole-body cleansing practice for health reset and toxin elimination.
+Monsoon Immunity,Specific immune support for protecting health during the rainy season.
+Winter Wellness,Support for maintaining warmth, immunity, and energy during cold winter months.
+Summer Heat Support,Cooling and hydrating support to manage heat-related stress in summer.
+Circadian Rhythm Support,Aligning the body's internal clock for better sleep, digestion, and hormonal balance.
+Gut-Brain Axis Support,Supporting the bidirectional connection between digestive and mental health.
+Skin-Gut Connection,Addressing skin issues through gut health improvement and dietary changes.
+Hair-Nutrition Connection,Supporting hair health through targeted nutritional and herbal interventions.
+Mind-Body Balance,Holistic support for aligning physical health with mental and emotional wellbeing.
+Spiritual Wellbeing,Support for inner peace, purpose, and emotional equilibrium through Ayurvedic practice.

@@ -9,11 +9,12 @@ import { Metadata } from 'next';
 export const revalidate = 0;
 
 interface ProductDetailPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
-  const product = await db.product.findUnique({ where: { slug: params.slug } });
+export async function generateMetadata(props: ProductDetailPageProps): Promise<Metadata> {
+  const params = await props.params;
+  const product = await db.preparation.findUnique({ where: { slug: params.slug } });
   if (!product) return { title: 'Product Not Found | AYURWED' };
   return {
     title: `${product.name} | AYURWED`,
@@ -21,18 +22,11 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
   };
 }
 
-export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
-  const product = await db.product.findUnique({
+export default async function ProductDetailPage(props: ProductDetailPageProps) {
+  const params = await props.params;
+  const product = await db.preparation.findUnique({
     where: { slug: params.slug },
-    include: {
-      category: true,
-      manufacturer: {
-        select: {
-          id: true, companyName: true, slug: true,
-          website: true, contactEmail: true, contactPhone: true, isVerified: true,
-        },
-      },
-    },
+    include: { indications: true }
   });
 
   if (!product || !product.isActive) notFound();
@@ -42,36 +36,59 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     name: product.name,
     description: product.description,
     mrp: product.mrp ? Number(product.mrp) : null,
-    images: Array.isArray(product.images) ? (product.images as string[]) : [],
-    ingredients: Array.isArray(product.ingredients) ? (product.ingredients as string[]) : [],
-    benefits: Array.isArray(product.benefits) ? (product.benefits as string[]) : [],
+    images: (() => {
+      try {
+        const parsed = typeof product.images === 'string' ? JSON.parse(product.images) : (product.images || []);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    })(),
+    ingredients: (() => {
+      try {
+        const parsed = typeof product.ingredients === 'string' ? JSON.parse(product.ingredients) : (product.ingredients || []);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    })(),
+    benefits: (() => {
+      try {
+        const parsed = typeof product.benefits === 'string' ? JSON.parse(product.benefits) : (product.benefits || []);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    })(),
     usage: product.usage,
-    isSponsored: product.isSponsored,
-    isFeatured: product.isFeatured,
-    isShopProduct: product.isShopProduct,
-    manufacturer: product.manufacturer as any,
+    type: product.type,
+    volume: product.volume,
+    volumeUnit: product.volumeUnit,
+    weight: product.weight,
+    weightUnit: product.weightUnit,
+    count: product.count,
+    countUnit: product.countUnit,
+    indications: product.indications ? product.indications.map(i => i.name) : [],
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto layout-padding-minimal py-10 space-y-8">
       {/* Breadcrumbs */}
       <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-brand-foreground/60">
         <Link href="/" className="hover:text-brand-green">Home</Link>
         <ChevronRight className="h-3.5 w-3.5" />
-        <Link href="/preparations" className="hover:text-brand-green">Preparations</Link>
-        <ChevronRight className="h-3.5 w-3.5" />
         <span className="text-brand-green font-semibold line-clamp-1">{product.name}</span>
       </div>
 
-      <Link href="/preparations" className="inline-flex items-center gap-2 text-sm font-bold text-brand-green hover:text-brand-gold transition-colors">
+      <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-brand-green hover:text-brand-gold transition-colors">
         <ArrowLeft className="h-4 w-4" />
-        Back to Preparations
+        Back to Home
       </Link>
 
-      <ProductInteraction product={productData} />
+      <ProductInteraction preparation={productData} />
 
       {/* Disclaimer */}
-      <div className="bg-brand-green-light/40 border border-brand-green-border/20 rounded-3xl p-6 flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+      <div className="bg-brand-green-light/40 border border-border rounded-3xl p-6 flex flex-col sm:flex-row gap-4 items-center sm:items-start">
         <div className="bg-brand-green p-3 rounded-2xl text-white flex-shrink-0">
           <ShieldAlert className="h-6 w-6" />
         </div>

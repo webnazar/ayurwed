@@ -7,15 +7,13 @@ export default withAuth(
     const path = req.nextUrl.pathname;
 
     // Role-based authorization rules
-    if (path.startsWith('/dashboard/admin') && token?.role !== 'ADMIN') {
+    if (path.startsWith('/admin') && token?.role !== 'ADMIN') {
       return NextResponse.redirect(new URL('/', req.url));
     }
-    if (path.startsWith('/dashboard/consultant') && token?.role !== 'CONSULTANT' && token?.role !== 'ADMIN') {
+    if (path.startsWith('/consultant') && token?.role !== 'CONSULTANT' && token?.role !== 'ADMIN') {
       return NextResponse.redirect(new URL('/', req.url));
     }
-    if (path.startsWith('/dashboard/manufacturer') && token?.role !== 'MANUFACTURER' && token?.role !== 'ADMIN') {
-      return NextResponse.redirect(new URL('/', req.url));
-    }
+
     
     return NextResponse.next();
   },
@@ -27,5 +25,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard/:path*', '/admin/:path*', '/consumer/dashboard/:path*', '/consultant/:path*'],
 };

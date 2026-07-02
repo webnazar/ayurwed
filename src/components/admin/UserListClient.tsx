@@ -1,8 +1,19 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, ShieldCheck, Mail, Phone, Calendar, UserCheck, UserX, User, Shield, Info, Edit, Check, Plus, X } from 'lucide-react';
+import { Search, Filter, ShieldCheck, Mail, Phone, Calendar, UserCheck, UserX, User, Shield, Info, Edit, Check, Plus, X, Eye, Trash2, ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+const PROTECTED_EMAILS = ['ayurwed.com@gmail.com', 'webnazar@gmail.com'];
+
+interface OrderItemInfo {
+  id: number;
+  orderNumber: string;
+  status: string;
+  totalAmount: number;
+  createdAt: string;
+  itemCount: number;
+}
 
 interface UserItem {
   id: number;
@@ -13,7 +24,8 @@ interface UserItem {
   phone: string | null;
   isActive: boolean;
   createdAt: string;
-  manufacturerSlug?: string | null;
+
+  orders?: OrderItemInfo[];
 }
 
 export default function UserListClient({ initialUsers }: { initialUsers: UserItem[] }) {
@@ -29,6 +41,11 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createForm, setCreateForm] = useState({ name: '', email: '', password: '', role: 'CONSUMER' });
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ id: 0, name: '', email: '', password: '', role: '' });
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Statistics
   const stats = useMemo(() => {
@@ -38,13 +55,12 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
       inactive: users.filter(u => !u.isActive).length,
       admins: users.filter(u => u.role === 'ADMIN').length,
       consultants: users.filter(u => u.role === 'CONSULTANT').length,
-      manufacturers: users.filter(u => u.role === 'MANUFACTURER').length,
       consumers: users.filter(u => u.role === 'CONSUMER').length,
     };
   }, [users]);
 
   // Handle patch action
-  const handleUpdateUser = async (userId: number, updates: { role?: string; isActive?: boolean }) => {
+  const handleUpdateUser = async (userId: number, updates: { role?: string; isActive?: boolean; name?: string; email?: string; password?: string }) => {
     setLoadingUserId(userId);
     try {
       const res = await fetch('/api/admin/users', {
@@ -95,6 +111,25 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
     }
   };
 
+  const handleEditUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsEditing(true);
+    try {
+      const updates: any = { name: editForm.name, email: editForm.email, role: editForm.role };
+      if (editForm.password) updates.password = editForm.password;
+
+      await handleUpdateUser(editForm.id, updates);
+      
+      // Update selectedUser if it's currently open
+      if (selectedUser && selectedUser.id === editForm.id) {
+        setSelectedUser({ ...selectedUser, name: editForm.name, email: editForm.email, role: editForm.role });
+      }
+      setIsEditModalOpen(false);
+    } finally {
+      setIsEditing(false);
+    }
+  };
+
   // Filtered & Sorted Users
   const filteredUsers = useMemo(() => {
     return users
@@ -123,53 +158,63 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
 
   const getRoleStyle = (role: string) => {
     switch (role) {
-      case 'ADMIN':
-        return 'bg-brand-gold/15 text-brand-gold-dark border-brand-gold/30';
-      case 'CONSULTANT':
-        return 'bg-brand-green-light text-brand-green border-brand-green/30';
-      case 'MANUFACTURER':
-        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
-      default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+      case 'ADMIN': return 'badge-role-admin';
+      case 'CONSULTANT': return 'badge-role-consultant';
+      default: return 'badge-neutral';
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/users?id=${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to delete user');
+      }
+      setUsers(prev => prev.filter(u => u.id !== id));
+      toast.success('User deleted successfully');
+    } catch (err: any) {
+      toast.error(err.message || 'Error deleting user');
+    } finally {
+      setIsDeleting(false);
+      setDeleteConfirmId(null);
     }
   };
 
   return (
     <div className="space-y-6">
       {/* Statistics Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-        <div className="bg-white rounded-2xl p-4 border border-brand-green-border/10 shadow-sm text-center">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
           <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Total</span>
           <span className="text-xl font-extrabold text-brand-green">{stats.total}</span>
         </div>
-        <div className="bg-white rounded-2xl p-4 border border-brand-green-border/10 shadow-sm text-center">
+        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
           <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Active</span>
           <span className="text-xl font-extrabold text-emerald-600">{stats.active}</span>
         </div>
-        <div className="bg-white rounded-2xl p-4 border border-brand-green-border/10 shadow-sm text-center">
+        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
           <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Inactive</span>
           <span className="text-xl font-extrabold text-red-500">{stats.inactive}</span>
         </div>
-        <div className="bg-white rounded-2xl p-4 border border-brand-green-border/10 shadow-sm text-center">
+        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
           <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Admins</span>
           <span className="text-xl font-extrabold text-brand-gold-dark">{stats.admins}</span>
         </div>
-        <div className="bg-white rounded-2xl p-4 border border-brand-green-border/10 shadow-sm text-center">
+        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
           <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Doctors</span>
           <span className="text-xl font-extrabold text-brand-green">{stats.consultants}</span>
         </div>
-        <div className="bg-white rounded-2xl p-4 border border-brand-green-border/10 shadow-sm text-center">
-          <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Brand Mfrs</span>
-          <span className="text-xl font-extrabold text-indigo-600">{stats.manufacturers}</span>
-        </div>
-        <div className="bg-white rounded-2xl p-4 border border-brand-green-border/10 shadow-sm text-center col-span-2 md:col-span-1">
-          <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Consumers</span>
-          <span className="text-xl font-extrabold text-gray-600">{stats.consumers}</span>
+
+        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center col-span-2 md:col-span-1">
+          <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Users</span>
+          <span className="text-xl font-extrabold text-muted-foreground">{stats.consumers}</span>
         </div>
       </div>
 
       {/* Action Filters Panel */}
-      <div className="bg-white rounded-3xl p-6 border border-brand-green-border/10 shadow-sm space-y-4">
+      <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-4">
         <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
           
           {/* Search Box */}
@@ -182,7 +227,7 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
               placeholder="Search users by name, email, phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full bg-brand-gold-light/40 border border-brand-green-border/10 rounded-2xl py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20"
+              className="pl-10 w-full bg-muted border border-border rounded-2xl py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20"
             />
           </div>
 
@@ -193,20 +238,19 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="bg-brand-gold-light/40 border border-brand-green-border/10 rounded-2xl px-3 py-2.5 text-xs font-semibold focus:outline-none"
+                className="bg-muted border border-border rounded-2xl px-3 py-2.5 text-xs font-semibold focus:outline-none"
               >
                 <option value="ALL">All Roles</option>
                 <option value="ADMIN">Administrators</option>
-                <option value="CONSULTANT">Consultants</option>
-                <option value="MANUFACTURER">Manufacturers</option>
-                <option value="CONSUMER">Consumers</option>
+                <option value="CONSULTANT">Doctors</option>
+                <option value="CONSUMER">Users</option>
               </select>
             </div>
 
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-brand-gold-light/40 border border-brand-green-border/10 rounded-2xl px-3 py-2.5 text-xs font-semibold focus:outline-none"
+              className="bg-muted border border-border rounded-2xl px-3 py-2.5 text-xs font-semibold focus:outline-none"
             >
               <option value="ALL">All Status</option>
               <option value="ACTIVE">Active Only</option>
@@ -216,7 +260,7 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-brand-gold-light/40 border border-brand-green-border/10 rounded-2xl px-3 py-2.5 text-xs font-semibold focus:outline-none"
+              className="bg-muted border border-border rounded-2xl px-3 py-2.5 text-xs font-semibold focus:outline-none"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -234,16 +278,16 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
         </div>
 
         {/* Responsive Table */}
-        <div className="overflow-x-auto rounded-2xl border border-brand-green-border/10">
-          <table className="min-w-full divide-y divide-brand-green-border/10 bg-white">
-            <thead className="bg-brand-gold-light/30">
+        <div className="overflow-x-auto rounded-2xl border border-border">
+          <table className="min-w-full divide-y divide-brand-green-border/10 bg-card">
+            <thead className="bg-muted/50">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-bold text-brand-green uppercase tracking-wider">User Details</th>
                 <th className="px-6 py-4 text-left text-xs font-bold text-brand-green uppercase tracking-wider">System Role</th>
                 <th className="px-6 py-4 text-left text-xs font-bold text-brand-green uppercase tracking-wider">Contact Info</th>
                 <th className="px-6 py-4 text-left text-xs font-bold text-brand-green uppercase tracking-wider">Registered</th>
                 <th className="px-6 py-4 text-center text-xs font-bold text-brand-green uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-center text-xs font-bold text-brand-green uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-4 text-right text-xs font-bold text-brand-green uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-brand-green-border/10 text-sm">
@@ -255,10 +299,10 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
                 </tr>
               ) : (
                 filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-brand-gold-light/10 transition-colors duration-150">
+                  <tr key={user.id} className="hover:bg-muted transition-colors duration-150">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 bg-brand-gold/25 text-brand-green rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 shadow-sm border border-brand-gold/15">
+                      <div className="flex items-center gap-2">
+                        <div className="h-10 w-10 bg-brand-gold text-brand-green dark:text-black font-bold rounded-full flex items-center justify-center text-sm shadow flex-shrink-0">
                           {user.avatar ? (
                             <img src={user.avatar} alt={user.name} className="h-full w-full rounded-full object-cover" />
                           ) : (
@@ -281,10 +325,9 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
                         onChange={(e) => handleUpdateUser(user.id, { role: e.target.value })}
                         className={`text-xs border rounded-full px-3 py-1 font-bold outline-none cursor-pointer ${getRoleStyle(user.role)}`}
                       >
-                        <option value="CONSUMER">CONSUMER</option>
-                        <option value="CONSULTANT">CONSULTANT</option>
-                        <option value="MANUFACTURER">MANUFACTURER</option>
-                        <option value="ADMIN">ADMIN</option>
+                        <option value="CONSUMER">User</option>
+                        <option value="CONSULTANT">Doctor</option>
+                        <option value="ADMIN">Administrator</option>
                       </select>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -305,14 +348,12 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
                         <span>{new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
                       <button
                         onClick={() => handleUpdateUser(user.id, { isActive: !user.isActive })}
                         disabled={loadingUserId === user.id}
                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all ${
-                          user.isActive
-                            ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                            : 'bg-rose-100 text-rose-800 hover:bg-rose-200'
+                          user.isActive ? 'badge-success' : 'badge-danger'
                         }`}
                       >
                         {user.isActive ? (
@@ -328,14 +369,23 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
                         )}
                       </button>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-xs">
+                    <td className="px-6 py-4 whitespace-nowrap text-right space-x-2 text-xs">
                       <button
                         onClick={() => setSelectedUser(user)}
-                        className="text-brand-gold hover:text-brand-green font-bold inline-flex items-center gap-1 border border-brand-gold/30 hover:border-brand-green px-2.5 py-1.5 rounded-xl transition-all"
+                        className="p-2 text-brand-green hover:bg-brand-green/10 rounded-lg transition-colors"
+                        title="View Details"
                       >
-                        <Info className="h-3.5 w-3.5" />
-                        <span>Inspect</span>
+                        <Eye className="h-4 w-4" />
                       </button>
+                      {!PROTECTED_EMAILS.includes(user.email) && (
+                        <button
+                          onClick={() => setDeleteConfirmId(user.id)}
+                          className="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                          title="Delete User"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -348,11 +398,11 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
       {/* User Details Inspection Modal */}
       {selectedUser && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[32px] border border-brand-green-border/10 shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-250">
+          <div className="bg-card rounded-[32px] border border-border shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-250">
             {/* Header */}
             <div className="bg-gradient-to-r from-brand-green to-[#0f381b] p-6 text-white flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 bg-white/20 rounded-full flex items-center justify-center font-bold text-lg">
+              <div className="flex items-center gap-2">
+                <div className="h-12 w-12 bg-card/20 rounded-full flex items-center justify-center font-bold text-lg">
                   {selectedUser.avatar ? (
                     <img src={selectedUser.avatar} alt={selectedUser.name} className="h-full w-full rounded-full object-cover" />
                   ) : (
@@ -369,7 +419,7 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
               </div>
               <button
                 onClick={() => setSelectedUser(null)}
-                className="text-white/70 hover:text-white text-sm font-bold bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full"
+                className="text-white/70 hover:text-white text-sm font-bold bg-card/10 hover:bg-card/20 px-3 py-1.5 rounded-full"
               >
                 Close
               </button>
@@ -378,11 +428,11 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
             {/* Content */}
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-brand-gold-light/40 border border-brand-green-border/5 rounded-2xl p-4">
+                <div className="bg-muted border border-brand-green-border/5 rounded-2xl p-4">
                   <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">User ID</span>
                   <span className="text-sm font-extrabold text-brand-green"># {selectedUser.id}</span>
                 </div>
-                <div className="bg-brand-gold-light/40 border border-brand-green-border/5 rounded-2xl p-4">
+                <div className="bg-muted border border-brand-green-border/5 rounded-2xl p-4">
                   <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Status</span>
                   <span className={`text-sm font-extrabold ${selectedUser.isActive ? 'text-emerald-600' : 'text-rose-600'}`}>
                     {selectedUser.isActive ? 'Active System Account' : 'Suspended'}
@@ -425,8 +475,44 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
                 </div>
               </div>
 
+              {/* Recent Orders for Consumers */}
+              {selectedUser.role === 'CONSUMER' && selectedUser.orders && (
+                <div className="pt-4 border-t border-border space-y-3">
+                  <div className="flex items-center gap-2 text-brand-green">
+                    <ShoppingBag className="h-4 w-4" />
+                    <span className="text-xs font-bold uppercase tracking-wide">Recent Orders</span>
+                  </div>
+                  {selectedUser.orders.length > 0 ? (
+                    <div className="space-y-2">
+                      {selectedUser.orders.map(order => (
+                        <div key={order.id} className="bg-muted border border-border rounded-xl p-3 flex items-center justify-between">
+                          <div>
+                            <span className="text-xs font-extrabold text-brand-green block">#{order.orderNumber}</span>
+                            <span className="text-[10px] text-brand-foreground/60">{new Date(order.createdAt).toLocaleDateString()} • {order.itemCount} items</span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-xs font-extrabold block">₹{order.totalAmount.toFixed(2)}</span>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-1 ${
+                              order.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                              order.status === 'CANCELLED' ? 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400' :
+                              'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                            }`}>
+                              {order.status}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-xs text-brand-foreground/50 text-center py-4 bg-muted/50 rounded-xl border border-dashed border-border">
+                      No orders placed yet.
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Advanced Controls */}
-              <div className="pt-4 border-t border-brand-green-border/10 space-y-3">
+              <div className="pt-4 border-t border-border space-y-3">
                 <span className="text-xs font-bold text-brand-green uppercase tracking-wide block">Administrative Actions</span>
                 <div className="flex flex-col gap-3">
                   <button
@@ -435,31 +521,31 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
                       setSelectedUser(prev => prev ? { ...prev, isActive: !prev.isActive } : null);
                     }}
                     className={`w-full text-center text-xs font-bold py-3 px-4 rounded-xl shadow-sm transition-all ${
-                      selectedUser.isActive
-                        ? 'bg-rose-100 text-rose-800 hover:bg-rose-200'
-                        : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                      selectedUser.isActive ? 'badge-danger' : 'badge-success'
                     }`}
                   >
                     {selectedUser.isActive ? 'Suspend User' : 'Activate User'}
                   </button>
 
-                  {(selectedUser.role === 'MANUFACTURER' || selectedUser.role === 'CONSULTANT') && (
+                  {selectedUser.role === 'CONSULTANT' && (
                     <div className="flex gap-3">
-                      {selectedUser.role === 'MANUFACTURER' && selectedUser.manufacturerSlug && (
-                        <a href={`/manufacturers/${selectedUser.manufacturerSlug}`} target="_blank" rel="noreferrer" className="flex-1 text-center text-xs font-bold py-3 px-4 rounded-xl shadow-sm transition-all bg-brand-gold-light/40 text-brand-gold-dark hover:bg-brand-gold/20">
-                          View Public Profile
-                        </a>
-                      )}
-                      {selectedUser.role === 'CONSULTANT' && (
-                        <a href={`/consultants/${selectedUser.id}`} target="_blank" rel="noreferrer" className="flex-1 text-center text-xs font-bold py-3 px-4 rounded-xl shadow-sm transition-all bg-brand-gold-light/40 text-brand-gold-dark hover:bg-brand-gold/20">
-                          View Public Profile
-                        </a>
-                      )}
-                      <a href={`/dashboard/admin/users/${selectedUser.id}/edit-profile`} className="flex-1 text-center text-xs font-bold py-3 px-4 rounded-xl shadow-sm transition-all bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green">
+                      <a href={`/consultants/${selectedUser.id}`} target="_blank" rel="noreferrer" className="flex-1 text-center text-xs font-bold py-3 px-4 rounded-xl shadow-sm transition-all bg-muted text-brand-foreground hover:bg-muted/80">
+                        View Public Profile
+                      </a>
+                      <a href={`/admin/users/${selectedUser.id}/edit-profile`} className="flex-1 text-center text-xs font-bold py-3 px-4 rounded-xl shadow-sm transition-all bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green">
                         Edit Profile Details
                       </a>
                     </div>
                   )}
+                  <button
+                    onClick={() => {
+                      setEditForm({ id: selectedUser.id, name: selectedUser.name, email: selectedUser.email, password: '', role: selectedUser.role });
+                      setIsEditModalOpen(true);
+                    }}
+                    className="w-full text-center text-xs font-bold py-3 px-4 rounded-xl shadow-sm transition-all bg-card border-2 border-brand-green text-brand-green hover:bg-brand-green hover:text-white"
+                  >
+                    Edit Core Account Settings
+                  </button>
                 </div>
               </div>
             </div>
@@ -469,7 +555,7 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
       {/* Create User Modal */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[32px] border border-brand-green-border/10 shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-250">
+          <div className="bg-card rounded-[32px] border border-border shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-250">
             <div className="bg-gradient-to-r from-brand-green to-[#0f381b] p-6 text-white flex items-center justify-between">
               <h3 className="font-extrabold text-lg flex items-center gap-2">
                 <Plus className="h-5 w-5 text-brand-gold" /> Create New User
@@ -482,26 +568,25 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
               <div>
                 <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5">Full Name</label>
                 <input required type="text" value={createForm.name} onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))}
-                  className="w-full text-sm bg-brand-gold-light/40 border border-brand-green-border/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold" />
+                  className="w-full text-sm bg-muted border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold" />
               </div>
               <div>
                 <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5">Email Address</label>
                 <input required type="email" value={createForm.email} onChange={e => setCreateForm(f => ({ ...f, email: e.target.value }))}
-                  className="w-full text-sm bg-brand-gold-light/40 border border-brand-green-border/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold" />
+                  className="w-full text-sm bg-muted border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold" />
               </div>
               <div>
                 <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5">Temporary Password</label>
                 <input required type="text" value={createForm.password} onChange={e => setCreateForm(f => ({ ...f, password: e.target.value }))}
-                  className="w-full text-sm bg-brand-gold-light/40 border border-brand-green-border/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold" />
+                  className="w-full text-sm bg-muted border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold" />
               </div>
               <div>
                 <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5">Account Role</label>
                 <select value={createForm.role} onChange={e => setCreateForm(f => ({ ...f, role: e.target.value }))}
-                  className="w-full text-sm bg-brand-gold-light/40 border border-brand-green-border/10 rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold font-bold">
-                  <option value="CONSUMER">CONSUMER</option>
-                  <option value="CONSULTANT">CONSULTANT</option>
-                  <option value="MANUFACTURER">MANUFACTURER</option>
-                  <option value="ADMIN">ADMIN</option>
+                  className="w-full text-sm bg-muted border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold font-bold">
+                  <option value="CONSUMER">User</option>
+                  <option value="CONSULTANT">Doctor</option>
+                  <option value="ADMIN">Administrator</option>
                 </select>
               </div>
               <div className="pt-4">
@@ -511,6 +596,92 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-card rounded-[32px] border border-border shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-250">
+            <div className="bg-gradient-to-r from-brand-gold to-brand-gold-dark p-6 text-brand-green flex items-center justify-between">
+              <h3 className="font-extrabold text-lg flex items-center gap-2">
+                <Edit className="h-5 w-5" /> Edit Account Settings
+              </h3>
+              <button onClick={() => setIsEditModalOpen(false)} className="text-brand-green/70 hover:text-brand-green p-1">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={handleEditUser} className="p-6 space-y-4">
+              <div>
+                <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5">Full Name</label>
+                <input required type="text" value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
+                  className="w-full text-sm bg-muted border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5">Email Address</label>
+                <input required type="email" value={editForm.email} onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))}
+                  disabled={PROTECTED_EMAILS.includes(editForm.email)}
+                  className={`w-full text-sm bg-muted border border-border rounded-xl px-4 py-3 focus:outline-none ${PROTECTED_EMAILS.includes(editForm.email) ? 'opacity-50 cursor-not-allowed' : 'focus:border-brand-gold'}`} />
+                {PROTECTED_EMAILS.includes(editForm.email) && (
+                  <p className="text-[10px] text-brand-foreground/50 mt-1 pl-1 font-semibold italic">This default admin email cannot be changed.</p>
+                )}
+              </div>
+              <div>
+                <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5">New Password (Leave blank to keep current)</label>
+                <input type="text" value={editForm.password} onChange={e => setEditForm(f => ({ ...f, password: e.target.value }))}
+                  placeholder="Leave empty to remain unchanged"
+                  className="w-full text-sm bg-muted border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5">Account Role</label>
+                <select value={editForm.role} onChange={e => setEditForm(f => ({ ...f, role: e.target.value }))}
+                  className="w-full text-sm bg-muted border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold font-bold">
+                  <option value="CONSUMER">User</option>
+                  <option value="CONSULTANT">Doctor</option>
+                  <option value="ADMIN">Administrator</option>
+                </select>
+              </div>
+              <div className="pt-4">
+                <button type="submit" disabled={isEditing || loadingUserId !== null}
+                  className="w-full bg-brand-gold text-brand-green font-bold py-3.5 rounded-full hover:bg-brand-green hover:text-white transition-colors text-sm disabled:opacity-50">
+                  {isEditing ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmId !== null && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-card rounded-[28px] shadow-2xl w-full max-w-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200 border border-border">
+            <div className="p-6 text-center space-y-4">
+              <div className="mx-auto w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                <Trash2 className="h-8 w-8 text-red-500" />
+              </div>
+              <h3 className="text-xl font-extrabold text-foreground">Delete User?</h3>
+              <p className="text-sm text-brand-foreground/60">
+                Are you sure you want to permanently delete this user? This action cannot be undone.
+              </p>
+            </div>
+            <div className="p-4 bg-muted border-t border-border flex gap-3">
+              <button 
+                onClick={() => setDeleteConfirmId(null)} 
+                disabled={isDeleting}
+                className="flex-1 py-3 rounded-2xl bg-card border border-border text-sm font-bold hover:bg-muted-foreground/10 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => handleDelete(deleteConfirmId)} 
+                disabled={isDeleting}
+                className="flex-1 py-3 rounded-2xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors shadow-sm disabled:opacity-50"
+              >
+                {isDeleting ? 'Deleting...' : 'Yes, Delete'}
+              </button>
+            </div>
           </div>
         </div>
       )}

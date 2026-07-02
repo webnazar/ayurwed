@@ -7,7 +7,11 @@ import { join } from 'path';
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || (session.user as any).role !== 'ADMIN') {
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const role = session.user.role;
+    if (!['ADMIN', 'CONSULTANT', 'CONSUMER'].includes(role as string)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

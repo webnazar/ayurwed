@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, X, Calendar, Clock, CheckCircle2, XCircle, Video, Phone, MessageSquare, Link as LinkIcon, HeartHandshake, MapPin, Printer } from 'lucide-react';
+import { Search, Filter, X, Calendar, Clock, CheckCircle2, XCircle, Video, Phone, MessageSquare, Link as LinkIcon, HeartHandshake, MapPin, Printer, Truck, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatPrice } from '@/lib/utils';
 import Link from 'next/link';
+import SafeImage from '@/components/ui/SafeImage';
 
 type ApptStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
 
@@ -18,6 +19,9 @@ interface Appointment {
   consultant: {
     id: number; specialization: string;
     userId: number;
+    hasClinicPickup?: boolean;
+    hasSelfDispatch?: boolean;
+    hasAyurwedDelivery?: boolean;
     user?: { name: string; avatar: string | null };
   } | null;
   prescription?: any;
@@ -44,6 +48,29 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
   const [filterDate, setFilterDate] = useState('');
   const [cancelling, setCancelling] = useState<number | null>(null);
   const [cancelModalId, setCancelModalId] = useState<number | null>(null);
+
+  // Track selected method for each appointment's pending fulfillment
+  const [selectedMethods, setSelectedMethods] = useState<Record<number, string>>(() => {
+    const initial: Record<number, string> = {};
+    initialAppointments.forEach(a => {
+      if (a.prescription?.fulfillment?.status === 'PENDING') {
+        const f = a.prescription.fulfillment;
+        const c = a.consultant;
+        if (c) {
+          if (c.hasSelfDispatch) {
+            initial[f.id] = 'SELF_DISPATCH';
+          } else if (c.hasClinicPickup) {
+            initial[f.id] = 'CLINIC_PICKUP';
+          } else if (c.hasAyurwedDelivery) {
+            initial[f.id] = 'AYURWED_DELIVERY';
+          } else {
+            initial[f.id] = 'SELF_DISPATCH';
+          }
+        }
+      }
+    });
+    return initial;
+  });
 
   const stats = useMemo(() => ({
     total: appointments.length,
@@ -72,12 +99,13 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
   };
 
   const handleConfirmOrder = async (fulfillmentId: number, appointmentId: number) => {
+    const selectedMethod = selectedMethods[fulfillmentId] || 'SELF_DISPATCH';
     toast.loading('Confirming medicine order...', { id: 'order' });
     try {
       const res = await fetch('/api/consumer/fulfillment', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fulfillmentId })
+        body: JSON.stringify({ fulfillmentId, method: selectedMethod })
       });
 
       if (!res.ok) {
@@ -97,7 +125,8 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
                 ...a.prescription,
                 fulfillment: {
                   ...a.prescription.fulfillment,
-                  status: 'CONFIRMED'
+                  status: 'CONFIRMED',
+                  method: selectedMethod
                 }
               }
             };
@@ -108,6 +137,42 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
     } catch (err: any) {
       toast.dismiss('order');
       toast.error(err.message || 'Something went wrong');
+    }
+  };
+
+  const isShippingMethod = (method: string) => {
+    return ['COURIER', 'SELF_DISPATCH', 'AYURWED_DELIVERY'].includes(method);
+  };
+
+  const getMethodDetails = (method: string) => {
+    switch (method) {
+      case 'CLINIC_PICKUP':
+      case 'PICKUP':
+        return {
+          label: 'Clinic Pickup',
+          icon: <MapPin className="h-3.5 w-3.5" />,
+          badgeClass: 'bg-amber-100 text-amber-800 border border-amber-200'
+        };
+      case 'SELF_DISPATCH':
+      case 'COURIER':
+        return {
+          label: 'Doctor Self-Dispatch',
+          icon: <Truck className="h-3.5 w-3.5" />,
+          badgeClass: 'bg-blue-100 text-blue-800 border border-blue-200'
+        };
+      case 'AYURWED_DELIVERY':
+        return {
+          label: 'AYURWED Delivery',
+          icon: <Truck className="h-3.5 w-3.5 text-brand-gold-dark" />,
+          badgeClass: 'bg-brand-gold/25 text-brand-gold-dark border border-brand-gold/30'
+        };
+      case 'PENDING':
+      default:
+        return {
+          label: 'Fulfillment Pending Selection',
+          icon: <Info className="h-3.5 w-3.5" />,
+          badgeClass: 'bg-gray-100 text-gray-800 border border-gray-200'
+        };
     }
   };
 
@@ -186,13 +251,12 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
                   <div className="flex items-center gap-4">
                     {/* Avatar */}
                     <div className="flex-shrink-0 h-14 w-14 sm:h-16 sm:w-16 rounded-full overflow-hidden bg-brand-green-light border border-brand-green/20">
-                      {a.consultant?.user?.avatar ? (
-                        <img src={a.consultant.user.avatar} alt={a.consultant?.user?.name || 'Doctor'} className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center font-bold text-brand-green text-xl">
-                          {a.consultant?.user?.name?.charAt(0) || 'D'}
-                        </div>
-                      )}
+                      <SafeImage 
+                        src={a.consultant?.user?.avatar} 
+                        fallbackSrc="/avatar.webp"
+                        alt={a.consultant?.user?.name || 'Doctor'} 
+                        className="h-full w-full object-cover" 
+                      />
                     </div>
                     {/* Doctor Info */}
                     <div>
@@ -332,150 +396,228 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
                     )}
 
                     {/* Visual Fulfillment Tracking */}
-                    {a.prescription.fulfillment && (
-                      <div className="mt-6 border-t border-brand-green-light/20 pt-6 space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h5 className="text-xs font-bold text-brand-green uppercase tracking-wider">Medicine Fulfillment Status</h5>
-                            <p className="text-[10px] text-brand-foreground/60 mt-0.5">
-                              Fulfillment Method:{' '}
-                              <strong className="text-brand-green">
-                                {a.prescription.fulfillment.method === 'COURIER' ? 'Courier Delivery' : 'Clinic Pickup'}
-                              </strong>
-                            </p>
-                          </div>
-                          <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
-                            a.prescription.fulfillment.status === 'COMPLETED'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : a.prescription.fulfillment.status === 'CANCELLED'
-                              ? 'bg-rose-100 text-rose-800'
-                              : 'bg-brand-gold/20 text-brand-gold-dark'
-                          }`}>
-                            {a.prescription.fulfillment.status}
-                          </span>
-                        </div>
+                    {a.prescription.fulfillment && (() => {
+                      const methodDetails = getMethodDetails(a.prescription.fulfillment.method);
+                      const isShipping = isShippingMethod(a.prescription.fulfillment.method);
 
-                        {/* Progress Stepper */}
-                        {a.prescription.fulfillment.status !== 'CANCELLED' && (
-                          <div className="relative pt-4 pb-2">
-                            {a.prescription.fulfillment.method === 'COURIER' ? (
-                              <div className="flex items-center justify-between relative">
-                                <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-border z-0" />
-                                <div
-                                  className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-brand-green transition-all duration-500 z-0"
-                                  style={{
-                                    width: 
-                                      a.prescription.fulfillment.status === 'PENDING' ? '0%' :
-                                      a.prescription.fulfillment.status === 'CONFIRMED' ? '25%' :
-                                      a.prescription.fulfillment.status === 'PACKED' ? '50%' :
-                                      a.prescription.fulfillment.status === 'DISPATCHED' ? '75%' : '100%'
-                                  }}
-                                />
-
-                                {[
-                                  { label: 'Ordered', status: 'PENDING' },
-                                  { label: 'Confirmed', status: 'CONFIRMED' },
-                                  { label: 'Packed', status: 'PACKED' },
-                                  { label: 'Dispatched', status: 'DISPATCHED' },
-                                  { label: 'Received', status: 'COMPLETED' }
-                                ].map((step, idx) => {
-                                  const statuses = ['PENDING', 'CONFIRMED', 'PACKED', 'DISPATCHED', 'COMPLETED'];
-                                  const currentIdx = statuses.indexOf(a.prescription.fulfillment.status);
-                                  const stepIdx = statuses.indexOf(step.status);
-                                  const isCompleted = stepIdx < currentIdx;
-                                  const isActive = stepIdx === currentIdx;
-
-                                  return (
-                                    <div key={step.label} className="flex flex-col items-center z-10 relative">
-                                      <div className={`h-6 w-6 rounded-full flex items-center justify-center border-2 text-[10px] font-bold transition-all duration-300 ${
-                                        isCompleted
-                                          ? 'bg-brand-green border-brand-green text-white'
-                                          : isActive
-                                          ? 'bg-brand-gold border-brand-gold text-brand-green font-black animate-pulse-slow'
-                                          : 'bg-white border-border text-brand-foreground/45'
-                                      }`}>
-                                        {isCompleted ? '✓' : idx + 1}
-                                      </div>
-                                      <span className={`text-[9px] font-bold mt-1.5 transition-colors ${
-                                        isActive ? 'text-brand-green font-black' : 'text-brand-foreground/60'
-                                      }`}>
-                                        {step.label}
-                                      </span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            ) : (
-                              <div className="flex items-center justify-between relative">
-                                <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-border z-0" />
-                                <div
-                                  className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-brand-green transition-all duration-500 z-0"
-                                  style={{
-                                    width: 
-                                      a.prescription.fulfillment.status === 'PENDING' ? '0%' :
-                                      a.prescription.fulfillment.status === 'CONFIRMED' ? '33%' :
-                                      a.prescription.fulfillment.status === 'PACKED' ? '66%' : '100%'
-                                  }}
-                                />
-
-                                {[
-                                  { label: 'Ordered', status: 'PENDING' },
-                                  { label: 'Preparing', status: 'CONFIRMED' },
-                                  { label: 'Ready for Pickup', status: 'PACKED' },
-                                  { label: 'Collected', status: 'COMPLETED' }
-                                ].map((step, idx) => {
-                                  const statuses = ['PENDING', 'CONFIRMED', 'PACKED', 'COMPLETED'];
-                                  const currentIdx = statuses.indexOf(a.prescription.fulfillment.status);
-                                  const stepIdx = statuses.indexOf(step.status);
-                                  const isCompleted = stepIdx < currentIdx;
-                                  const isActive = stepIdx === currentIdx;
-
-                                  return (
-                                    <div key={step.label} className="flex flex-col items-center z-10 relative">
-                                      <div className={`h-6 w-6 rounded-full flex items-center justify-center border-2 text-[10px] font-bold transition-all duration-300 ${
-                                        isCompleted
-                                          ? 'bg-brand-green border-brand-green text-white'
-                                          : isActive
-                                          ? 'bg-brand-gold border-brand-gold text-brand-green font-black animate-pulse-slow'
-                                          : 'bg-white border-border text-brand-foreground/45'
-                                      }`}>
-                                        {isCompleted ? '✓' : idx + 1}
-                                      </div>
-                                      <span className={`text-[9px] font-bold mt-1.5 transition-colors ${
-                                        isActive ? 'text-brand-green font-black' : 'text-brand-foreground/60'
-                                      }`}>
-                                        {step.label}
-                                      </span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Tracking Details */}
-                        {a.prescription.fulfillment.trackingNumber && (
-                          <div className="bg-brand-green-light/40 border border-brand-green-border/20 rounded-xl p-3 text-xs flex items-center justify-between">
+                      return (
+                        <div className="mt-6 border-t border-brand-green-light/20 pt-6 space-y-4">
+                          <div className="flex items-center justify-between">
                             <div>
-                              <span className="text-[9px] font-bold uppercase text-brand-foreground/50 block">Tracking Information</span>
-                              <span className="font-mono font-bold text-brand-green">{a.prescription.fulfillment.trackingNumber}</span>
+                              <h5 className="text-xs font-bold text-brand-green uppercase tracking-wider">Medicine Fulfillment Status</h5>
+                              <p className="text-[10px] text-brand-foreground/60 mt-0.5">
+                                Fulfillment Method:{' '}
+                                <strong className="text-brand-green">
+                                  {methodDetails.label}
+                                </strong>
+                              </p>
                             </div>
-                            <span className="text-[10px] bg-brand-green/10 text-brand-green px-2 py-0.5 rounded-full font-bold">Shipped</span>
+                            <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
+                              a.prescription.fulfillment.status === 'COMPLETED'
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : a.prescription.fulfillment.status === 'CANCELLED'
+                                ? 'bg-rose-100 text-rose-800'
+                                : 'bg-brand-gold/20 text-brand-gold-dark'
+                            }`}>
+                              {a.prescription.fulfillment.status}
+                            </span>
                           </div>
-                        )}
 
-                        {/* Order Action Button */}
-                        {a.prescription.fulfillment.status === 'PENDING' && (
-                          <button
-                            onClick={() => handleConfirmOrder(a.prescription.fulfillment.id, a.id)}
-                            className="w-full bg-brand-gold hover:bg-brand-green hover:text-white text-brand-green font-bold text-xs py-3 rounded-xl transition-all duration-300 shadow-sm border border-brand-gold/30 uppercase tracking-wider"
-                          >
-                            Confirm & Order Medicines
-                          </button>
-                        )}
-                      </div>
-                    )}
+                          {/* Progress Stepper */}
+                          {a.prescription.fulfillment.status !== 'CANCELLED' && a.prescription.fulfillment.status !== 'PENDING' && (
+                            <div className="relative pt-4 pb-2">
+                              {isShipping ? (
+                                <div className="flex items-center justify-between relative">
+                                  <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-border z-0" />
+                                  <div
+                                    className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-brand-green transition-all duration-500 z-0"
+                                    style={{
+                                      width: 
+                                        a.prescription.fulfillment.status === 'CONFIRMED' ? '0%' :
+                                        a.prescription.fulfillment.status === 'PACKED' ? '33%' :
+                                        a.prescription.fulfillment.status === 'DISPATCHED' ? '66%' : '100%'
+                                    }}
+                                  />
+
+                                  {[
+                                    { label: 'Confirmed', status: 'CONFIRMED' },
+                                    { label: 'Packed', status: 'PACKED' },
+                                    { label: 'Dispatched', status: 'DISPATCHED' },
+                                    { label: 'Received', status: 'COMPLETED' }
+                                  ].map((step, idx) => {
+                                    const statuses = ['CONFIRMED', 'PACKED', 'DISPATCHED', 'COMPLETED'];
+                                    const currentIdx = statuses.indexOf(a.prescription.fulfillment.status);
+                                    const stepIdx = statuses.indexOf(step.status);
+                                    const isCompleted = stepIdx < currentIdx;
+                                    const isActive = stepIdx === currentIdx;
+
+                                    return (
+                                      <div key={step.label} className="flex flex-col items-center z-10 relative">
+                                        <div className={`h-6 w-6 rounded-full flex items-center justify-center border-2 text-[10px] font-bold transition-all duration-300 ${
+                                          isCompleted
+                                            ? 'bg-brand-green border-brand-green text-white'
+                                            : isActive
+                                            ? 'bg-brand-gold border-brand-gold text-brand-green font-black animate-pulse-slow'
+                                            : 'bg-white border-border text-brand-foreground/45'
+                                        }`}>
+                                          {isCompleted ? '✓' : idx + 1}
+                                        </div>
+                                        <span className={`text-[9px] font-bold mt-1.5 transition-colors ${
+                                          isActive ? 'text-brand-green font-black' : 'text-brand-foreground/60'
+                                        }`}>
+                                          {step.label}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-between relative">
+                                  <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-border z-0" />
+                                  <div
+                                    className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-brand-green transition-all duration-500 z-0"
+                                    style={{
+                                      width: 
+                                        a.prescription.fulfillment.status === 'CONFIRMED' ? '0%' :
+                                        a.prescription.fulfillment.status === 'PACKED' ? '50%' : '100%'
+                                    }}
+                                  />
+
+                                  {[
+                                    { label: 'Preparing', status: 'CONFIRMED' },
+                                    { label: 'Ready for Pickup', status: 'PACKED' },
+                                    { label: 'Collected', status: 'COMPLETED' }
+                                  ].map((step, idx) => {
+                                    const statuses = ['CONFIRMED', 'PACKED', 'COMPLETED'];
+                                    const currentIdx = statuses.indexOf(a.prescription.fulfillment.status);
+                                    const stepIdx = statuses.indexOf(step.status);
+                                    const isCompleted = stepIdx < currentIdx;
+                                    const isActive = stepIdx === currentIdx;
+
+                                    return (
+                                      <div key={step.label} className="flex flex-col items-center z-10 relative">
+                                        <div className={`h-6 w-6 rounded-full flex items-center justify-center border-2 text-[10px] font-bold transition-all duration-300 ${
+                                          isCompleted
+                                            ? 'bg-brand-green border-brand-green text-white'
+                                            : isActive
+                                            ? 'bg-brand-gold border-brand-gold text-brand-green font-black animate-pulse-slow'
+                                            : 'bg-white border-border text-brand-foreground/45'
+                                        }`}>
+                                          {isCompleted ? '✓' : idx + 1}
+                                        </div>
+                                        <span className={`text-[9px] font-bold mt-1.5 transition-colors ${
+                                          isActive ? 'text-brand-green font-black' : 'text-brand-foreground/60'
+                                        }`}>
+                                          {step.label}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Tracking Details / Actions */}
+                          {a.prescription.fulfillment.status !== 'CANCELLED' && (
+                            <div className="bg-brand-gold-light/20 border border-brand-gold/25 rounded-2xl p-4 space-y-3">
+                              {a.prescription.fulfillment.status === 'PENDING' ? (
+                                <div className="space-y-3">
+                                  <p className="font-extrabold text-brand-green text-xs">Choose Fulfillment Method:</p>
+                                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    {a.consultant?.hasClinicPickup && (
+                                      <label className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                                        selectedMethods[a.prescription.fulfillment.id] === 'CLINIC_PICKUP'
+                                          ? 'border-brand-gold bg-brand-gold-light/40 font-bold'
+                                          : 'border-border hover:border-brand-green text-brand-foreground/75'
+                                      }`}>
+                                        <input
+                                          type="radio"
+                                          name={`appt-fulfillment-method-${a.prescription.fulfillment.id}`}
+                                          checked={selectedMethods[a.prescription.fulfillment.id] === 'CLINIC_PICKUP'}
+                                          onChange={() => setSelectedMethods(prev => ({ ...prev, [a.prescription.fulfillment.id]: 'CLINIC_PICKUP' }))}
+                                          className="text-brand-green focus:ring-brand-green cursor-pointer"
+                                        />
+                                        <span className="text-xs font-bold">Clinic Pickup</span>
+                                      </label>
+                                    )}
+                                    {a.consultant?.hasSelfDispatch && (
+                                      <label className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                                        selectedMethods[a.prescription.fulfillment.id] === 'SELF_DISPATCH'
+                                          ? 'border-brand-gold bg-brand-gold-light/40 font-bold'
+                                          : 'border-border hover:border-brand-green text-brand-foreground/75'
+                                      }`}>
+                                        <input
+                                          type="radio"
+                                          name={`appt-fulfillment-method-${a.prescription.fulfillment.id}`}
+                                          checked={selectedMethods[a.prescription.fulfillment.id] === 'SELF_DISPATCH'}
+                                          onChange={() => setSelectedMethods(prev => ({ ...prev, [a.prescription.fulfillment.id]: 'SELF_DISPATCH' }))}
+                                          className="text-brand-green focus:ring-brand-green cursor-pointer"
+                                        />
+                                        <span className="text-xs font-bold">Self-Dispatch</span>
+                                      </label>
+                                    )}
+                                    {a.consultant?.hasAyurwedDelivery && (
+                                      <label className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                                        selectedMethods[a.prescription.fulfillment.id] === 'AYURWED_DELIVERY'
+                                          ? 'border-brand-gold bg-brand-gold-light/40 font-bold'
+                                          : 'border-border hover:border-brand-green text-brand-foreground/75'
+                                      }`}>
+                                        <input
+                                          type="radio"
+                                          name={`appt-fulfillment-method-${a.prescription.fulfillment.id}`}
+                                          checked={selectedMethods[a.prescription.fulfillment.id] === 'AYURWED_DELIVERY'}
+                                          onChange={() => setSelectedMethods(prev => ({ ...prev, [a.prescription.fulfillment.id]: 'AYURWED_DELIVERY' }))}
+                                          className="text-brand-green focus:ring-brand-green cursor-pointer"
+                                        />
+                                        <span className="text-xs font-bold">AYURWED Delivery</span>
+                                      </label>
+                                    )}
+                                    {!a.consultant?.hasClinicPickup && !a.consultant?.hasSelfDispatch && !a.consultant?.hasAyurwedDelivery && (
+                                      <div className="col-span-3 text-xs italic text-brand-foreground/50">
+                                        No specific fulfillment configuration set by doctor.
+                                      </div>
+                                    )}
+                                  </div>
+                                  <button
+                                    onClick={() => handleConfirmOrder(a.prescription.fulfillment.id, a.id)}
+                                    className="w-full bg-brand-gold hover:bg-brand-green hover:text-white text-brand-green font-bold text-xs py-2.5 rounded-xl transition-all border border-brand-gold/30 shadow-sm uppercase tracking-wider"
+                                  >
+                                    Confirm & Order Medicines
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="text-xs text-brand-foreground/80">
+                                  {isShipping ? (
+                                    <>
+                                      <p className="font-bold text-brand-green">Courier Dispatch details</p>
+                                      <p>
+                                        Your consultant will pack and dispatch your Ayurvedic medicines.
+                                      </p>
+                                      {a.prescription.fulfillment.trackingNumber && (
+                                        <p className="pt-1.5">
+                                          Tracking ID:{' '}
+                                          <span className="font-mono font-bold text-brand-gold-dark bg-white px-2 py-0.5 rounded border border-brand-gold/30">
+                                            {a.prescription.fulfillment.trackingNumber}
+                                          </span>
+                                        </p>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <p className="font-bold text-brand-green">Clinic Pickup location</p>
+                                      <p>
+                                        Please collect your medicine pack directly from the consultant's clinic once status is "Ready for Pickup".
+                                      </p>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
 

@@ -16,9 +16,12 @@ interface BookingFormProps {
     specialization: string;
     consultationFee: number;
     followUpFee: number;
-    availability: Record<string, string[]>;
+    availability: any;
     isAcfp?: boolean;
     fulfillmentMethod?: string | null;
+    hasClinicPickup?: boolean;
+    hasSelfDispatch?: boolean;
+    hasAyurwedDelivery?: boolean;
   };
   initialUserPhone?: string;
   initialVisitType?: 'INITIAL' | 'FOLLOW_UP';
@@ -32,6 +35,42 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
   const [slot, setSlot] = useState('');
   const [type, setType] = useState<'VIDEO' | 'OFFLINE'>('VIDEO');
   const [visitType, setVisitType] = useState<'INITIAL' | 'FOLLOW_UP'>(initialVisitType);
+
+  const getDayName = (dateString: string): string => {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-').map(Number);
+    const dateObj = new Date(year, month - 1, day);
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return days[dateObj.getDay()];
+  };
+
+  const getAvailableSlots = (dateString: string): string[] => {
+    const dayName = getDayName(dateString);
+    if (!dayName || !consultant.availability) return [];
+    const val = consultant.availability[dayName];
+    if (Array.isArray(val)) {
+      return val;
+    }
+    if (val && typeof val === 'object' && 'enabled' in val && val.enabled) {
+      return val.slots || [];
+    }
+    return [];
+  };
+
+  const formatTimeSlot = (slotStr: string): string => {
+    if (slotStr.includes('AM') || slotStr.includes('PM')) {
+      return slotStr;
+    }
+    const [hoursStr, minutesStr] = slotStr.split(':');
+    let hours = parseInt(hoursStr, 10);
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const formattedHours = hours.toString().padStart(2, '0');
+    return `${formattedHours}:${minutesStr} ${ampm}`;
+  };
+
+  const availableSlots = getAvailableSlots(date);
 
   const selectedFee = visitType === 'INITIAL' ? consultant.consultationFee : consultant.followUpFee;
   
@@ -91,7 +130,7 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
           slot,
           type,
           concern,
-          fee: selectedFee,
+          visitType,
           patientName,
           patientAge,
           patientGender,
@@ -215,7 +254,10 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
           <input
             type="date"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={(e) => {
+              setDate(e.target.value);
+              setSlot('');
+            }}
             min={new Date().toISOString().split('T')[0]}
             className="w-full bg-brand-green-light/40 text-brand-foreground border border-border rounded-2xl py-3 px-4 pl-10 focus:outline-none focus:border-brand-gold text-sm"
             required
@@ -228,20 +270,29 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
       <div className="space-y-2">
         <label className="text-xs font-bold text-brand-green uppercase tracking-wider block">Available Slots</label>
         <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
-          {['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM'].map((time) => (
-            <button
-              key={time}
-              type="button"
-              onClick={() => setSlot(time)}
-              className={`py-2 px-3 text-xs font-semibold rounded-xl border text-center transition-all ${
-                slot === time
-                  ? 'bg-brand-green border-brand-green text-white shadow-sm'
-                  : 'bg-card border-border hover:border-brand-green text-brand-foreground/70'
-              }`}
-            >
-              {time}
-            </button>
-          ))}
+          {availableSlots.length > 0 ? (
+            availableSlots.map((rawTime) => {
+              const time = formatTimeSlot(rawTime);
+              return (
+                <button
+                  key={time}
+                  type="button"
+                  onClick={() => setSlot(time)}
+                  className={`py-2 px-3 text-xs font-semibold rounded-xl border text-center transition-all ${
+                    slot === time
+                      ? 'bg-brand-green border-brand-green text-white shadow-sm'
+                      : 'bg-card border-border hover:border-brand-green text-brand-foreground/70'
+                  }`}
+                >
+                  {time}
+                </button>
+              );
+            })
+          ) : (
+            <div className="col-span-2 text-center py-4 text-xs text-brand-foreground/50 italic bg-brand-green-light/10 border border-dashed border-border rounded-xl">
+              {date ? 'No availability slots defined on this day.' : 'Please select a date to view available slots.'}
+            </div>
+          )}
         </div>
       </div>
 
@@ -352,11 +403,16 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
           />
           <div className="text-[11px] leading-relaxed text-brand-foreground/80">
             <span className="font-bold text-brand-green block mb-0.5">Medicine Fulfillment Acknowledgment</span>
-            I understand that Dr. {consultant.name} will prepare and fulfill my prescribed Ayurvedic medicine plan via{' '}
-            <strong className="text-brand-gold-dark font-extrabold">
-              {consultant.fulfillmentMethod === 'COURIER' ? 'Courier Delivery' : 'Clinic Pickup Only'}
-            </strong>
-            . I agree to receive/collect the medicines after my consultation.
+            I understand that {consultant.name} will prepare and fulfill my prescribed Ayurvedic medicine plan via:
+            <ul className="list-disc pl-4 mt-1 space-y-0.5 text-brand-gold-dark font-extrabold">
+              {consultant.hasClinicPickup && <li>Clinic Pickup</li>}
+              {consultant.hasSelfDispatch && <li>Doctor Self-Dispatch</li>}
+              {consultant.hasAyurwedDelivery && <li>AYURWED Delivery</li>}
+              {!consultant.hasClinicPickup && !consultant.hasSelfDispatch && !consultant.hasAyurwedDelivery && (
+                <li className="italic text-brand-foreground/50">To be discussed with the doctor</li>
+              )}
+            </ul>
+            I agree to receive/collect the medicines after my consultation.
           </div>
         </label>
       )}

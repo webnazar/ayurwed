@@ -3,11 +3,10 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Building2, Globe, Mail, Phone, Leaf, CheckCircle2, MessageSquare, Calendar, ShieldAlert, Sparkles, ShoppingCart, CreditCard, HeartHandshake } from 'lucide-react';
+import { Building2, Globe, Mail, Phone, Leaf, CheckCircle2, MessageSquare, Calendar, ShieldAlert, Sparkles, HeartHandshake } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useCartStore } from '@/store/cartStore';
 
 interface ExtractInteractionProps {
   preparation: {
@@ -125,49 +124,15 @@ export default function ExtractInteraction({ preparation }: ExtractInteractionPr
           </div>
 
           {/* CTAs */}
-          {preparation.isShopExtract ? (
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <button
-                onClick={() => {
-                  useCartStore.getState().addItem({
-                    id: preparation.id,
-                    name: preparation.name,
-                    mrp: preparation.mrp || 0,
-                    image: preparation.images[0] || ''
-                  });
-                  toast.success('Added to Cart!');
-                }}
-                className="flex-1 bg-card border-2 border-brand-green text-brand-green hover:bg-brand-green-light font-bold py-3.5 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow hover:shadow-lg text-sm"
-              >
-                <ShoppingCart className="h-4 w-4" /> Add to Cart
-              </button>
-              <button
-                onClick={() => {
-                  useCartStore.getState().addItem({
-                    id: preparation.id,
-                    name: preparation.name,
-                    mrp: preparation.mrp || 0,
-                    image: preparation.images[0] || ''
-                  });
-                  toast.success('Added to Cart! Redirecting...');
-                  window.location.href = '/cart';
-                }}
-                className="flex-1 bg-brand-green text-white hover:bg-brand-gold hover:text-brand-green font-bold py-3.5 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow hover:shadow-lg text-sm"
-              >
-                <CreditCard className="h-4 w-4" /> Buy Now
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <Link
-                href="/doctors"
-                className="btn-secondary text-sm sm:text-base w-full sm:w-[260px] shadow-sm hover:shadow-lg flex items-center justify-center gap-2"
-              >
-                <HeartHandshake className="h-5 w-5 flex-shrink-0" />
-                <span>Book Consultation</span>
-              </Link>
-            </div>
-          )}
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <Link
+              href="/doctors"
+              className="btn-secondary text-sm sm:text-base w-full sm:w-[260px] shadow-sm hover:shadow-lg flex items-center justify-center gap-2"
+            >
+              <HeartHandshake className="h-5 w-5 flex-shrink-0" />
+              <span>Book Consultation</span>
+            </Link>
+          </div>
 
 
 

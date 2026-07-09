@@ -13,7 +13,14 @@ type WeekAvailability = Record<string, DayAvailability>;
 function initAvailability(raw: any): WeekAvailability {
   const result: WeekAvailability = {};
   DAYS.forEach(d => {
-    result[d] = raw?.[d] ?? { enabled: false, slots: [...DEFAULT_SLOTS] };
+    const val = raw?.[d];
+    if (Array.isArray(val)) {
+      result[d] = { enabled: true, slots: val };
+    } else if (val && typeof val === 'object' && 'enabled' in val) {
+      result[d] = { enabled: val.enabled, slots: val.slots || [] };
+    } else {
+      result[d] = { enabled: false, slots: [...DEFAULT_SLOTS] };
+    }
   });
   return result;
 }

@@ -3,8 +3,28 @@ import { db } from '@/lib/db';
 import Link from 'next/link';
 import { Star, ShieldCheck, HeartHandshake, Award, Languages, Search } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
-import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import ConsultantFilterSidebarClient from '@/components/consultants/ConsultantFilterSidebarClient';
+
+function parseLanguages(langStr: any): string {
+  if (!langStr) return 'English';
+  try {
+    const parsed = JSON.parse(langStr);
+    if (Array.isArray(parsed)) {
+      return parsed.join(', ');
+    }
+  } catch (e) {}
+  if (typeof langStr === 'string') {
+    if (langStr.startsWith('[') && langStr.endsWith(']')) {
+      try {
+        const cleaned = langStr.slice(1, -1).replace(/"/g, '');
+        return cleaned;
+      } catch {}
+    }
+    return langStr;
+  }
+  return 'English';
+}
 import AyuriTriggerButton from '@/components/layout/AyuriTriggerButton';
 
 export const revalidate = 0; // Fresh updates
@@ -94,8 +114,9 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
   if (selectedFulfillments.length > 0) {
     const fulfillmentConditions: any[] = [];
     selectedFulfillments.forEach((f) => {
-      if (f === 'courier') fulfillmentConditions.push({ fulfillmentMethod: 'COURIER' });
-      if (f === 'pickup') fulfillmentConditions.push({ fulfillmentMethod: 'PICKUP' });
+      if (f === 'clinic_pickup') fulfillmentConditions.push({ hasClinicPickup: true });
+      if (f === 'self_dispatch') fulfillmentConditions.push({ hasSelfDispatch: true });
+      if (f === 'ayurwed_delivery') fulfillmentConditions.push({ hasAyurwedDelivery: true });
     });
     if (fulfillmentConditions.length > 0) {
       andConditions.push({ OR: fulfillmentConditions });
@@ -207,20 +228,24 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
                 >
                   {/* Avatar block */}
                   <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-brand-green-light flex-shrink-0 mx-auto">
-                    <Image
-                      src={c.user?.avatar || (c.id % 2 === 0 ? '/female-doctor.webp' : '/male-doctor.webp')}
+                    <SafeImage
+                      src={c.user?.avatar}
+                      fallbackSrc={c.id % 2 === 0 ? '/female-doctor.webp' : '/male-doctor.webp'}
                       alt={c.user?.name || 'Doctor'}
-                      fill
-                      sizes="112px"
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
 
                   {/* Info details block */}
                   <div className="flex-grow flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
+                      <h3 className="text-lg font-bold text-title-primary">{c.user?.name}</h3>
+                      
+                      <p className="text-[10px] font-bold text-brand-gold-dark uppercase tracking-wide">
+                        {c.specialization}
+                      </p>
+
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-lg font-bold text-title-primary">{c.user?.name}</h3>
                         {c.isCaiCertified && (
                           <span className="bg-brand-green/10 text-brand-green border border-brand-green/20 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                             <Award className="h-2.5 w-2.5 text-brand-gold-dark" />
@@ -234,10 +259,6 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
                           </span>
                         )}
                       </div>
-                      
-                      <p className="text-[10px] font-bold text-brand-gold-dark uppercase tracking-wide">
-                        {c.specialization}
-                      </p>
 
                       <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                         {c.bio}
@@ -250,7 +271,7 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
                         </div>
                         <div className="flex items-center gap-1">
                           <Languages className="h-3 w-3 text-brand-green/75" />
-                          <span>{Array.isArray(c.languages) ? (c.languages as string[]).join(', ') : 'English'}</span>
+                          <span>{parseLanguages(c.languages)}</span>
                         </div>
                       </div>
 
@@ -268,9 +289,23 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
                           <span className="bg-brand-green/10 text-brand-green px-2 py-0.5 rounded-full font-bold">✓ Offline</span>
                         )}
                         {c.isAcfp && (
-                          <span className="bg-brand-gold/15 text-brand-gold-dark px-2 py-0.5 rounded-full font-extrabold shadow-sm border border-brand-gold/20">
-                            ✓ {c.fulfillmentMethod === 'COURIER' ? 'Courier Delivery' : 'Clinic Pickup'}
-                          </span>
+                          <>
+                            {c.hasClinicPickup && (
+                              <span className="bg-brand-gold/15 text-brand-gold-dark px-2 py-0.5 rounded-full font-extrabold shadow-sm border border-brand-gold/20">
+                                ✓ Clinic Pickup
+                              </span>
+                            )}
+                            {c.hasSelfDispatch && (
+                              <span className="bg-brand-gold/15 text-brand-gold-dark px-2 py-0.5 rounded-full font-extrabold shadow-sm border border-brand-gold/20">
+                                ✓ Self-Dispatch
+                              </span>
+                            )}
+                            {c.hasAyurwedDelivery && (
+                              <span className="bg-brand-gold/15 text-brand-gold-dark px-2 py-0.5 rounded-full font-extrabold shadow-sm border border-brand-gold/20">
+                                ✓ AYURWED Delivery
+                              </span>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>

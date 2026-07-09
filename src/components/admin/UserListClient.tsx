@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Filter, ShieldCheck, Mail, Phone, Calendar, UserCheck, UserX, User, Shield, Info, Edit, Check, Plus, X, Eye, Trash2, ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
+import SafeImage from '@/components/ui/SafeImage';
 
 const PROTECTED_EMAILS = ['ayurwed.com@gmail.com', 'webnazar@gmail.com'];
 
@@ -302,12 +303,13 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
                   <tr key={user.id} className="hover:bg-muted transition-colors duration-150">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <div className="h-10 w-10 bg-brand-gold text-brand-green dark:text-black font-bold rounded-full flex items-center justify-center text-sm shadow flex-shrink-0">
-                          {user.avatar ? (
-                            <img src={user.avatar} alt={user.name} className="h-full w-full rounded-full object-cover" />
-                          ) : (
-                            user.name.charAt(0).toUpperCase()
-                          )}
+                        <div className="h-10 w-10 rounded-full overflow-hidden bg-brand-gold text-brand-green dark:text-black flex-shrink-0">
+                          <SafeImage
+                            src={user.avatar}
+                            fallbackSrc="/avatar.webp"
+                            alt={user.name}
+                            className="h-full w-full object-cover"
+                          />
                         </div>
                         <div>
                           <div className="font-bold text-brand-green flex items-center gap-1.5">
@@ -402,12 +404,13 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
             {/* Header */}
             <div className="bg-gradient-to-r from-brand-green to-[#0f381b] p-6 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="h-12 w-12 bg-card/20 rounded-full flex items-center justify-center font-bold text-lg">
-                  {selectedUser.avatar ? (
-                    <img src={selectedUser.avatar} alt={selectedUser.name} className="h-full w-full rounded-full object-cover" />
-                  ) : (
-                    selectedUser.name.charAt(0).toUpperCase()
-                  )}
+                <div className="h-12 w-12 rounded-full overflow-hidden bg-card/20 flex-shrink-0">
+                  <SafeImage
+                    src={selectedUser.avatar}
+                    fallbackSrc="/avatar.webp"
+                    alt={selectedUser.name}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
                 <div>
                   <h3 className="font-extrabold text-lg flex items-center gap-2">

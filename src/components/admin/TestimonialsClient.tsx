@@ -195,6 +195,9 @@ export default function TestimonialsClient({ initialTestimonials }: { initialTes
                         src={t.avatar && t.avatar.trim().length > 0 ? t.avatar : "/avatar.webp"} 
                         alt={t.name} 
                         className="h-9 w-9 rounded-full object-cover border border-brand-gold/15 flex-shrink-0" 
+                        onError={(e) => {
+                          e.currentTarget.src = "/avatar.webp";
+                        }}
                       />
                       <div>
                         <div className="font-bold text-brand-green">{t.name}</div>

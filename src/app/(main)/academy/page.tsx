@@ -59,10 +59,23 @@ export default async function AcademyPage() {
             <Link href="#aeis" className="w-full sm:w-auto px-8 py-4 btn-green rounded-full text-lg shadow-xl hover:shadow-2xl flex items-center justify-center gap-2">
               Explore Program <ArrowRight className="h-5 w-5" />
             </Link>
-            <button className="w-full sm:w-auto px-8 py-4 btn-outline text-lg">
+            <Link href="#intro-video" className="w-full sm:w-auto px-8 py-4 btn-outline text-lg rounded-full flex items-center justify-center gap-2">
               <PlayCircle className="h-5 w-5" /> Introduction Video
-            </button>
+            </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Video Introduction Section */}
+      <section id="intro-video" className="max-w-5xl mx-auto layout-padding-minimal px-4 pb-20 -mt-8 relative z-20">
+        <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border-4 border-brand-green/20 bg-black transform hover:scale-[1.01] transition-transform duration-300">
+          <iframe
+            src="https://www.youtube.com/embed/EOk417MiCtE"
+            title="Certificate in Ancient Intelligence (CAI) Introduction Video"
+            className="absolute inset-0 w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          ></iframe>
         </div>
       </section>
 

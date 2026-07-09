@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { PrismaClient } from '@prisma/client';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { db } from '@/lib/db';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 
-const prisma = new PrismaClient();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(req: NextRequest) {
@@ -22,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch available preparations to feed into the AI
-    const preparations = await prisma.preparation.findMany({
+    const preparations = await db.preparation.findMany({
       where: { isActive: true },
       select: {
         id: true,
@@ -42,16 +41,7 @@ export async function POST(req: NextRequest) {
     Your task is to analyze patient data, consultation notes, and indications to suggest suitable Ayurvedic preparations from the available list.
     
     IMPORTANT: You must ONLY suggest preparations from the provided Available Preparations list. Do not invent new ones.
-    Return your response strictly as a JSON array of suggestion objects.
-    Each suggestion object must have the following fields:
-    - "preparationId": number (the ID of the suggested preparation)
-    - "preparationName": string (the name of the suggested preparation)
-    - "dosage": string (e.g., "10 Drops", "1 Tablet")
-    - "frequency": string (e.g., "Twice Daily", "Morning and Evening")
-    - "duration": string (e.g., "15 Days", "1 Month")
-    - "instructions": string (e.g., "After meals with warm water")
-    - "reason": string (a brief explanation of why this is suggested based on the patient's indications)
-
+    
     --- INPUT DATA ---
     Patient Profile:
     Age: ${patient.age || 'Unknown'}
@@ -69,26 +59,54 @@ export async function POST(req: NextRequest) {
     Available Preparations:
     ${prepContext}
     --- END INPUT DATA ---
-    
-    Provide your output as a valid JSON array. Do not include markdown blocks like \`\`\`json.
     `;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: SchemaType.OBJECT,
+          properties: {
+            suggestions: {
+              type: SchemaType.ARRAY,
+              items: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  preparationId: { type: SchemaType.INTEGER, description: "the ID of the suggested preparation" },
+                  preparationName: { type: SchemaType.STRING, description: "the name of the suggested preparation" },
+                  dosage: { type: SchemaType.STRING, description: "e.g., '10 Drops', '1 Tablet'" },
+                  frequency: { type: SchemaType.STRING, description: "e.g., 'Twice Daily', 'Morning and Evening'" },
+                  duration: { type: SchemaType.STRING, description: "e.g., '15 Days', '1 Month'" },
+                  instructions: { type: SchemaType.STRING, description: "e.g., 'After meals with warm water'" },
+                  reason: { type: SchemaType.STRING, description: "a brief explanation of why this is suggested based on the patient's indications" }
+                },
+                required: [
+                  "preparationId",
+                  "preparationName",
+                  "dosage",
+                  "frequency",
+                  "duration",
+                  "instructions",
+                  "reason"
+                ]
+              }
+            }
+          },
+          required: ["suggestions"]
+        }
+      }
+    });
+
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
     
-    // Attempt to parse JSON
     let suggestions = [];
     try {
-      // Find JSON array in the response string if it's wrapped in something else
-      const jsonMatch = responseText.match(/\[[\s\S]*\]/);
-      if (jsonMatch) {
-        suggestions = JSON.parse(jsonMatch[0]);
-      } else {
-        suggestions = JSON.parse(responseText);
-      }
+      const parsed = JSON.parse(responseText);
+      suggestions = parsed.suggestions || [];
     } catch (e) {
-      console.error("Failed to parse AI response", responseText);
+      console.error("Failed to parse AIPE structured response", responseText, e);
       return NextResponse.json({ error: 'Failed to generate valid suggestions' }, { status: 500 });
     }
 

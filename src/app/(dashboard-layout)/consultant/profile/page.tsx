@@ -48,13 +48,16 @@ export default async function ConsultantProfilePage() {
       consultationFee: Number(profile.consultationFee),
       followUpFee: Number(profile.followUpFee),
       fulfillmentMethod: profile.fulfillmentMethod,
+      hasClinicPickup: profile.hasClinicPickup,
+      hasSelfDispatch: profile.hasSelfDispatch,
+      hasAyurwedDelivery: profile.hasAyurwedDelivery,
     }
   };
 
   const isPendingAcfp = !!profile.acfpVerifiedAt && !profile.isAcfp;
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto w-full">
+    <div className="space-y-6 max-w-7xl mx-auto w-full">
       <div className="dashboard-header-card">
         <h1 className="dashboard-header-title">My Profile</h1>
         <p className="dashboard-header-subtitle">

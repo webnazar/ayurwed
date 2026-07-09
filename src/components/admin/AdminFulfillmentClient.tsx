@@ -58,6 +58,33 @@ export default function AdminFulfillmentClient({ initialFulfillments }: { initia
     return true;
   });
 
+  const getMethodDetails = (method: string) => {
+    switch (method) {
+      case 'CLINIC_PICKUP':
+      case 'PICKUP':
+        return {
+          label: method === 'PICKUP' ? 'Clinic Pickup (Legacy)' : 'Clinic Pickup',
+          badgeClass: 'bg-amber-50 text-amber-700 border border-amber-200'
+        };
+      case 'SELF_DISPATCH':
+      case 'COURIER':
+        return {
+          label: method === 'COURIER' ? 'Courier (Legacy)' : 'Doctor Self-Dispatch',
+          badgeClass: 'bg-blue-50 text-blue-700 border border-blue-200'
+        };
+      case 'AYURWED_DELIVERY':
+        return {
+          label: 'AYURWED Delivery',
+          badgeClass: 'bg-brand-gold/15 text-brand-gold-dark border border-brand-gold/30'
+        };
+      default:
+        return {
+          label: method,
+          badgeClass: 'bg-gray-50 text-gray-700 border border-gray-200'
+        };
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Search and Filters */}
@@ -94,8 +121,11 @@ export default function AdminFulfillmentClient({ initialFulfillments }: { initia
             className="bg-brand-gold-light/40 border border-border rounded-2xl py-2.5 px-4 text-sm focus:outline-none font-bold text-brand-green"
           >
             <option value="ALL">All Methods</option>
-            <option value="COURIER">Courier Delivery</option>
-            <option value="PICKUP">Clinic Pickup</option>
+            <option value="CLINIC_PICKUP">Clinic Pickup</option>
+            <option value="SELF_DISPATCH">Doctor Self-Dispatch</option>
+            <option value="AYURWED_DELIVERY">AYURWED Delivery</option>
+            <option value="COURIER">Courier (Legacy)</option>
+            <option value="PICKUP">Pickup (Legacy)</option>
           </select>
         </div>
       </div>
@@ -124,42 +154,41 @@ export default function AdminFulfillmentClient({ initialFulfillments }: { initia
                 </tr>
               </thead>
               <tbody className="divide-y divide-brand-green-light/25">
-                {filteredOrders.map(order => (
-                  <tr key={order.id} className="hover:bg-brand-gold-light/10 transition-colors">
-                    <td className="p-4 font-mono font-bold text-brand-green">#{order.prescriptionId}</td>
-                    <td className="p-4">
-                      <p className="font-bold text-brand-foreground">{order.patient.name}</p>
-                      <p className="text-[10px] text-brand-foreground/60">{order.patient.email}</p>
-                    </td>
-                    <td className="p-4 font-semibold text-brand-foreground">{order.consultant?.user?.name || 'Doctor'}</td>
-                    <td className="p-4">
-                      <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
-                        order.method === 'COURIER'
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                          : 'bg-amber-50 text-amber-700 border border-amber-200'
-                      }`}>
-                        {order.method === 'COURIER' ? 'Courier' : 'Clinic Pickup'}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
-                        order.status === 'COMPLETED'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : order.status === 'CANCELLED'
-                          ? 'bg-rose-100 text-rose-800'
-                          : 'bg-brand-gold/20 text-brand-gold-dark'
-                      }`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="p-4 font-mono font-medium text-brand-foreground/75">
-                      {order.trackingNumber || '—'}
-                    </td>
-                    <td className="p-4 text-brand-foreground/60">
-                      {format(new Date(order.createdAt), 'dd MMM yyyy')}
-                    </td>
-                  </tr>
-                ))}
+                {filteredOrders.map(order => {
+                  const methodInfo = getMethodDetails(order.method);
+                  return (
+                    <tr key={order.id} className="hover:bg-brand-gold-light/10 transition-colors">
+                      <td className="p-4 font-mono font-bold text-brand-green">#{order.prescriptionId}</td>
+                      <td className="p-4">
+                        <p className="font-bold text-brand-foreground">{order.patient.name}</p>
+                        <p className="text-[10px] text-brand-foreground/60">{order.patient.email}</p>
+                      </td>
+                      <td className="p-4 font-semibold text-brand-foreground">{order.consultant?.user?.name || 'Doctor'}</td>
+                      <td className="p-4">
+                        <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${methodInfo.badgeClass}`}>
+                          {methodInfo.label}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                          order.status === 'COMPLETED'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : order.status === 'CANCELLED'
+                            ? 'bg-rose-100 text-rose-800'
+                            : 'bg-brand-gold/20 text-brand-gold-dark'
+                        }`}>
+                          {order.status}
+                        </span>
+                      </td>
+                      <td className="p-4 font-mono font-medium text-brand-foreground/75">
+                        {order.trackingNumber || '—'}
+                      </td>
+                      <td className="p-4 text-brand-foreground/60">
+                        {format(new Date(order.createdAt), 'dd MMM yyyy')}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

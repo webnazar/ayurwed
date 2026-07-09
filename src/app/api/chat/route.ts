@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { db } from '@/lib/db';
 
 // Simple Ayurveda-themed fallback answers when Gemini API key is missing or calls fail
 const AYURVEDA_FALLBACKS = [
@@ -26,16 +27,55 @@ export async function POST(req: Request) {
       });
     }
 
-    // Live call to Google Gemini model
+    // Fetch preparations and consultants for contextual recommendations (RAG)
+    let preparations: any[] = [];
+    let consultants: any[] = [];
+    try {
+      preparations = await db.preparation.findMany({
+        where: { isActive: true },
+        select: { id: true, name: true, type: true, benefits: true }
+      });
+      consultants = await db.consultantProfile.findMany({
+        where: { isVerified: true },
+        select: { id: true, specialization: true, user: { select: { name: true } } }
+      });
+    } catch (dbErr) {
+      console.error('[CHAT_DB_ERROR] Failed to fetch context', dbErr);
+    }
+
+    const prepContext = preparations.map(p => `- ${p.name} (${p.type}): ${JSON.stringify(p.benefits)} (Link: /preparations/${p.id})`).join('\n');
+    const doctorContext = consultants.map(c => `- Dr. ${c.user?.name || 'Practitioner'} (${c.specialization}) (Link: /doctors/${c.id})`).join('\n');
+
+    const systemInstruction = `You are Ayuri, a kind, knowledgeable Ayurvedic AI assistant. You answer health and wellness questions using authentic, classical Ayurvedic guidelines.
+Suggest lifestyle modifications, dosha balancing routines, and single herbs.
+
+Below are the actual wellness preparations and certified consultants available on our platform. 
+Whenever relevant to the user's question, mention these preparations or consultants and provide their EXACT relative URLs using standard markdown links (e.g., [Bringadi Oil](/preparations/3) or [Dr. Nair](/doctors/1)).
+Do not invent preparations or doctor URLs that are not in this list.
+
+AVAILABLE PREPARATIONS:
+${prepContext || 'None available at the moment'}
+
+AVAILABLE CERTIFIED CONSULTANTS:
+${doctorContext || 'None available at the moment'}
+
+Always remind users to consult a certified practitioner for diagnostic checks.`;
+
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Use gemini-1.5-flash for speed and lightweight footprint
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      systemInstruction: "You are Ayuri, a kind, knowledgeable Ayurvedic AI assistant. You answer health and wellness questions using authentic, classical Ayurvedic guidelines. Suggest lifestyle modifications, dosha balancing routines, and single herbs. Always remind users to consult a certified practitioner for diagnostic checks.",
+      model: "gemini-2.0-flash",
+      systemInstruction,
     });
 
-    const response = await model.generateContent(lastMessage);
-    const text = response.response.text();
+    // Format chat history for multi-turn Gemini API
+    const history = (messages.slice(0, -1) || []).map((m: any) => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content || '' }]
+    }));
+
+    const chat = model.startChat({ history });
+    const result = await chat.sendMessage(lastMessage);
+    const text = result.response.text();
 
     return NextResponse.json({ content: text });
   } catch (err: any) {

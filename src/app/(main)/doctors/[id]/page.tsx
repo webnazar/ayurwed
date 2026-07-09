@@ -6,7 +6,7 @@ import { authOptions } from '@/lib/auth';
 import BookingForm from '@/components/consultants/BookingForm';
 import Link from 'next/link';
 import { ChevronRight, ArrowLeft, ShieldCheck, Languages, Award, BookOpen, Stethoscope, Briefcase, FileText, CheckCircle, XCircle } from 'lucide-react';
-import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import { format } from 'date-fns';
 import AcfpInfoCard from '@/components/consultants/AcfpInfoCard';
 
@@ -77,6 +77,9 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
     availability: parsedAvailability,
     isAcfp: consultant.isAcfp,
     fulfillmentMethod: consultant.fulfillmentMethod,
+    hasClinicPickup: consultant.hasClinicPickup,
+    hasSelfDispatch: consultant.hasSelfDispatch,
+    hasAyurwedDelivery: consultant.hasAyurwedDelivery,
   };
 
   return (
@@ -103,12 +106,11 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
           {/* Doctor Header Card */}
           <div className="bg-card rounded-3xl p-8 border border-border shadow-sm flex flex-col sm:flex-row gap-8 items-center sm:items-start text-center sm:text-left relative overflow-hidden">
             <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-2xl overflow-hidden bg-brand-green-light flex-shrink-0">
-              <Image
-                src={consultant.user?.avatar || (consultant.id % 2 === 0 ? '/female-doctor.webp' : '/male-doctor.webp')}
+              <SafeImage
+                src={consultant.user?.avatar}
+                fallbackSrc={consultant.id % 2 === 0 ? '/female-doctor.webp' : '/male-doctor.webp'}
                 alt={consultant.user?.name || 'Doctor'}
-                fill
-                sizes="160px"
-                className="object-cover"
+                className="h-full w-full object-cover"
               />
             </div>
             <div className="space-y-4 flex-grow">
@@ -255,11 +257,28 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
                   </span>
                 </div>
                 {consultant.isAcfp && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-brand-foreground/60 font-medium">Fulfillment Method</span>
-                    <span className="font-bold text-brand-green">
-                      {consultant.fulfillmentMethod === 'COURIER' ? 'Courier Delivery' : 'Clinic Pickup Only'}
-                    </span>
+                  <div className="flex flex-col gap-1 border-t sm:border-t-0 border-brand-green-light/20 pt-3 sm:pt-0">
+                    <span className="text-brand-foreground/60 font-medium mb-1">Supported Fulfillment Options</span>
+                    <div className="flex flex-col gap-1.5 pl-2">
+                      {consultant.hasClinicPickup && (
+                        <span className="text-brand-green font-bold flex items-center gap-1.5">
+                          ✓ Clinic Pickup
+                        </span>
+                      )}
+                      {consultant.hasSelfDispatch && (
+                        <span className="text-brand-green font-bold flex items-center gap-1.5">
+                          ✓ Doctor Self-Dispatch
+                        </span>
+                      )}
+                      {consultant.hasAyurwedDelivery && (
+                        <span className="text-brand-green font-bold flex items-center gap-1.5">
+                          ✓ AYURWED Delivery
+                        </span>
+                      )}
+                      {!consultant.hasClinicPickup && !consultant.hasSelfDispatch && !consultant.hasAyurwedDelivery && (
+                        <span className="text-brand-foreground/40 italic">None configured yet</span>
+                      )}
+                    </div>
                   </div>
                 )}
                 <div className="flex items-center justify-between border-t border-brand-green-light/20 pt-3 sm:col-span-2">

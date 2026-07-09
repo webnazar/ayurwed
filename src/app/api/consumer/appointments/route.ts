@@ -46,10 +46,20 @@ export async function POST(req: Request) {
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     
     const { 
-      consultantId, date, slot, type, concern, fee,
+      consultantId, date, slot, type, concern, visitType,
       patientName, patientAge, patientGender, patientPhone, patientRelation,
       chronicDiseases, allergies
     } = await req.json();
+
+    const consultant = await db.consultantProfile.findUnique({
+      where: { id: Number(consultantId) }
+    });
+
+    if (!consultant) {
+      return NextResponse.json({ error: 'Consultant not found' }, { status: 404 });
+    }
+
+    const resolvedFee = visitType === 'FOLLOW_UP' ? Number(consultant.followUpFee) : Number(consultant.consultationFee);
     
     const [timeStr, ampm] = slot.split(' ');
     let [hours, minutes] = timeStr.split(':').map(Number);
@@ -65,7 +75,7 @@ export async function POST(req: Request) {
         scheduledAt,
         type,
         concern,
-        fee: fee,
+        fee: resolvedFee,
         patientName,
         patientAge: patientAge ? Number(patientAge) : null,
         patientGender,

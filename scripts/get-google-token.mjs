@@ -14,10 +14,16 @@
 import http from 'http';
 import { google } from 'googleapis';
 
-const CLIENT_ID     = '708170516308-nh96nrd5ej4aa450c6d9chvao7r02642.apps.googleusercontent.com';
-const CLIENT_SECRET = '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';
+const CLIENT_ID     = process.env.GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const REDIRECT_URI  = 'http://localhost:3000/api/auth/callback/google';
 const SCOPES        = ['https://www.googleapis.com/auth/calendar'];
+
+if (!CLIENT_ID || !CLIENT_SECRET) {
+  console.error('❌ Error: GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables must be set.');
+  console.log('Run this script as: GOOGLE_CLIENT_ID=your_id GOOGLE_CLIENT_SECRET=your_secret node scripts/get-google-token.mjs');
+  process.exit(1);
+}
 
 const oauth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 

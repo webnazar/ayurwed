@@ -7,6 +7,7 @@ import Image from 'next/image';
 import AyuriTriggerButton from '@/components/layout/AyuriTriggerButton';
 import HeroCard from '@/components/home/HeroCard';
 import HeroCarousel from '@/components/home/HeroCarousel';
+import SafeImage from '@/components/ui/SafeImage';
 
 export const revalidate = 0; // Dynamic rendering to fetch latest db updates
 
@@ -418,10 +419,11 @@ export default async function HomePage() {
                   &ldquo;{t.quote}&rdquo;
                 </p>
                 <div className="pt-4 mt-auto border-t border-brand-green-light flex items-center gap-3">
-                  <img 
+                  <SafeImage 
                     src={t.avatar && t.avatar.trim().length > 0 ? t.avatar : "/avatar.webp"} 
                     alt={t.name} 
                     className="h-9 w-9 rounded-full object-cover border border-brand-gold/20 flex-shrink-0" 
+                    fallbackSrc="/avatar.webp"
                   />
                   <div>
                     <span className="text-xs font-bold text-brand-green block">{t.name}</span>

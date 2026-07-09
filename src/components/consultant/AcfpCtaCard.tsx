@@ -49,7 +49,7 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         {/* CARD 1: Certificate in Ancient Intelligence (CAI) */}
         <div className={`relative overflow-hidden rounded-3xl border p-8 flex flex-col justify-between h-full transition-all duration-300 shadow-sm ${
           isCaiCertified 

@@ -24,10 +24,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
     }
 
-    // Calculate subtotal from trusted server side? 
-    // Ideally, we'd fetch the DB preparations and sum their MRP. 
-    // For now, we trust the client items array for the sake of the prototype.
-    const subtotal = items.reduce((sum: number, item: any) => sum + (item.mrp * item.quantity), 0);
+    // Securely calculate subtotal server-side by fetching actual preparation prices from the database
+    const itemIds = items.map((i: any) => Number(i.id));
+    const databaseItems = await db.preparation.findMany({
+      where: { id: { in: itemIds } },
+      select: { id: true, mrp: true }
+    });
+
+    const dbItemMap = new Map(databaseItems.map(item => [item.id, Number(item.mrp || 0)]));
+
+    let subtotal = 0;
+    for (const item of items) {
+      const dbPrice = dbItemMap.get(Number(item.id));
+      if (dbPrice === undefined) {
+        return NextResponse.json({ error: `Item with ID ${item.id} not found` }, { status: 400 });
+      }
+      subtotal += dbPrice * Number(item.quantity);
+      // Ensure we use the server-validated price in subsequent db updates
+      item.mrp = dbPrice;
+    }
+
     const shipping = subtotal > 999 ? 0 : 50;
     const totalAmount = subtotal + shipping;
 
@@ -43,10 +59,10 @@ export async function POST(req: Request) {
         paymentStatus: 'PENDING',
         items: {
           create: items.map((item: any) => ({
-            extractId: item.id,
-            quantity: item.quantity,
+            extractId: Number(item.id),
+            quantity: Number(item.quantity),
             price: item.mrp,
-            total: item.mrp * item.quantity
+            total: item.mrp * Number(item.quantity)
           }))
         }
       }

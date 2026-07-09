@@ -85,7 +85,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       { name: 'Carousel Master', href: '/admin/carousels', icon: Sparkles },
       { name: 'Indication Master', href: '/admin/indications', icon: HeartPulse },
       { name: 'Preparation Master', href: '/admin/preparations', icon: Package },
-      { name: 'Orders Management', href: '/admin/orders', icon: ShoppingBag },
       { name: 'Enquiries', href: '/admin/enquiries', icon: Inbox },
       { name: 'Newsletter Subs', href: '/admin/newsletter', icon: Mail },
       { name: 'Testimonials', href: '/admin/testimonials', icon: MessageSquare },

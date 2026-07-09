@@ -79,7 +79,7 @@ export default function AyuriChatWidget() {
         <button
           id="ayuri-chat-widget-trigger"
           onClick={() => setIsOpen(true)}
-          className="btn-green p-4 rounded-full shadow-2xl flex items-center justify-center group hover:scale-105 border border-border"
+          className="btn-gold p-4 rounded-full shadow-2xl flex items-center justify-center group hover:scale-105 border border-border"
           title="Ask Ayuri AI"
         >
           <MessageSquare className="h-6 w-6 group-hover:rotate-12 transition-transform duration-300" />

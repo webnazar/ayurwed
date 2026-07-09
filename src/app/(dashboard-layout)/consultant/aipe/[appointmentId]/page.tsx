@@ -1,10 +1,8 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import { PrismaClient } from '@prisma/client';
+import { db } from '@/lib/db';
 import AipeDashboardClient from '@/components/consultant/AipeDashboardClient';
-
-const prisma = new PrismaClient();
 
 export default async function AipeDashboardPage(props: { params: Promise<{ appointmentId: string }> }) {
   const params = await props.params;
@@ -19,7 +17,7 @@ export default async function AipeDashboardPage(props: { params: Promise<{ appoi
     redirect('/consultant/appointments');
   }
 
-  const appointment = await prisma.appointment.findUnique({
+  const appointment = await db.appointment.findUnique({
     where: { id: appointmentId },
     include: {
       user: true,
@@ -46,12 +44,12 @@ export default async function AipeDashboardPage(props: { params: Promise<{ appoi
     } : null
   };
 
-  const indications = await prisma.indication.findMany({
+  const indications = await db.indication.findMany({
     where: { isActive: true },
     select: { id: true, name: true }
   });
 
-  const preparations = await prisma.preparation.findMany({
+  const preparations = await db.preparation.findMany({
     where: { isActive: true },
     select: { id: true, name: true, type: true }
   });
@@ -75,7 +73,7 @@ export default async function AipeDashboardPage(props: { params: Promise<{ appoi
 }
 
 async function getConsultantId(userId: number) {
-  const profile = await prisma.consultantProfile.findUnique({
+  const profile = await db.consultantProfile.findUnique({
     where: { userId }
   });
   return profile?.id || -1;

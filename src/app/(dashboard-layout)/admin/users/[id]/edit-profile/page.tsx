@@ -68,6 +68,9 @@ export default async function AdminEditProfilePage(props: { params: Promise<{ id
                 isVerified: user.consultantProfile.isVerified,
                 isAcfp: user.consultantProfile.isAcfp,
                 fulfillmentMethod: user.consultantProfile.fulfillmentMethod,
+                hasClinicPickup: user.consultantProfile.hasClinicPickup,
+                hasSelfDispatch: user.consultantProfile.hasSelfDispatch,
+                hasAyurwedDelivery: user.consultantProfile.hasAyurwedDelivery,
               }
             }}
           />

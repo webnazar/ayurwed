@@ -21,6 +21,9 @@ interface ConsultantProfileProps {
     isVerified?: boolean;
     isAcfp?: boolean;
     fulfillmentMethod?: string | null;
+    hasClinicPickup?: boolean;
+    hasSelfDispatch?: boolean;
+    hasAyurwedDelivery?: boolean;
   };
 }
 
@@ -46,6 +49,9 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
     isVerified: data.profile.isVerified || false,
     isAcfp: data.profile.isAcfp || false,
     fulfillmentMethod: data.profile.fulfillmentMethod || 'COURIER',
+    hasClinicPickup: data.profile.hasClinicPickup || false,
+    hasSelfDispatch: data.profile.hasSelfDispatch || false,
+    hasAyurwedDelivery: data.profile.hasAyurwedDelivery || false,
   });
   
   const [saving, setSaving] = useState(false);
@@ -93,6 +99,9 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
           isVerified: form.isVerified,
           isAcfp: form.isAcfp,
           fulfillmentMethod: form.fulfillmentMethod,
+          hasClinicPickup: form.hasClinicPickup,
+          hasSelfDispatch: form.hasSelfDispatch,
+          hasAyurwedDelivery: form.hasAyurwedDelivery,
         }),
       });
       if (res.ok) {
@@ -112,7 +121,7 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
   const inp = "w-full text-sm bg-brand-green-light/20 border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold";
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-3xl mx-auto w-full space-y-6">
+    <form onSubmit={handleSubmit} className="max-w-7xl mx-auto w-full space-y-6">
       <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-5">
         <h2 className="font-bold text-brand-green flex items-center gap-2 border-b border-brand-green-light pb-3">
           <UserCircle className="h-5 w-5" /> Basic Identity
@@ -221,47 +230,62 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
         </h2>
         <div className="space-y-4">
           <p className="text-xs text-brand-foreground/70 leading-relaxed">
-            As an AYURWED Certified Consultant & Fulfillment Partner (ACFP), you are required to fulfill prescribed medicines. Please select your primary fulfillment method.
+            As an AYURWED Certified Consultant & Fulfillment Partner (ACFP), you are required to fulfill prescribed medicines. Please select the fulfillment options you support (select all that apply).
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <label className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${
-              form.fulfillmentMethod === 'COURIER'
+              form.hasClinicPickup
                 ? 'border-brand-gold bg-brand-gold-light/40 text-brand-gold-dark font-bold'
                 : 'border-border hover:border-brand-green hover:bg-brand-green-light/30 text-brand-foreground/70'
             }`}>
               <input
-                type="radio"
-                name="fulfillmentMethod"
-                value="COURIER"
-                checked={form.fulfillmentMethod === 'COURIER'}
-                onChange={() => setForm(f => ({ ...f, fulfillmentMethod: 'COURIER' }))}
-                className="mt-1 text-brand-green focus:ring-brand-green cursor-pointer"
+                type="checkbox"
+                checked={form.hasClinicPickup}
+                onChange={(e) => setForm(f => ({ ...f, hasClinicPickup: e.target.checked }))}
+                className="mt-1 text-brand-green focus:ring-brand-green cursor-pointer h-4 w-4 rounded"
               />
               <div>
-                <span className="text-sm font-bold block text-brand-green">Courier Delivery</span>
+                <span className="text-sm font-bold block text-brand-green">Clinic Pickup</span>
                 <span className="text-[10px] text-brand-foreground/60 block mt-1 leading-normal">
-                  Agree to pack prescribed preparations, dispatch through courier services, and provide tracking numbers to online patients.
+                  Give medicine in clinic directly to the patient.
                 </span>
               </div>
             </label>
 
             <label className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${
-              form.fulfillmentMethod === 'PICKUP'
+              form.hasSelfDispatch
                 ? 'border-brand-gold bg-brand-gold-light/40 text-brand-gold-dark font-bold'
                 : 'border-border hover:border-brand-green hover:bg-brand-green-light/30 text-brand-foreground/70'
             }`}>
               <input
-                type="radio"
-                name="fulfillmentMethod"
-                value="PICKUP"
-                checked={form.fulfillmentMethod === 'PICKUP'}
-                onChange={() => setForm(f => ({ ...f, fulfillmentMethod: 'PICKUP' }))}
-                className="mt-1 text-brand-green focus:ring-brand-green cursor-pointer"
+                type="checkbox"
+                checked={form.hasSelfDispatch}
+                onChange={(e) => setForm(f => ({ ...f, hasSelfDispatch: e.target.checked }))}
+                className="mt-1 text-brand-green focus:ring-brand-green cursor-pointer h-4 w-4 rounded"
               />
               <div>
-                <span className="text-sm font-bold block text-brand-green">Clinic Pickup Only</span>
+                <span className="text-sm font-bold block text-brand-green">Doctor Self-Dispatch</span>
                 <span className="text-[10px] text-brand-foreground/60 block mt-1 leading-normal">
-                  Agree to prepare prescribed medicines, keep them ready at your clinic, and inform patients when they are ready to collect.
+                  Dispatch the prescribed medicines to the patient by yourself.
+                </span>
+              </div>
+            </label>
+
+            <label className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${
+              form.hasAyurwedDelivery
+                ? 'border-brand-gold bg-brand-gold-light/40 text-brand-gold-dark font-bold'
+                : 'border-border hover:border-brand-green hover:bg-brand-green-light/30 text-brand-foreground/70'
+            }`}>
+              <input
+                type="checkbox"
+                checked={form.hasAyurwedDelivery}
+                onChange={(e) => setForm(f => ({ ...f, hasAyurwedDelivery: e.target.checked }))}
+                className="mt-1 text-brand-green focus:ring-brand-green cursor-pointer h-4 w-4 rounded"
+              />
+              <div>
+                <span className="text-sm font-bold block text-brand-green">AYURWED Delivery</span>
+                <span className="text-[10px] text-brand-foreground/60 block mt-1 leading-normal">
+                  AYURWED platform handles the delivery to the patient.
                 </span>
               </div>
             </label>

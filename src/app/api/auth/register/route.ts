@@ -45,7 +45,7 @@ export async function POST(req: Request) {
               followUpFee: 150.00,
               isVerified: false,
               availability: JSON.stringify({
-                monday: ['09:00-12:00'],
+                Monday: ['09:00 AM', '10:00 AM', '11:00 AM'],
               }),
             },
           },

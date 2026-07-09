@@ -7,7 +7,7 @@ export default function AcfpInfoCard() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-gradient-to-br from-[#fdf6e3] to-white border border-brand-gold/30 rounded-3xl overflow-hidden shadow-sm transition-all duration-300">
+    <div className="bg-gradient-to-br from-brand-gold-light to-card border border-brand-gold/30 rounded-3xl overflow-hidden shadow-sm transition-all duration-300">
       {/* Header (Trigger) */}
       <button
         onClick={() => setIsOpen(!isOpen)}

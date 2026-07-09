@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Award, Check, X, ShieldAlert, Loader2, Calendar, AwardIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import SafeImage from '@/components/ui/SafeImage';
 
 interface PendingConsultant {
   id: number;
@@ -76,12 +77,13 @@ export default function PendingAcfpList({ initialList }: PendingAcfpListProps) {
           <div key={c.id} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-brand-gold-light/5 transition-colors">
             {/* Doctor details */}
             <div className="flex items-start gap-4">
-              <div className="h-12 w-12 bg-brand-green text-white font-bold rounded-full flex items-center justify-center text-lg shadow flex-shrink-0">
-                {c.user.avatar ? (
-                  <img src={c.user.avatar} alt={c.user.name} className="h-full w-full rounded-full object-cover" />
-                ) : (
-                  c.user.name.charAt(0).toUpperCase()
-                )}
+              <div className="h-12 w-12 rounded-full overflow-hidden bg-brand-green-light flex-shrink-0">
+                <SafeImage
+                  src={c.user.avatar}
+                  fallbackSrc="/avatar.webp"
+                  alt={c.user.name}
+                  className="h-full w-full object-cover"
+                />
               </div>
               <div className="space-y-1">
                 <h4 className="font-extrabold text-brand-green dark:text-foreground text-base">

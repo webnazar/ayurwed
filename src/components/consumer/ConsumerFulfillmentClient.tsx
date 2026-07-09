@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Truck, Award, CheckCircle, Package, Info, Search, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
+import SafeImage from '@/components/ui/SafeImage';
 
 interface FulfillmentOrder {
   id: number;
@@ -30,6 +31,9 @@ interface FulfillmentOrder {
   };
   consultant: {
     specialization: string;
+    hasClinicPickup?: boolean;
+    hasSelfDispatch?: boolean;
+    hasAyurwedDelivery?: boolean;
     user?: {
       name: string;
       avatar: string | null;
@@ -42,13 +46,33 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
   const [filter, setFilter] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  // Track patient chosen fulfillment method for each pending order
+  const [selectedMethods, setSelectedMethods] = useState<Record<number, string>>(() => {
+    const initial: Record<number, string> = {};
+    initialFulfillments.forEach(f => {
+      if (f.status === 'PENDING') {
+        if (f.consultant.hasSelfDispatch) {
+          initial[f.id] = 'SELF_DISPATCH';
+        } else if (f.consultant.hasClinicPickup) {
+          initial[f.id] = 'CLINIC_PICKUP';
+        } else if (f.consultant.hasAyurwedDelivery) {
+          initial[f.id] = 'AYURWED_DELIVERY';
+        } else {
+          initial[f.id] = 'SELF_DISPATCH';
+        }
+      }
+    });
+    return initial;
+  });
+
   const handleConfirmOrder = async (fulfillmentId: number) => {
+    const selectedMethod = selectedMethods[fulfillmentId] || 'SELF_DISPATCH';
     toast.loading('Confirming medicine order...', { id: 'order' });
     try {
       const res = await fetch('/api/consumer/fulfillment', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fulfillmentId })
+        body: JSON.stringify({ fulfillmentId, method: selectedMethod })
       });
 
       if (!res.ok) {
@@ -60,7 +84,7 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
       toast.success('Medicine order placed successfully!');
 
       setFulfillments(prev =>
-        prev.map(f => (f.id === fulfillmentId ? { ...f, status: 'CONFIRMED' } : f))
+        prev.map(f => (f.id === fulfillmentId ? { ...f, status: 'CONFIRMED', method: selectedMethod } : f))
       );
     } catch (err: any) {
       toast.dismiss('order');
@@ -79,6 +103,42 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
     if (filter === 'CANCELLED') return f.status === 'CANCELLED';
     return true;
   });
+
+  const isShippingMethod = (method: string) => {
+    return ['COURIER', 'SELF_DISPATCH', 'AYURWED_DELIVERY'].includes(method);
+  };
+
+  const getMethodDetails = (method: string) => {
+    switch (method) {
+      case 'CLINIC_PICKUP':
+      case 'PICKUP':
+        return {
+          label: 'Clinic Pickup',
+          icon: <MapPin className="h-3 w-3" />,
+          badgeClass: 'bg-amber-100 text-amber-800 border border-amber-200'
+        };
+      case 'SELF_DISPATCH':
+      case 'COURIER':
+        return {
+          label: 'Doctor Self-Dispatch',
+          icon: <Truck className="h-3 w-3" />,
+          badgeClass: 'bg-blue-100 text-blue-800 border border-blue-200'
+        };
+      case 'AYURWED_DELIVERY':
+        return {
+          label: 'AYURWED Delivery',
+          icon: <Truck className="h-3 w-3 text-brand-gold-dark" />,
+          badgeClass: 'bg-brand-gold/25 text-brand-gold-dark border border-brand-gold/30'
+        };
+      case 'PENDING':
+      default:
+        return {
+          label: 'Fulfillment Pending Selection',
+          icon: <Info className="h-3 w-3" />,
+          badgeClass: 'bg-gray-100 text-gray-800 border border-gray-200'
+        };
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -126,214 +186,277 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
         </div>
       ) : (
         <div className="space-y-6">
-          {filteredOrders.map(order => (
-            <div key={order.id} className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-6">
-              {/* Header Info */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-brand-green-light/20 pb-4">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-full overflow-hidden bg-brand-green-light border border-brand-green/20 flex-shrink-0">
-                    {order.consultant?.user?.avatar ? (
-                      <img src={order.consultant.user.avatar} alt="Doctor" className="h-full w-full object-cover" />
+          {filteredOrders.map(order => {
+            const methodDetails = getMethodDetails(order.method);
+            const isShipping = isShippingMethod(order.method);
+
+            return (
+              <div key={order.id} className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-6">
+                {/* Header Info */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-brand-green-light/20 pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-full overflow-hidden bg-brand-green-light border border-brand-green/20 flex-shrink-0">
+                      <SafeImage 
+                        src={order.consultant?.user?.avatar} 
+                        fallbackSrc="/avatar.webp"
+                        alt={order.consultant?.user?.name || 'Doctor'} 
+                        className="h-full w-full object-cover" 
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-base text-brand-green">{order.consultant?.user?.name || 'Doctor'}</h3>
+                      <p className="text-xs text-brand-foreground/60">
+                        Prescription #{order.prescriptionId} • {format(new Date(order.createdAt), 'dd MMM yyyy')}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1.5 ${methodDetails.badgeClass}`}>
+                      {methodDetails.icon}
+                      <span>{methodDetails.label}</span>
+                    </span>
+                    <span className={`text-[10px] font-black px-3 py-1 rounded-full ${
+                      order.status === 'COMPLETED'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : order.status === 'CANCELLED'
+                        ? 'bg-rose-100 text-rose-800'
+                        : 'bg-brand-gold/20 text-brand-gold-dark'
+                    }`}>
+                      {order.status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Progress Stepper */}
+                {order.status !== 'CANCELLED' && order.status !== 'PENDING' && (
+                  <div className="relative py-4 border-b border-brand-green-light/20 pb-6">
+                    {isShipping ? (
+                      <div className="flex items-center justify-between relative">
+                        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-border z-0" />
+                        <div
+                          className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-brand-green transition-all duration-500 z-0"
+                          style={{
+                            width: 
+                              order.status === 'CONFIRMED' ? '0%' :
+                              order.status === 'PACKED' ? '33%' :
+                              order.status === 'DISPATCHED' ? '66%' : '100%'
+                          }}
+                        />
+
+                        {[
+                          { label: 'Confirmed', status: 'CONFIRMED' },
+                          { label: 'Packed', status: 'PACKED' },
+                          { label: 'Dispatched', status: 'DISPATCHED' },
+                          { label: 'Received', status: 'COMPLETED' }
+                        ].map((step, idx) => {
+                          const statuses = ['CONFIRMED', 'PACKED', 'DISPATCHED', 'COMPLETED'];
+                          const currentIdx = statuses.indexOf(order.status);
+                          const stepIdx = statuses.indexOf(step.status);
+                          const isCompleted = stepIdx < currentIdx;
+                          const isActive = stepIdx === currentIdx;
+
+                          return (
+                            <div key={step.label} className="flex flex-col items-center z-10 relative">
+                              <div className={`h-6 w-6 rounded-full flex items-center justify-center border-2 text-[10px] font-bold transition-all duration-300 ${
+                                isCompleted
+                                  ? 'bg-brand-green border-brand-green text-white'
+                                  : isActive
+                                  ? 'bg-brand-gold border-brand-gold text-brand-green font-black animate-pulse-slow'
+                                  : 'bg-white border-border text-brand-foreground/45'
+                              }`}>
+                                {isCompleted ? '✓' : idx + 1}
+                              </div>
+                              <span className={`text-[9px] font-bold mt-1.5 transition-colors ${
+                                isActive ? 'text-brand-green font-black' : 'text-brand-foreground/60'
+                              }`}>
+                                {step.label}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center font-bold text-brand-green text-lg">
-                        {order.consultant?.user?.name?.charAt(0) || 'D'}
+                      <div className="flex items-center justify-between relative">
+                        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-border z-0" />
+                        <div
+                          className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-brand-green transition-all duration-500 z-0"
+                          style={{
+                            width: 
+                              order.status === 'CONFIRMED' ? '0%' :
+                              order.status === 'PACKED' ? '50%' : '100%'
+                          }}
+                        />
+
+                        {[
+                          { label: 'Preparing', status: 'CONFIRMED' },
+                          { label: 'Ready for Pickup', status: 'PACKED' },
+                          { label: 'Collected', status: 'COMPLETED' }
+                        ].map((step, idx) => {
+                          const statuses = ['CONFIRMED', 'PACKED', 'COMPLETED'];
+                          const currentIdx = statuses.indexOf(order.status);
+                          const stepIdx = statuses.indexOf(step.status);
+                          const isCompleted = stepIdx < currentIdx;
+                          const isActive = stepIdx === currentIdx;
+
+                          return (
+                            <div key={step.label} className="flex flex-col items-center z-10 relative">
+                              <div className={`h-6 w-6 rounded-full flex items-center justify-center border-2 text-[10px] font-bold transition-all duration-300 ${
+                                isCompleted
+                                  ? 'bg-brand-green border-brand-green text-white'
+                                  : isActive
+                                  ? 'bg-brand-gold border-brand-gold text-brand-green font-black animate-pulse-slow'
+                                  : 'bg-white border-border text-brand-foreground/45'
+                              }`}>
+                                {isCompleted ? '✓' : idx + 1}
+                              </div>
+                              <span className={`text-[9px] font-bold mt-1.5 transition-colors ${
+                                isActive ? 'text-brand-green font-black' : 'text-brand-foreground/60'
+                              }`}>
+                                {step.label}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
-                  <div>
-                    <h3 className="font-extrabold text-base text-brand-green">{order.consultant?.user?.name || 'Doctor'}</h3>
-                    <p className="text-xs text-brand-foreground/60">
-                      Prescription #{order.prescriptionId} • {format(new Date(order.createdAt), 'dd MMM yyyy')}
-                    </p>
-                  </div>
-                </div>
+                )}
 
-                <div className="flex items-center gap-2">
-                  <span className={`text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1.5 ${
-                    order.method === 'COURIER'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-amber-100 text-amber-800'
-                  }`}>
-                    {order.method === 'COURIER' ? <Truck className="h-3 w-3" /> : <MapPin className="h-3 w-3" />}
-                    {order.method === 'COURIER' ? 'Courier Delivery' : 'Clinic Pickup'}
-                  </span>
-                  <span className={`text-[10px] font-black px-3 py-1 rounded-full ${
-                    order.status === 'COMPLETED'
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : order.status === 'CANCELLED'
-                      ? 'bg-rose-100 text-rose-800'
-                      : 'bg-brand-gold/20 text-brand-gold-dark'
-                  }`}>
-                    {order.status}
-                  </span>
-                </div>
-              </div>
-
-              {/* Progress Stepper */}
-              {order.status !== 'CANCELLED' && (
-                <div className="relative py-4 border-b border-brand-green-light/20 pb-6">
-                  {order.method === 'COURIER' ? (
-                    <div className="flex items-center justify-between relative">
-                      <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-border z-0" />
-                      <div
-                        className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-brand-green transition-all duration-500 z-0"
-                        style={{
-                          width: 
-                            order.status === 'PENDING' ? '0%' :
-                            order.status === 'CONFIRMED' ? '25%' :
-                            order.status === 'PACKED' ? '50%' :
-                            order.status === 'DISPATCHED' ? '75%' : '100%'
-                        }}
-                      />
-
-                      {[
-                        { label: 'Ordered', status: 'PENDING' },
-                        { label: 'Confirmed', status: 'CONFIRMED' },
-                        { label: 'Packed', status: 'PACKED' },
-                        { label: 'Dispatched', status: 'DISPATCHED' },
-                        { label: 'Received', status: 'COMPLETED' }
-                      ].map((step, idx) => {
-                        const statuses = ['PENDING', 'CONFIRMED', 'PACKED', 'DISPATCHED', 'COMPLETED'];
-                        const currentIdx = statuses.indexOf(order.status);
-                        const stepIdx = statuses.indexOf(step.status);
-                        const isCompleted = stepIdx < currentIdx;
-                        const isActive = stepIdx === currentIdx;
-
-                        return (
-                          <div key={step.label} className="flex flex-col items-center z-10 relative">
-                            <div className={`h-6 w-6 rounded-full flex items-center justify-center border-2 text-[10px] font-bold transition-all duration-300 ${
-                              isCompleted
-                                ? 'bg-brand-green border-brand-green text-white'
-                                : isActive
-                                ? 'bg-brand-gold border-brand-gold text-brand-green font-black animate-pulse-slow'
-                                : 'bg-white border-border text-brand-foreground/45'
-                            }`}>
-                              {isCompleted ? '✓' : idx + 1}
+                {/* Courier Tracking or Pickup Location details */}
+                {order.status !== 'CANCELLED' && (
+                  <div className="bg-brand-gold-light/20 border border-brand-gold/20 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                    <div className="flex gap-3 items-start w-full">
+                      <Info className="h-5 w-5 text-brand-gold-dark mt-0.5 flex-shrink-0" />
+                      <div className="text-xs text-brand-foreground/80 space-y-1 w-full">
+                        {order.status === 'PENDING' ? (
+                          <div className="flex flex-col gap-4 w-full pt-2">
+                            <p className="font-extrabold text-brand-green text-xs">Choose Fulfillment Method:</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              {order.consultant.hasClinicPickup && (
+                                <label className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                                  selectedMethods[order.id] === 'CLINIC_PICKUP'
+                                    ? 'border-brand-gold bg-brand-gold-light/40 font-bold'
+                                    : 'border-border hover:border-brand-green text-brand-foreground/75'
+                                }`}>
+                                  <input
+                                    type="radio"
+                                    name={`fulfillment-method-${order.id}`}
+                                    checked={selectedMethods[order.id] === 'CLINIC_PICKUP'}
+                                    onChange={() => setSelectedMethods(prev => ({ ...prev, [order.id]: 'CLINIC_PICKUP' }))}
+                                    className="text-brand-green focus:ring-brand-green cursor-pointer"
+                                  />
+                                  <div className="text-xs">
+                                    <span className="block font-bold">Clinic Pickup</span>
+                                  </div>
+                                </label>
+                              )}
+                              {order.consultant.hasSelfDispatch && (
+                                <label className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                                  selectedMethods[order.id] === 'SELF_DISPATCH'
+                                    ? 'border-brand-gold bg-brand-gold-light/40 font-bold'
+                                    : 'border-border hover:border-brand-green text-brand-foreground/75'
+                                }`}>
+                                  <input
+                                    type="radio"
+                                    name={`fulfillment-method-${order.id}`}
+                                    checked={selectedMethods[order.id] === 'SELF_DISPATCH'}
+                                    onChange={() => setSelectedMethods(prev => ({ ...prev, [order.id]: 'SELF_DISPATCH' }))}
+                                    className="text-brand-green focus:ring-brand-green cursor-pointer"
+                                  />
+                                  <div className="text-xs">
+                                    <span className="block font-bold">Self-Dispatch</span>
+                                  </div>
+                                </label>
+                              )}
+                              {order.consultant.hasAyurwedDelivery && (
+                                <label className={`flex items-center gap-2.5 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                                  selectedMethods[order.id] === 'AYURWED_DELIVERY'
+                                    ? 'border-brand-gold bg-brand-gold-light/40 font-bold'
+                                    : 'border-border hover:border-brand-green text-brand-foreground/75'
+                                }`}>
+                                  <input
+                                    type="radio"
+                                    name={`fulfillment-method-${order.id}`}
+                                    checked={selectedMethods[order.id] === 'AYURWED_DELIVERY'}
+                                    onChange={() => setSelectedMethods(prev => ({ ...prev, [order.id]: 'AYURWED_DELIVERY' }))}
+                                    className="text-brand-green focus:ring-brand-green cursor-pointer"
+                                  />
+                                  <div className="text-xs">
+                                    <span className="block font-bold">AYURWED Delivery</span>
+                                  </div>
+                                </label>
+                              )}
+                              {!order.consultant.hasClinicPickup && !order.consultant.hasSelfDispatch && !order.consultant.hasAyurwedDelivery && (
+                                <div className="col-span-3 text-xs italic text-brand-foreground/50 bg-brand-gold-light/20 p-3 rounded-xl border border-brand-gold/25">
+                                  No fulfillment configuration set by doctor. Defaulting to doctor dispatch.
+                                </div>
+                              )}
                             </div>
-                            <span className={`text-[9px] font-bold mt-1.5 transition-colors ${
-                              isActive ? 'text-brand-green font-black' : 'text-brand-foreground/60'
-                            }`}>
-                              {step.label}
-                            </span>
+                            <button
+                              onClick={() => handleConfirmOrder(order.id)}
+                              className="bg-brand-gold hover:bg-brand-green hover:text-white text-brand-green font-bold text-xs px-6 py-2.5 rounded-xl transition-all border border-brand-gold/30 shadow-sm whitespace-nowrap self-start uppercase tracking-wider"
+                            >
+                              Confirm Order
+                            </button>
                           </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between relative">
-                      <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-border z-0" />
-                      <div
-                        className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-brand-green transition-all duration-500 z-0"
-                        style={{
-                          width: 
-                            order.status === 'PENDING' ? '0%' :
-                            order.status === 'CONFIRMED' ? '33%' :
-                            order.status === 'PACKED' ? '66%' : '100%'
-                        }}
-                      />
-
-                      {[
-                        { label: 'Ordered', status: 'PENDING' },
-                        { label: 'Preparing', status: 'CONFIRMED' },
-                        { label: 'Ready for Pickup', status: 'PACKED' },
-                        { label: 'Collected', status: 'COMPLETED' }
-                      ].map((step, idx) => {
-                        const statuses = ['PENDING', 'CONFIRMED', 'PACKED', 'COMPLETED'];
-                        const currentIdx = statuses.indexOf(order.status);
-                        const stepIdx = statuses.indexOf(step.status);
-                        const isCompleted = stepIdx < currentIdx;
-                        const isActive = stepIdx === currentIdx;
-
-                        return (
-                          <div key={step.label} className="flex flex-col items-center z-10 relative">
-                            <div className={`h-6 w-6 rounded-full flex items-center justify-center border-2 text-[10px] font-bold transition-all duration-300 ${
-                              isCompleted
-                                ? 'bg-brand-green border-brand-green text-white'
-                                : isActive
-                                ? 'bg-brand-gold border-brand-gold text-brand-green font-black animate-pulse-slow'
-                                : 'bg-white border-border text-brand-foreground/45'
-                            }`}>
-                              {isCompleted ? '✓' : idx + 1}
-                            </div>
-                            <span className={`text-[9px] font-bold mt-1.5 transition-colors ${
-                              isActive ? 'text-brand-green font-black' : 'text-brand-foreground/60'
-                            }`}>
-                              {step.label}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Courier Tracking or Pickup Location details */}
-              {order.status !== 'CANCELLED' && (
-                <div className="bg-brand-gold-light/20 border border-brand-gold/20 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                  <div className="flex gap-3 items-start">
-                    <Info className="h-5 w-5 text-brand-gold-dark mt-0.5 flex-shrink-0" />
-                    <div className="text-xs text-brand-foreground/80 space-y-1">
-                      {order.method === 'COURIER' ? (
-                        <>
-                          <p className="font-bold text-brand-green">Courier Dispatch details</p>
-                          <p>
-                            Once packed, your consultant will ship via priority courier and share a tracking ID.
-                          </p>
-                          {order.trackingNumber && (
-                            <p className="pt-1.5">
-                              Tracking ID:{' '}
-                              <span className="font-mono font-bold text-brand-gold-dark bg-white px-2 py-0.5 rounded border border-brand-gold/30">
-                                {order.trackingNumber}
-                              </span>
-                            </p>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          <p className="font-bold text-brand-green">Clinic Pickup location</p>
-                          <p>
-                            Please collect your medicine pack directly from the consultant's clinic once status is "Ready for Pickup".
-                          </p>
-                          <p className="italic text-[10px] text-brand-foreground/60">
-                            Clinic details: Check doctor profile details or contact clinic support.
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  {order.status === 'PENDING' && (
-                    <button
-                      onClick={() => handleConfirmOrder(order.id)}
-                      className="bg-brand-gold hover:bg-brand-green hover:text-white text-brand-green font-bold text-xs px-6 py-2.5 rounded-xl transition-all border border-brand-gold/30 shadow-sm whitespace-nowrap self-stretch sm:self-auto uppercase tracking-wider"
-                    >
-                      Confirm Order
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Medicine Items List */}
-              <div className="space-y-3">
-                <span className="text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider block">Ordered Preparations</span>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {order.prescription.items.map(item => (
-                    <div key={item.id} className="bg-white rounded-2xl p-4 border border-border shadow-sm space-y-2 text-xs">
-                      <p className="font-bold text-brand-green text-sm">{item.preparation.name}</p>
-                      <div className="grid grid-cols-2 gap-2 text-[11px] text-brand-foreground/70">
-                        <p><span className="font-bold block text-[9px] text-brand-foreground/45 uppercase">Dosage</span>{item.dosage}</p>
-                        <p><span className="font-bold block text-[9px] text-brand-foreground/45 uppercase">Frequency</span>{item.frequency}</p>
-                        <p><span className="font-bold block text-[9px] text-brand-foreground/45 uppercase">Duration</span>{item.duration}</p>
-                        {item.instructions && (
-                          <p className="col-span-2"><span className="font-bold block text-[9px] text-brand-foreground/45 uppercase">Instructions</span>{item.instructions}</p>
+                        ) : (
+                          <>
+                            {isShipping ? (
+                              <>
+                                <p className="font-bold text-brand-green">Courier Dispatch details</p>
+                                <p>
+                                  Your consultant will pack and dispatch your Ayurvedic medicines.
+                                </p>
+                                {order.trackingNumber && (
+                                  <p className="pt-1.5">
+                                    Tracking ID:{' '}
+                                    <span className="font-mono font-bold text-brand-gold-dark bg-white px-2 py-0.5 rounded border border-brand-gold/30">
+                                      {order.trackingNumber}
+                                    </span>
+                                  </p>
+                                )}
+                              </>
+                            ) : (
+                              <>
+                                <p className="font-bold text-brand-green">Clinic Pickup location</p>
+                                <p>
+                                  Please collect your medicine pack directly from the consultant's clinic once status is "Ready for Pickup".
+                                </p>
+                                <p className="italic text-[10px] text-brand-foreground/60">
+                                  Clinic details: Check doctor profile details or contact clinic support.
+                                </p>
+                              </>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
-                  ))}
+                  </div>
+                )}
+
+                {/* Medicine Items List */}
+                <div className="space-y-3">
+                  <span className="text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider block">Ordered Preparations</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {order.prescription.items.map(item => (
+                      <div key={item.id} className="bg-white rounded-2xl p-4 border border-border shadow-sm space-y-2 text-xs">
+                        <p className="font-bold text-brand-green text-sm">{item.preparation.name}</p>
+                        <div className="grid grid-cols-2 gap-2 text-[11px] text-brand-foreground/70">
+                          <p><span className="font-bold block text-[9px] text-brand-foreground/45 uppercase">Dosage</span>{item.dosage}</p>
+                          <p><span className="font-bold block text-[9px] text-brand-foreground/45 uppercase">Frequency</span>{item.frequency}</p>
+                          <p><span className="font-bold block text-[9px] text-brand-foreground/45 uppercase">Duration</span>{item.duration}</p>
+                          {item.instructions && (
+                            <p className="col-span-2"><span className="font-bold block text-[9px] text-brand-foreground/45 uppercase">Instructions</span>{item.instructions}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

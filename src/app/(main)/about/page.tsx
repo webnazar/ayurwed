@@ -26,7 +26,7 @@ export default function AboutPage() {
             <img
               src="/ayurwed.webp"
               alt="AYURWED Logo"
-              className="h-36 sm:h-48 w-auto object-contain drop-shadow-md"
+              className="h-56 sm:h-72 w-auto object-contain drop-shadow-md"
             />
           </div>
 

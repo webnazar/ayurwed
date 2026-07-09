@@ -9,7 +9,8 @@ export async function PATCH(req: Request) {
     const body = await req.json();
     const { 
       targetUserId, name, avatar, degree, specialization, experience, bio, languages, consultationFee, followUpFee,
-      isCaiCertified, isVerified, isAcfp, fulfillmentMethod 
+      isCaiCertified, isVerified, isAcfp, fulfillmentMethod,
+      hasClinicPickup, hasSelfDispatch, hasAyurwedDelivery
     } = body;
 
     const isAdmin = session && (session.user as any).role === 'ADMIN';
@@ -41,10 +42,13 @@ export async function PATCH(req: Request) {
           specialization: specialization || undefined,
           experience: experience !== undefined ? experience : undefined,
           bio: bio || undefined,
-          languages: languages || undefined,
+          languages: Array.isArray(languages) ? JSON.stringify(languages) : (languages || undefined),
           consultationFee: consultationFee !== undefined ? Number(consultationFee) : undefined,
           followUpFee: followUpFee !== undefined ? Number(followUpFee) : undefined,
           fulfillmentMethod: (fulfillmentMethod === 'COURIER' || fulfillmentMethod === 'PICKUP') ? fulfillmentMethod : undefined,
+          hasClinicPickup: hasClinicPickup !== undefined ? Boolean(hasClinicPickup) : undefined,
+          hasSelfDispatch: hasSelfDispatch !== undefined ? Boolean(hasSelfDispatch) : undefined,
+          hasAyurwedDelivery: hasAyurwedDelivery !== undefined ? Boolean(hasAyurwedDelivery) : undefined,
           // Admin override flags
           isCaiCertified: (isAdmin && isCaiCertified !== undefined) ? isCaiCertified : undefined,
           isVerified: (isAdmin && isVerified !== undefined) ? isVerified : undefined,

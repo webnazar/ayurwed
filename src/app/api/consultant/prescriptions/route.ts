@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,7 +18,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get consultant profile ID
-    const consultant = await prisma.consultantProfile.findUnique({
+    const consultant = await db.consultantProfile.findUnique({
       where: { userId: Number(session.user.id) }
     });
 
@@ -29,7 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Upsert prescription
-    const prescription = await prisma.prescription.upsert({
+    const prescription = await db.prescription.upsert({
       where: { appointmentId },
       update: {
         consultantJudgment: consultantJudgment || '',
@@ -72,18 +70,18 @@ export async function POST(req: NextRequest) {
 
     // If finalizing the prescription, also mark the appointment as COMPLETED
     if (status === 'PRESCRIBED') {
-      await prisma.appointment.update({
+      await db.appointment.update({
         where: { id: appointmentId },
         data: { status: 'COMPLETED' }
       });
 
       // Spawn a fulfillment record and patient notification
-      const existingFulfillment = await prisma.fulfillment.findUnique({
+      const existingFulfillment = await db.fulfillment.findUnique({
         where: { prescriptionId: prescription.id }
       });
 
       if (!existingFulfillment) {
-        await prisma.fulfillment.create({
+        await db.fulfillment.create({
           data: {
             prescriptionId: prescription.id,
             consultantId: consultant.id,
@@ -94,7 +92,7 @@ export async function POST(req: NextRequest) {
         });
 
         // Notify patient
-        await prisma.notification.create({
+        await db.notification.create({
           data: {
             userId: Number(patientId),
             title: 'Prescription Finalized & Pending Fulfillment',

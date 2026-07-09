@@ -89,6 +89,9 @@ model ConsultantProfile {
   hasOffline         Boolean        @default(false)
   hasFulfillment     Boolean        @default(false)
   hasHomeDelivery    Boolean        @default(false)
+  hasClinicPickup    Boolean        @default(false)
+  hasSelfDispatch    Boolean        @default(false)
+  hasAyurwedDelivery Boolean        @default(false)
   appointments       Appointment[]
   user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   prescriptions      Prescription[]

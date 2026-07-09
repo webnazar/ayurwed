@@ -11,7 +11,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { fulfillmentId } = body;
+    const { fulfillmentId, method } = body;
 
     if (!fulfillmentId) {
       return NextResponse.json({ error: 'Missing fulfillmentId' }, { status: 400 });
@@ -35,10 +35,40 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Order already processed' }, { status: 400 });
     }
 
+    // Validate the chosen fulfillment method against consultant capabilities
+    let validatedMethod = method || 'SELF_DISPATCH';
+    if (method) {
+      if (method === 'CLINIC_PICKUP') {
+        if (!fulfillment.consultant.hasClinicPickup) {
+          return NextResponse.json({ error: 'Clinic Pickup is not supported by this consultant' }, { status: 400 });
+        }
+      } else if (method === 'SELF_DISPATCH') {
+        if (!fulfillment.consultant.hasSelfDispatch) {
+          return NextResponse.json({ error: 'Self-Dispatch is not supported by this consultant' }, { status: 400 });
+        }
+      } else if (method === 'AYURWED_DELIVERY') {
+        if (!fulfillment.consultant.hasAyurwedDelivery) {
+          return NextResponse.json({ error: 'AYURWED Delivery is not supported by this consultant' }, { status: 400 });
+        }
+      } else {
+        return NextResponse.json({ error: 'Invalid fulfillment method specified' }, { status: 400 });
+      }
+    } else {
+      // Auto-fallback: select first supported option
+      if (fulfillment.consultant.hasSelfDispatch) {
+        validatedMethod = 'SELF_DISPATCH';
+      } else if (fulfillment.consultant.hasClinicPickup) {
+        validatedMethod = 'CLINIC_PICKUP';
+      } else if (fulfillment.consultant.hasAyurwedDelivery) {
+        validatedMethod = 'AYURWED_DELIVERY';
+      }
+    }
+
     const updated = await db.fulfillment.update({
       where: { id: fulfillment.id },
       data: {
-        status: 'CONFIRMED'
+        status: 'CONFIRMED',
+        method: validatedMethod
       }
     });
 

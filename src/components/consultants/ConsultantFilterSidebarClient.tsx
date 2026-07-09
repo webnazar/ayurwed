@@ -32,8 +32,9 @@ const TYPE_OPTIONS = [
 ];
 
 const FULFILLMENT_OPTIONS = [
-  { id: 'courier', label: 'Courier Delivery' },
-  { id: 'pickup', label: 'Clinic Pickup' },
+  { id: 'clinic_pickup', label: 'Clinic Pickup' },
+  { id: 'self_dispatch', label: 'Doctor Self-Dispatch' },
+  { id: 'ayurwed_delivery', label: 'AYURWED Delivery' },
 ];
 
 interface ConsultantFilterSidebarClientProps {

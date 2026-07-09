@@ -41,7 +41,7 @@ export default function HeroCard() {
             <img
               src="/ayuri.webp"
               alt="Ayuri AI Assistant"
-              className="h-[320px] sm:h-[380px] lg:h-[450px] w-auto object-contain relative z-10 transition-transform duration-500 hover:scale-[1.03] pointer-events-none"
+              className="h-[320px] sm:h-[380px] lg:h-[450px] w-auto object-contain object-bottom relative z-10 transition-transform duration-500 hover:scale-[1.03] pointer-events-none"
             />
           </div>
         </div>

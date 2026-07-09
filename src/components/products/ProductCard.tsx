@@ -83,7 +83,7 @@ export default function ExtractCard({ preparation }: ExtractCardProps) {
             href={`/preparations/${preparation.slug}`}
             className="btn-primary text-xs px-4 py-2 rounded-full flex items-center gap-1.5"
           >
-            {(preparation as any).isShopExtract ? 'Buy Now' : 'Explore'} <ArrowRight className="h-3.5 w-3.5" />
+            Explore <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
       </div>

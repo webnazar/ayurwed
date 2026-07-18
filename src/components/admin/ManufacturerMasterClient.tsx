@@ -156,7 +156,7 @@ export default function ManufacturerMasterClient({ initialManufacturers }: { ini
             placeholder="Search manufacturers..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-muted border border-border rounded-xl text-sm focus:outline-none focus:border-brand-gold"
+            className="w-full pl-10 pr-4 py-2.5 bg-muted text-foreground placeholder:text-foreground/40 border border-border rounded-xl text-sm focus:outline-none focus:border-brand-gold"
           />
         </div>
         <button
@@ -352,9 +352,9 @@ export default function ManufacturerMasterClient({ initialManufacturers }: { ini
                   <div className="bg-brand-gold-light/10 p-3 rounded-lg border border-brand-gold/30 flex items-start gap-2">
                     <div className="flex-1 space-y-2">
                       <input type="text" placeholder="Certificate Name (e.g. GMP)" value={newCert.name} onChange={e => setNewCert(n => ({...n, name: e.target.value}))}
-                        className="w-full px-3 py-1.5 text-xs border rounded-md" />
+                        className="w-full px-3 py-1.5 text-xs bg-card text-foreground placeholder:text-foreground/40 border border-border rounded-md focus:outline-none focus:border-brand-gold" />
                       <input type="url" placeholder="URL (optional)" value={newCert.url} onChange={e => setNewCert(n => ({...n, url: e.target.value}))}
-                        className="w-full px-3 py-1.5 text-xs border rounded-md" />
+                        className="w-full px-3 py-1.5 text-xs bg-card text-foreground placeholder:text-foreground/40 border border-border rounded-md focus:outline-none focus:border-brand-gold" />
                     </div>
                     <div className="flex flex-col gap-1 shrink-0">
                       <button type="button" onClick={addCert} className="bg-brand-green text-white px-2 py-1.5 rounded-md text-[10px] font-bold">Add</button>

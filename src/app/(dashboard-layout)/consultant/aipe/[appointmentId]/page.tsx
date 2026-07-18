@@ -23,7 +23,12 @@ export default async function AipeDashboardPage(props: { params: Promise<{ appoi
       user: true,
       prescription: {
         include: {
-          items: true,
+          items: {
+            include: {
+              preparation: true,
+              product: true
+            }
+          },
           indications: true
         }
       }
@@ -54,6 +59,11 @@ export default async function AipeDashboardPage(props: { params: Promise<{ appoi
     select: { id: true, name: true, type: true }
   });
 
+  const products = await db.product.findMany({
+    where: { isActive: true },
+    select: { id: true, name: true, category: true }
+  });
+
   return (
     <div className="w-full space-y-6">
       <div className="flex items-center justify-between">
@@ -67,6 +77,7 @@ export default async function AipeDashboardPage(props: { params: Promise<{ appoi
         appointment={safeAppointment} 
         allIndications={indications} 
         allPreparations={preparations}
+        allProducts={products}
       />
     </div>
   );

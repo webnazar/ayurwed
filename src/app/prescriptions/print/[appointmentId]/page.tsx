@@ -42,7 +42,8 @@ export default async function PrintPrescriptionPage(props: { params: Promise<{ a
         include: {
           items: {
             include: {
-              preparation: true
+              preparation: true,
+              product: true
             }
           },
           indications: true
@@ -247,16 +248,16 @@ export default async function PrintPrescriptionPage(props: { params: Promise<{ a
               </div>
             )}
 
-            {/* Prescribed Preparations Table */}
+            {/* Prescribed Medicines Table */}
             <div className="space-y-2">
               <div className="flex items-center gap-1.5">
-                <h3 className="text-xs font-bold uppercase text-[#045829] tracking-wider">Prescribed Preparations</h3>
+                <h3 className="text-xs font-bold uppercase text-[#045829] tracking-wider">Prescribed Medicines</h3>
               </div>
               <div className="overflow-hidden border border-slate-200 rounded-2xl">
                 <table className="w-full text-left border-collapse text-[11px]">
                   <thead>
                     <tr className="bg-[#045829]/5 border-b border-slate-200">
-                      <th className="py-1.5 px-2.5 font-bold text-[#045829] uppercase tracking-wider w-[35%]">Preparation</th>
+                      <th className="py-1.5 px-2.5 font-bold text-[#045829] uppercase tracking-wider w-[35%]">Medicine / Product</th>
                       <th className="py-1.5 px-2.5 font-bold text-[#045829] uppercase tracking-wider">Dosage</th>
                       <th className="py-1.5 px-2.5 font-bold text-[#045829] uppercase tracking-wider">Frequency</th>
                       <th className="py-1.5 px-2.5 font-bold text-[#045829] uppercase tracking-wider">Duration</th>
@@ -266,7 +267,7 @@ export default async function PrintPrescriptionPage(props: { params: Promise<{ a
                   <tbody className="divide-y divide-slate-100 bg-transparent">
                     {prescription.items?.map((item) => (
                       <tr key={item.id} className="hover:bg-slate-50">
-                        <td className="py-1.5 px-2.5 font-bold text-[#045829]">{item.preparation?.name}</td>
+                        <td className="py-1.5 px-2.5 font-bold text-[#045829]">{item.preparation?.name || item.product?.name}</td>
                         <td className="py-1.5 px-2.5 font-medium text-slate-900">{item.dosage}</td>
                         <td className="py-1.5 px-2.5 font-medium text-slate-900">{item.frequency}</td>
                         <td className="py-1.5 px-2.5 font-medium text-slate-900">{item.duration}</td>

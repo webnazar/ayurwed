@@ -15,6 +15,7 @@ interface ImageUploadCropProps {
   value: string;
   onChange: (url: string) => void;
   folder?: string;
+  filename?: string;       // optional override for the uploaded file's name (without extension)
   label?: string;
   children?: React.ReactNode;
   aspect?: number;
@@ -90,6 +91,7 @@ export default function ImageUploadCrop({
   value,
   onChange,
   folder = 'categories',
+  filename,
   label = 'Category Image',
   children,
   aspect = DEFAULT_ASPECT,
@@ -147,6 +149,7 @@ export default function ImageUploadCrop({
       const formData = new FormData();
       formData.append('file', croppedFile);
       formData.append('folder', folder);
+      if (filename) formData.append('filename', filename);
 
       const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
       if (!res.ok) {

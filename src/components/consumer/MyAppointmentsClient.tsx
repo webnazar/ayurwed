@@ -359,10 +359,10 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
                       </div>
                     )}
                     <div className="space-y-3">
-                      <span className="text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider block mb-1">Prescribed Preparations</span>
+                      <span className="text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider block mb-1">Prescribed Medicines</span>
                       {a.prescription.items?.map((item: any) => (
                         <div key={item.id} className="bg-white rounded-xl p-3 border border-border shadow-sm text-sm">
-                          <p className="font-bold text-brand-green mb-1">{item.preparation?.name || 'Preparation'}</p>
+                          <p className="font-bold text-brand-green mb-1">{item.preparation?.name || item.product?.name || 'Medicine'}</p>
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px] text-brand-foreground/70">
                             <p><span className="font-bold uppercase block text-[9px] text-brand-foreground/40">Dosage</span>{item.dosage}</p>
                             <p><span className="font-bold uppercase block text-[9px] text-brand-foreground/40">Frequency</span>{item.frequency}</p>

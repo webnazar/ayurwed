@@ -18,7 +18,7 @@ export default async function ConsumerAppointmentsPage() {
       consultant: { include: { user: { select: { name: true, avatar: true } } } },
       prescription: {
         include: {
-          items: { include: { preparation: true } },
+          items: { include: { preparation: true, product: true } },
           fulfillment: true,
         },
       },

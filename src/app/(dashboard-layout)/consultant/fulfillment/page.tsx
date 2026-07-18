@@ -25,7 +25,8 @@ export default async function ConsultantFulfillmentPage() {
         include: {
           items: {
             include: {
-              preparation: true
+              preparation: true,
+              product: true
             }
           }
         }

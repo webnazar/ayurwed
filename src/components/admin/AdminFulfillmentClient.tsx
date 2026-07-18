@@ -18,9 +18,12 @@ interface FulfillmentOrder {
     dosageInstructions: string | null;
     items: Array<{
       id: number;
-      preparation: {
+      preparation?: {
         name: string;
-      };
+      } | null;
+      product?: {
+        name: string;
+      } | null;
       dosage: string;
       frequency: string;
       duration: string;

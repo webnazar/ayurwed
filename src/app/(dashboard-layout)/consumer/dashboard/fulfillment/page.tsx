@@ -19,7 +19,8 @@ export default async function ConsumerFulfillmentPage() {
         include: {
           items: {
             include: {
-              preparation: true
+              preparation: true,
+              product: true
             }
           }
         }

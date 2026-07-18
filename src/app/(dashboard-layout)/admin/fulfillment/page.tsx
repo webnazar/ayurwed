@@ -18,7 +18,8 @@ export default async function AdminFulfillmentPage() {
         include: {
           items: {
             include: {
-              preparation: true
+              preparation: true,
+              product: true
             }
           }
         }

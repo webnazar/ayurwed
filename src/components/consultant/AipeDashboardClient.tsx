@@ -5,7 +5,7 @@ import { Sparkles, Save, CheckCircle2, Plus, Trash2, Edit2, AlertCircle, X, Sear
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
-export default function AipeDashboardClient({ appointment, allIndications, allPreparations }: any) {
+export default function AipeDashboardClient({ appointment, allIndications, allPreparations, allProducts = [] }: any) {
   const router = useRouter();
   const [selectedIndications, setSelectedIndications] = useState<number[]>(
     appointment.prescription?.indications?.map((i: any) => i.id) || []
@@ -16,11 +16,13 @@ export default function AipeDashboardClient({ appointment, allIndications, allPr
 
   const [showPrepModal, setShowPrepModal] = useState(false);
   const [prepSearch, setPrepSearch] = useState('');
+  const [modalTab, setModalTab] = useState<'PREPARATION' | 'PRODUCT'>('PREPARATION');
 
   const [items, setItems] = useState<any[]>(
     appointment.prescription?.items?.map((item: any) => ({
       preparationId: item.preparationId,
-      preparationName: allPreparations.find((p: any) => p.id === item.preparationId)?.name || 'Unknown',
+      productId: item.productId,
+      preparationName: item.preparation?.name || item.product?.name || allPreparations.find((p: any) => p.id === item.preparationId)?.name || allProducts.find((p: any) => p.id === item.productId)?.name || 'Unknown',
       dosage: item.dosage,
       frequency: item.frequency,
       duration: item.duration,
@@ -132,22 +134,28 @@ export default function AipeDashboardClient({ appointment, allIndications, allPr
     );
   };
 
-  const toggleManualPreparation = (prep: any) => {
-    const exists = items.some(i => i.preparationId === prep.id);
+  const toggleManualItem = (itemType: 'PREPARATION' | 'PRODUCT', itemData: any) => {
+    const isPrep = itemType === 'PREPARATION';
+    const exists = items.some(i => 
+      isPrep ? i.preparationId === itemData.id : i.productId === itemData.id
+    );
     if (exists) {
-      setItems(items.filter(i => i.preparationId !== prep.id));
-      toast.success('Preparation removed');
+      setItems(items.filter(i => 
+        isPrep ? i.preparationId !== itemData.id : i.productId !== itemData.id
+      ));
+      toast.success(`${isPrep ? 'Preparation' : 'Product'} removed`);
     } else {
       setItems([...items, {
-        preparationId: prep.id,
-        preparationName: prep.name,
+        preparationId: isPrep ? itemData.id : null,
+        productId: !isPrep ? itemData.id : null,
+        preparationName: itemData.name,
         dosage: '',
         frequency: '',
         duration: '',
         instructions: '',
         reason: 'Added manually'
       }]);
-      toast.success('Preparation added');
+      toast.success(`${isPrep ? 'Preparation' : 'Product'} added`);
     }
   };
 
@@ -259,7 +267,7 @@ export default function AipeDashboardClient({ appointment, allIndications, allPr
             <h3 className="text-lg font-bold text-brand-green">Prescription Editor</h3>
             <div className="flex flex-wrap items-center gap-2">
               <button onClick={() => setShowPrepModal(true)} className="text-xs font-bold text-brand-green bg-brand-green-light/20 hover:bg-brand-green-light/40 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1 border border-brand-green/30">
-                <Plus className="h-3.5 w-3.5" /> Add Manual Preparations
+                <Plus className="h-3.5 w-3.5" /> Add Medicines
               </button>
               {appointment.prescription && (
                 <a
@@ -282,13 +290,22 @@ export default function AipeDashboardClient({ appointment, allIndications, allPr
           <div className="space-y-4">
             {items.length === 0 ? (
               <div className="text-center py-12 text-brand-foreground/40 text-sm font-medium border-2 border-dashed border-border rounded-2xl">
-                No preparations added yet.<br/>Generate from AI or add manually.
+                No medicines added yet.<br/>Generate from AI or add manually.
               </div>
             ) : items.map((item, idx) => (
               <div key={idx} className="bg-brand-gold-light/20 border border-brand-gold/30 rounded-2xl p-4 flex gap-4 items-start relative group">
                 <div className="flex-1 space-y-3 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="font-extrabold text-brand-green text-base">{item.preparationName}</span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-extrabold text-brand-green text-base">{item.preparationName}</span>
+                      <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
+                        item.productId 
+                          ? 'bg-brand-gold/25 text-brand-gold-dark border border-brand-gold/30'
+                          : 'bg-brand-green-light/40 text-brand-green'
+                      }`}>
+                        {item.productId ? 'Retail Product' : 'Clinical Preparation'}
+                      </span>
+                    </div>
                     <div className="flex items-center gap-2">
                       {idx === 0 && items.length > 1 && (item.dosage || item.frequency || item.duration) && (
                         <button
@@ -478,23 +495,25 @@ export default function AipeDashboardClient({ appointment, allIndications, allPr
         </div>
       )}
 
-      {/* Preparation Selection Modal */}
+      {/* Medicine Selection Modal */}
       {showPrepModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setShowPrepModal(false)} />
           <div className="relative bg-card w-full max-w-lg max-h-[85vh] flex flex-col rounded-3xl shadow-2xl border border-border animate-in zoom-in-95 duration-200">
             <div className="p-6 border-b border-border flex items-center justify-between shrink-0">
-              <h3 className="text-lg font-bold text-brand-green">Add Preparation</h3>
+              <h3 className="text-lg font-bold text-brand-green">Add Medicine</h3>
               <button onClick={() => setShowPrepModal(false)} className="text-brand-foreground/50 hover:text-brand-foreground bg-muted hover:bg-muted/80 p-1.5 rounded-full transition-colors">
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <div className="p-4 shrink-0">
+            
+            {/* Search Input */}
+            <div className="p-4 shrink-0 pb-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/40" />
                 <input
                   type="text"
-                  placeholder="Search preparations by name..."
+                  placeholder="Search medicines by name..."
                   autoFocus
                   value={prepSearch}
                   onChange={(e) => setPrepSearch(e.target.value)}
@@ -502,32 +521,98 @@ export default function AipeDashboardClient({ appointment, allIndications, allPr
                 />
               </div>
             </div>
-            <div className="p-2 overflow-y-auto flex-1">
-              {allPreparations
-                .filter((p: any) => p.name.toLowerCase().includes(prepSearch.toLowerCase()))
-                .slice(0, 50)
-                .map((prep: any) => (
-                  <button
-                    key={prep.id}
-                    onClick={() => toggleManualPreparation(prep)}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-between ${
-                      items.some((i: any) => i.preparationId === prep.id)
-                        ? 'bg-brand-green-light/30 text-brand-green font-bold'
-                        : 'hover:bg-brand-gold-light/30 text-brand-foreground/80'
-                    }`}
-                  >
-                    {prep.name}
-                    {items.some((i: any) => i.preparationId === prep.id) ? (
-                      <CheckCircle2 className="h-4 w-4 text-brand-green" />
-                    ) : (
-                      <Plus className="h-4 w-4 text-brand-green opacity-0 group-hover:opacity-100 transition-opacity" />
-                    )}
-                  </button>
-                ))}
-                {allPreparations.filter((p: any) => p.name.toLowerCase().includes(prepSearch.toLowerCase())).length === 0 && (
-                  <div className="p-4 text-center text-sm text-brand-foreground/50 italic">No preparations found.</div>
-                )}
+
+            {/* Modal Tabs */}
+            <div className="flex border-b border-border shrink-0 px-4">
+              <button
+                onClick={() => setModalTab('PREPARATION')}
+                className={`flex-1 py-3 text-sm font-bold border-b-2 transition-all ${
+                  modalTab === 'PREPARATION'
+                    ? 'border-brand-green text-brand-green'
+                    : 'border-transparent text-brand-foreground/55 hover:text-brand-foreground'
+                }`}
+              >
+                Clinical Preparations ({allPreparations.length})
+              </button>
+              <button
+                onClick={() => setModalTab('PRODUCT')}
+                className={`flex-1 py-3 text-sm font-bold border-b-2 transition-all ${
+                  modalTab === 'PRODUCT'
+                    ? 'border-brand-green text-brand-green'
+                    : 'border-transparent text-brand-foreground/55 hover:text-brand-foreground'
+                }`}
+              >
+                Retail Products ({allProducts.length})
+              </button>
             </div>
+
+            {/* Modal Content */}
+            <div className="p-2 overflow-y-auto flex-1">
+              {modalTab === 'PREPARATION' ? (
+                allPreparations
+                  .filter((p: any) => p.name.toLowerCase().includes(prepSearch.toLowerCase()))
+                  .slice(0, 50)
+                  .map((prep: any) => {
+                    const isSelected = items.some((i: any) => i.preparationId === prep.id);
+                    return (
+                      <button
+                        key={`prep-${prep.id}`}
+                        onClick={() => toggleManualItem('PREPARATION', prep)}
+                        className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-between ${
+                          isSelected
+                            ? 'bg-brand-green-light/30 text-brand-green font-bold'
+                            : 'hover:bg-brand-gold-light/30 text-brand-foreground/80'
+                        }`}
+                      >
+                        <div>
+                          <p>{prep.name}</p>
+                          <p className="text-[10px] text-brand-foreground/50 uppercase">{prep.type || 'Clinical preparation'}</p>
+                        </div>
+                        {isSelected ? (
+                          <CheckCircle2 className="h-4 w-4 text-brand-green" />
+                        ) : (
+                          <Plus className="h-4 w-4 text-brand-green opacity-0 group-hover:opacity-100 transition-opacity" />
+                        )}
+                      </button>
+                    );
+                  })
+              ) : (
+                allProducts
+                  .filter((p: any) => p.name.toLowerCase().includes(prepSearch.toLowerCase()))
+                  .slice(0, 50)
+                  .map((prod: any) => {
+                    const isSelected = items.some((i: any) => i.productId === prod.id);
+                    return (
+                      <button
+                        key={`prod-${prod.id}`}
+                        onClick={() => toggleManualItem('PRODUCT', prod)}
+                        className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-between ${
+                          isSelected
+                            ? 'bg-brand-green-light/30 text-brand-green font-bold'
+                            : 'hover:bg-brand-gold-light/30 text-brand-foreground/80'
+                        }`}
+                      >
+                        <div>
+                          <p>{prod.name}</p>
+                          <p className="text-[10px] text-brand-gold-dark font-extrabold uppercase">{prod.category || 'Retail Product'}</p>
+                        </div>
+                        {isSelected ? (
+                          <CheckCircle2 className="h-4 w-4 text-brand-green" />
+                        ) : (
+                          <Plus className="h-4 w-4 text-brand-green opacity-0 group-hover:opacity-100 transition-opacity" />
+                        )}
+                      </button>
+                    );
+                  })
+              )}
+              {modalTab === 'PREPARATION' && allPreparations.filter((p: any) => p.name.toLowerCase().includes(prepSearch.toLowerCase())).length === 0 && (
+                <div className="p-4 text-center text-sm text-brand-foreground/50 italic">No preparations found.</div>
+              )}
+              {modalTab === 'PRODUCT' && allProducts.filter((p: any) => p.name.toLowerCase().includes(prepSearch.toLowerCase())).length === 0 && (
+                <div className="p-4 text-center text-sm text-brand-foreground/50 italic">No products found.</div>
+              )}
+            </div>
+            
             <div className="p-4 border-t border-border shrink-0">
               <button
                 onClick={() => {

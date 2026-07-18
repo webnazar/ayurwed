@@ -37,7 +37,8 @@ export async function POST(req: NextRequest) {
         items: {
           deleteMany: {}, // Clear existing items
           create: items.map((item: any) => ({
-            preparationId: item.preparationId,
+            preparationId: item.preparationId || null,
+            productId: item.productId || null,
             dosage: item.dosage,
             frequency: item.frequency,
             duration: item.duration,
@@ -55,7 +56,8 @@ export async function POST(req: NextRequest) {
         status: status || 'DRAFT',
         items: {
           create: items.map((item: any) => ({
-            preparationId: item.preparationId,
+            preparationId: item.preparationId || null,
+            productId: item.productId || null,
             dosage: item.dosage,
             frequency: item.frequency,
             duration: item.duration,

@@ -67,8 +67,8 @@ export default async function AcademyPage() {
       </section>
 
       {/* Video Introduction Section */}
-      <section id="intro-video" className="max-w-5xl mx-auto layout-padding-minimal px-4 pb-20 -mt-8 relative z-20">
-        <div className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border-4 border-brand-green/20 bg-black transform hover:scale-[1.01] transition-transform duration-300">
+      <section id="intro-video" className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 pb-20 -mt-8 relative z-20">
+        <div className="relative aspect-video rounded-3xl md:rounded-[2rem] lg:rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-brand-green/20 bg-black transform hover:scale-[1.01] transition-transform duration-300">
           <iframe
             src="https://www.youtube.com/embed/EOk417MiCtE"
             title="Certificate in Ancient Intelligence (CAI) Introduction Video"

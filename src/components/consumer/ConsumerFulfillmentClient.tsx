@@ -20,9 +20,12 @@ interface FulfillmentOrder {
     dosageInstructions: string | null;
     items: Array<{
       id: number;
-      preparation: {
+      preparation?: {
         name: string;
-      };
+      } | null;
+      product?: {
+        name: string;
+      } | null;
       dosage: string;
       frequency: string;
       duration: string;
@@ -437,11 +440,11 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
 
                 {/* Medicine Items List */}
                 <div className="space-y-3">
-                  <span className="text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider block">Ordered Preparations</span>
+                  <span className="text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider block">Prescribed Medicines</span>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {order.prescription.items.map(item => (
                       <div key={item.id} className="bg-white rounded-2xl p-4 border border-border shadow-sm space-y-2 text-xs">
-                        <p className="font-bold text-brand-green text-sm">{item.preparation.name}</p>
+                        <p className="font-bold text-brand-green text-sm">{item.preparation?.name || item.product?.name}</p>
                         <div className="grid grid-cols-2 gap-2 text-[11px] text-brand-foreground/70">
                           <p><span className="font-bold block text-[9px] text-brand-foreground/45 uppercase">Dosage</span>{item.dosage}</p>
                           <p><span className="font-bold block text-[9px] text-brand-foreground/45 uppercase">Frequency</span>{item.frequency}</p>

@@ -36,18 +36,22 @@ export async function POST(req: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Build a unique filename
+    // Use caller-supplied filename if provided, else generate a unique one
     const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const customName = (formData.get('filename') as string | null)?.trim();
+    const safeName = customName
+      ? `${customName.replace(/[^a-z0-9_\-]/gi, '_')}.${ext}`
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
     const uploadDir = join(process.cwd(), 'public', 'uploads', folder);
 
     // Ensure dir exists
     await mkdir(uploadDir, { recursive: true });
 
-    const filepath = join(uploadDir, filename);
+    const filepath = join(uploadDir, safeName);
     await writeFile(filepath, buffer);
 
-    const publicUrl = `/uploads/${folder}/${filename}`;
+    const publicUrl = `/uploads/${folder}/${safeName}`;
     return NextResponse.json({ url: publicUrl }, { status: 201 });
   } catch (err: any) {
     console.error('[UPLOAD_ERROR]', err);

@@ -3,15 +3,18 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { User, Menu, X, LogOut, LayoutDashboard, Building2 } from 'lucide-react';
+import { User, Menu, X, LogOut, LayoutDashboard, ShoppingBag } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
+import { useCart } from '@/components/shop/CartContext';
+import CartDrawer from '@/components/shop/CartDrawer';
 
 export default function Header() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const { totalItems, openCart } = useCart();
 
   // Hydration fix
   React.useEffect(() => setMounted(true), []); 
@@ -19,6 +22,7 @@ export default function Header() {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Consult', href: '/doctors' },
+    { name: 'Shop', href: '/shop' },
     { name: 'Academy', href: '/academy' },
     { name: 'Knowledge', href: '/knowledge' },
     { name: 'About', href: '/about' },
@@ -33,6 +37,8 @@ export default function Header() {
   };
 
   return (
+    <>
+      <CartDrawer />
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md text-brand-green shadow-sm border-b border-border transition-all duration-300">
       <div className="max-w-7xl mx-auto layout-padding-minimal">
         <div className="flex items-center justify-between h-16 sm:h-20">
@@ -74,6 +80,15 @@ export default function Header() {
 
               {session ? (
                 <div className="flex items-center space-x-4">
+                  {/* Cart Icon */}
+                  <button onClick={openCart} className="relative p-2 text-brand-green hover:text-brand-gold transition-colors" title="Cart">
+                    <ShoppingBag className="h-5 w-5" />
+                    {totalItems > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">
+                        {totalItems > 9 ? '9+' : totalItems}
+                      </span>
+                    )}
+                  </button>
                   <Link
                     href={getDashboardLink(session.user?.role as string)}
                     className="flex items-center space-x-2 text-brand-green hover:text-brand-gold transition-colors duration-200"
@@ -106,7 +121,13 @@ export default function Header() {
             {/* Mobile Actions */}
             <div className="flex md:hidden items-center space-x-2">
               <ThemeToggle />
-
+              {/* Mobile Cart */}
+              <button onClick={openCart} className="relative p-2 text-brand-green hover:text-brand-gold transition-colors">
+                <ShoppingBag className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">{totalItems > 9 ? '9+' : totalItems}</span>
+                )}
+              </button>
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 text-brand-green hover:text-brand-gold focus:outline-none"
@@ -172,5 +193,6 @@ export default function Header() {
         </div>
       )}
     </header>
+    </>
   );
 }

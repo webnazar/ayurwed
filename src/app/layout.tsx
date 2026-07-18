@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import AuthProvider from '@/components/providers/SessionProvider';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { CartProvider } from '@/components/shop/CartContext';
 import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -30,8 +31,10 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            {children}
-            <Toaster position="bottom-right" toastOptions={{ duration: 3000 }} />
+            <CartProvider>
+              {children}
+              <Toaster position="bottom-right" toastOptions={{ duration: 3000 }} />
+            </CartProvider>
           </ThemeProvider>
         </AuthProvider>
       </body>

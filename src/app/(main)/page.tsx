@@ -435,6 +435,23 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Video Introduction Section */}
+      <section className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 pb-10">
+        <div className="text-center space-y-4 mb-8">
+          <h2 className="text-3xl font-bold text-brand-green">Experience AYURWED</h2>
+          <p className="text-brand-foreground/75 max-w-xl mx-auto">Watch our introduction video to learn about the Ancient Extract Intelligence System.</p>
+        </div>
+        <div className="relative aspect-video rounded-3xl md:rounded-[2rem] lg:rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-brand-green/20 bg-black transform hover:scale-[1.01] transition-transform duration-300">
+          <iframe
+            src="https://www.youtube.com/embed/O6X58iklHfo"
+            title="AYURWED Introduction Video"
+            className="absolute inset-0 w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          ></iframe>
+        </div>
+      </section>
     </div>
   );
 }

@@ -14,6 +14,9 @@ export async function POST(req: Request) {
 
   if (!items?.length) return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
   if (!shippingAddress) return NextResponse.json({ error: 'Shipping address required' }, { status: 400 });
+  if (paymentMethod && paymentMethod !== 'PREPAID') {
+    return NextResponse.json({ error: 'Only prepaid payment is allowed' }, { status: 400 });
+  }
 
   // Fetch products to get current prices
   const productIds = items.map((i: any) => i.productId);

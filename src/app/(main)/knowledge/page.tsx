@@ -20,7 +20,7 @@ export default async function KnowledgePage(props: KnowledgePageProps) {
   return (
     <div className="max-w-7xl mx-auto layout-padding-minimal py-10">
       {/* Header */}
-      <div className="text-center sm:text-left pb-8 space-y-2">
+      <div className="text-center sm:text-left pb-0 space-y-2">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-brand-green tracking-tight">Ayurveda Knowledge Hub</h1>
         <p className="text-sm sm:text-base text-brand-foreground/70">
           Clinical research, herbal guides, dietary wisdom, and lifestyle routines from certified Ayurvedic experts.
@@ -45,7 +45,7 @@ export default async function KnowledgePage(props: KnowledgePageProps) {
         </form>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-10">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-6">
         {/* Sidebar */}
         <aside className="lg:col-span-1 space-y-6">
           <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-5">

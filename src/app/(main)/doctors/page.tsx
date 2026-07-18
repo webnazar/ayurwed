@@ -5,26 +5,8 @@ import { Star, ShieldCheck, HeartHandshake, Award, Languages, Search } from 'luc
 import { formatPrice } from '@/lib/utils';
 import SafeImage from '@/components/ui/SafeImage';
 import ConsultantFilterSidebarClient from '@/components/consultants/ConsultantFilterSidebarClient';
+import DoctorsGridClient from '@/components/consultants/DoctorsGridClient';
 
-function parseLanguages(langStr: any): string {
-  if (!langStr) return 'English';
-  try {
-    const parsed = JSON.parse(langStr);
-    if (Array.isArray(parsed)) {
-      return parsed.join(', ');
-    }
-  } catch (e) {}
-  if (typeof langStr === 'string') {
-    if (langStr.startsWith('[') && langStr.endsWith(']')) {
-      try {
-        const cleaned = langStr.slice(1, -1).replace(/"/g, '');
-        return cleaned;
-      } catch {}
-    }
-    return langStr;
-  }
-  return 'English';
-}
 import AyuriTriggerButton from '@/components/layout/AyuriTriggerButton';
 
 export const revalidate = 0; // Fresh updates
@@ -146,6 +128,13 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
     orderBy,
   });
 
+  const safeConsultants = consultants.map((c) => ({
+    ...c,
+    consultationFee: Number(c.consultationFee),
+    followUpFee: Number(c.followUpFee),
+    rating: Number(c.rating),
+  }));
+
   return (
     <div className="max-w-7xl mx-auto layout-padding-minimal py-10">
       {/* Header (border-b removed as requested) */}
@@ -219,115 +208,8 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
 
         {/* Consultants Grid */}
         <main className="lg:col-span-3">
-          {consultants.length > 0 ? (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              {consultants.map((c) => (
-                <div
-                  key={c.id}
-                  className="card-premium p-6 flex flex-col sm:flex-row gap-6 group"
-                >
-                  {/* Avatar block */}
-                  <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-brand-green-light flex-shrink-0 mx-auto">
-                    <SafeImage
-                      src={c.user?.avatar}
-                      fallbackSrc={c.id % 2 === 0 ? '/female-doctor.webp' : '/male-doctor.webp'}
-                      alt={c.user?.name || 'Doctor'}
-                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-
-                  {/* Info details block */}
-                  <div className="flex-grow flex flex-col justify-between space-y-4">
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-bold text-title-primary">{c.user?.name}</h3>
-                      
-                      <p className="text-[10px] font-bold text-brand-gold-dark uppercase tracking-wide">
-                        {c.specialization}
-                      </p>
-
-                      <div className="flex flex-wrap items-center gap-2">
-                        {c.isCaiCertified && (
-                          <span className="bg-brand-green/10 text-brand-green border border-brand-green/20 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <Award className="h-2.5 w-2.5 text-brand-gold-dark" />
-                            <span>CAI Certified</span>
-                          </span>
-                        )}
-                        {c.isAcfp && (
-                          <span className="bg-brand-gold/20 text-brand-gold-dark border border-brand-gold/30 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                            <ShieldCheck className="h-2.5 w-2.5" />
-                            <span>ACFP Verified</span>
-                          </span>
-                        )}
-                      </div>
-
-                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                        {c.bio}
-                      </p>
-
-                      <div className="flex flex-wrap items-center gap-3 pt-1 text-[10px] text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Award className="h-3 w-3 text-brand-green/75" />
-                          <span>{c.experience} Years</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Languages className="h-3 w-3 text-brand-green/75" />
-                          <span>{parseLanguages(c.languages)}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1 text-brand-gold pt-1">
-                        <Star className="h-3 w-3 fill-current" />
-                        <span className="text-xs font-bold text-title-primary">{Number(c.rating).toFixed(1)}</span>
-                        <span className="text-[10px] text-muted-foreground/80 font-medium">({c.totalReviews} reviews)</span>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1.5 pt-1.5 text-[9px]">
-                        {c.hasOnline && (
-                          <span className="bg-brand-green/10 text-brand-green px-2 py-0.5 rounded-full font-bold">✓ Online</span>
-                        )}
-                        {c.hasOffline && (
-                          <span className="bg-brand-green/10 text-brand-green px-2 py-0.5 rounded-full font-bold">✓ Offline</span>
-                        )}
-                        {c.isAcfp && (
-                          <>
-                            {c.hasClinicPickup && (
-                              <span className="bg-brand-gold/15 text-brand-gold-dark px-2 py-0.5 rounded-full font-extrabold shadow-sm border border-brand-gold/20">
-                                ✓ Clinic Pickup
-                              </span>
-                            )}
-                            {c.hasSelfDispatch && (
-                              <span className="bg-brand-gold/15 text-brand-gold-dark px-2 py-0.5 rounded-full font-extrabold shadow-sm border border-brand-gold/20">
-                                ✓ Self-Dispatch
-                              </span>
-                            )}
-                            {c.hasAyurwedDelivery && (
-                              <span className="bg-brand-gold/15 text-brand-gold-dark px-2 py-0.5 rounded-full font-extrabold shadow-sm border border-brand-gold/20">
-                                ✓ AYURWED Delivery
-                              </span>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Consultation Fee and CTA */}
-                    <div className="flex items-center justify-between pt-3 border-t border-brand-green-light">
-                      <div>
-                        <span className="text-[9px] text-muted-foreground block font-semibold">Consultation Fee</span>
-                        <span className="text-lg font-extrabold text-title-primary">{formatPrice(Number(c.consultationFee))}</span>
-                      </div>
-                      <Link
-                        href={`/doctors/${c.userId}`}
-                        className="btn-book"
-                      >
-                        <HeartHandshake className="h-3.5 w-3.5" />
-                        <span>Book</span>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          {safeConsultants.length > 0 ? (
+            <DoctorsGridClient consultants={safeConsultants} />
           ) : (
             <div className="bg-card rounded-3xl p-12 text-center border border-border shadow-sm space-y-4">
               <HeartHandshake className="h-12 w-12 text-brand-foreground/30 mx-auto" />

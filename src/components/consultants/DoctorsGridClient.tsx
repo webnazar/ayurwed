@@ -105,12 +105,13 @@ export default function DoctorsGridClient({ consultants }: { consultants: Consul
 
             {/* Info details block */}
             <div className="flex-grow flex flex-col justify-between space-y-4">
-              <div className="space-y-2">
-                <h3 className="text-lg font-bold text-title-primary">{c.user?.name}</h3>
-                
-                <p className="text-[10px] font-bold text-brand-gold-dark uppercase tracking-wide">
-                  {c.specialization}
-                </p>
+              <div className="space-y-3">
+                <div>
+                  <h3 className="text-lg font-bold text-title-primary">{c.user?.name}</h3>
+                  <p className="text-[10px] font-bold text-brand-gold-dark uppercase tracking-wide mt-0.5">
+                    {c.specialization}
+                  </p>
+                </div>
 
                 <div className="flex flex-wrap items-center gap-2">
                   {c.isCaiCertified && (
@@ -127,53 +128,16 @@ export default function DoctorsGridClient({ consultants }: { consultants: Consul
                   )}
                 </div>
 
-                <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                  {c.bio}
-                </p>
-
-                <div className="flex flex-wrap items-center gap-3 pt-1 text-[10px] text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Award className="h-3 w-3 text-brand-green/75" />
-                    <span>{c.experience} Years</span>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground pt-1">
+                  <div className="flex items-center gap-1 font-semibold text-foreground/80">
+                    <Award className="h-3.5 w-3.5 text-brand-green/70" />
+                    <span>{c.experience} Years Experience</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Languages className="h-3 w-3 text-brand-green/75" />
-                    <span>{parseLanguages(c.languages)}</span>
+                  <div className="flex items-center gap-1 text-brand-gold">
+                    <Star className="h-3.5 w-3.5 fill-current" />
+                    <span className="font-bold text-foreground/80">{Number(c.rating).toFixed(1)}</span>
+                    <span className="text-[10px] text-muted-foreground">({c.totalReviews} reviews)</span>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-1 text-brand-gold pt-1">
-                  <Star className="h-3 w-3 fill-current" />
-                  <span className="text-xs font-bold text-title-primary">{Number(c.rating).toFixed(1)}</span>
-                  <span className="text-[10px] text-muted-foreground/80 font-medium">({c.totalReviews} reviews)</span>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 pt-1.5 text-[9px]">
-                  {c.hasOnline && (
-                    <span className="bg-brand-green/10 text-brand-green px-2 py-0.5 rounded-full font-bold">✓ Online</span>
-                  )}
-                  {c.hasOffline && (
-                    <span className="bg-brand-green/10 text-brand-green px-2 py-0.5 rounded-full font-bold">✓ Offline</span>
-                  )}
-                  {c.isAcfp && (
-                    <>
-                      {c.hasClinicPickup && (
-                        <span className="bg-brand-gold/15 text-brand-gold-dark px-2 py-0.5 rounded-full font-extrabold shadow-sm border border-brand-gold/20">
-                          ✓ Clinic Pickup
-                        </span>
-                      )}
-                      {c.hasSelfDispatch && (
-                        <span className="bg-brand-gold/15 text-brand-gold-dark px-2 py-0.5 rounded-full font-extrabold shadow-sm border border-brand-gold/20">
-                          ✓ Self-Dispatch
-                        </span>
-                      )}
-                      {c.hasAyurwedDelivery && (
-                        <span className="bg-brand-gold/15 text-brand-gold-dark px-2 py-0.5 rounded-full font-extrabold shadow-sm border border-brand-gold/20">
-                          ✓ AYURWED Delivery
-                        </span>
-                      )}
-                    </>
-                  )}
                 </div>
               </div>
 

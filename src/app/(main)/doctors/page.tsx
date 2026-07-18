@@ -138,7 +138,7 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
   return (
     <div className="max-w-7xl mx-auto layout-padding-minimal py-10">
       {/* Header (border-b removed as requested) */}
-      <div className="text-center sm:text-left pb-8 space-y-2">
+      <div className="text-center sm:text-left pb-0 space-y-2">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-title-primary tracking-tight">
@@ -191,7 +191,7 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
         </form>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-10">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-6">
         {/* Sidebar Filters (Desktop) */}
         <aside className="lg:col-span-1">
           <Suspense fallback={<div className="bg-card rounded-3xl p-6 h-64 border border-border animate-pulse"></div>}>

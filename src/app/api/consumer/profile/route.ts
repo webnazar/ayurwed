@@ -11,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const profile = await db.consumerProfile.findUnique({
+    let profile = await db.consumerProfile.findUnique({
       where: { userId: Number(session.user.id) },
       include: {
         user: {
@@ -19,6 +19,30 @@ export async function GET() {
         }
       }
     });
+
+    if (!profile) {
+      const user = await db.user.findUnique({
+        where: { id: Number(session.user.id) },
+        select: { name: true, email: true, phone: true }
+      });
+      if (user) {
+        profile = {
+          id: 0,
+          userId: Number(session.user.id),
+          address: '',
+          landmark: '',
+          city: '',
+          state: '',
+          pincode: '',
+          dateOfBirth: null,
+          gender: null,
+          medicalHistory: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          user
+        } as any;
+      }
+    }
 
     return NextResponse.json({ profile });
   } catch (error) {

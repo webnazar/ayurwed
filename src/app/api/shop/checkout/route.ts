@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json();
-  const { items, shippingAddress, paymentMethod, notes } = body;
+  const { items, shippingAddress, paymentMethod, paymentStatus, notes } = body;
 
   if (!items?.length) return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
   if (!shippingAddress) return NextResponse.json({ error: 'Shipping address required' }, { status: 400 });
@@ -47,7 +47,8 @@ export async function POST(req: Request) {
       orderNumber,
       userId: parseInt(session.user.id as string),
       status: 'PENDING',
-      paymentMethod: paymentMethod || 'COD',
+      paymentMethod: paymentMethod || 'PREPAID',
+      paymentStatus: paymentStatus || 'PENDING',
       subtotal,
       shipping,
       total,

@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { ShoppingBag, MapPin, Phone, User, Home, ChevronRight, Package, Trash2, Plus, Minus, ArrowRight, CheckCircle } from 'lucide-react';
+import { ShoppingBag, MapPin, Phone, User, Home, ChevronRight, Package, Trash2, Plus, Minus, ArrowRight, CheckCircle, X } from 'lucide-react';
 import { useCart } from '@/components/shop/CartContext';
 import toast from 'react-hot-toast';
 
@@ -18,11 +18,17 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Simulated Payment Modal state
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentStage, setPaymentStage] = useState<'idle' | 'processing' | 'success'>('idle');
+  const [selectedPaymentType, setSelectedPaymentType] = useState<'upi' | 'card' | 'netbanking'>('upi');
+  const [paymentProgressMsg, setPaymentProgressMsg] = useState('');
+
   const shipping = subtotal >= 500 ? 0 : subtotal > 0 ? 60 : 0;
   const total = subtotal + shipping;
 
   const [form, setForm] = useState({
-    name: session?.user?.name || '',
+    name: '',
     phone: '',
     address: '',
     city: '',
@@ -31,14 +37,55 @@ export default function CheckoutPage() {
     notes: '',
   });
 
+  useEffect(() => {
+    if (session?.user) {
+      setForm(f => ({ ...f, name: session.user.name || f.name }));
+
+      fetch('/api/consumer/profile')
+        .then(res => res.json())
+        .then(data => {
+          if (data?.profile) {
+            setForm(f => ({
+              ...f,
+              name: data.profile.user?.name || f.name || session.user.name || '',
+              phone: data.profile.user?.phone || f.phone,
+              address: data.profile.address || f.address,
+              city: data.profile.city || f.city,
+              state: data.profile.state || f.state,
+              pincode: data.profile.pincode || f.pincode,
+            }));
+          }
+        })
+        .catch(err => console.error('Error fetching consumer profile:', err));
+    }
+  }, [session]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session?.user) { router.push('/login'); return; }
     if (items.length === 0) return toast.error('Your cart is empty');
     if (!form.address || !form.city || !form.pincode) return toast.error('Please fill shipping address');
+    if (!form.phone || form.phone.trim().length < 10) return toast.error('Please enter a valid 10-digit phone number');
 
+    // Open simulated payment modal
+    setShowPaymentModal(true);
+    setPaymentStage('idle');
+  };
+
+  const handleSimulatedPayment = async () => {
+    setPaymentStage('processing');
     setLoading(true);
+
     try {
+      setPaymentProgressMsg('Connecting to secure payment gateway...');
+      await new Promise((r) => setTimeout(r, 900));
+
+      setPaymentProgressMsg('Authorizing transaction with bank...');
+      await new Promise((r) => setTimeout(r, 900));
+
+      setPaymentProgressMsg('Verifying secure signature...');
+      await new Promise((r) => setTimeout(r, 800));
+
       const res = await fetch('/api/shop/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -52,7 +99,8 @@ export default function CheckoutPage() {
             state: form.state,
             pincode: form.pincode,
           },
-          paymentMethod: 'COD',
+          paymentMethod: 'PREPAID',
+          paymentStatus: 'PAID',
           notes: form.notes || null,
         }),
       });
@@ -63,10 +111,18 @@ export default function CheckoutPage() {
       }
 
       const order = await res.json();
+      setPaymentStage('success');
+      toast.success('Payment Received!');
+      
+      // Let success transition show briefly
+      await new Promise((r) => setTimeout(r, 1000));
+      
       clearCart();
+      setShowPaymentModal(false);
       setSuccess(order.orderNumber);
     } catch (err: any) {
-      toast.error(err.message || 'Failed to place order');
+      toast.error(err.message || 'Failed to complete payment');
+      setPaymentStage('idle');
     } finally {
       setLoading(false);
     }
@@ -86,7 +142,7 @@ export default function CheckoutPage() {
           </div>
           <div className="bg-muted rounded-2xl p-4 text-sm text-foreground/70 space-y-1 text-left">
             <p>✓ Order confirmation received</p>
-            <p>✓ Cash on Delivery — pay when received</p>
+            <p>✓ Payment Verified — Prepaid Order</p>
             <p>✓ Delivery within 5-7 business days</p>
           </div>
           <div className="flex flex-col gap-3">
@@ -183,10 +239,13 @@ export default function CheckoutPage() {
                     <div className="w-2.5 h-2.5 rounded-full bg-white" />
                   </div>
                   <div>
-                    <p className="font-bold text-brand-green">Cash on Delivery (COD)</p>
-                    <p className="text-xs text-foreground/60">Pay when your order arrives</p>
+                    <p className="font-bold text-brand-green">Online Payment (Prepaid)</p>
+                    <p className="text-xs text-foreground/60">Secure payment via UPI, Cards, or Netbanking</p>
                   </div>
-                  <span className="ml-auto text-2xl">🏠</span>
+                  <span className="ml-auto text-2xl">💳</span>
+                </div>
+                <div className="text-xs text-red-500 font-bold bg-red-50 dark:bg-red-950/20 px-3 py-2 rounded-xl">
+                  ⚠️ Cash on Delivery (COD) is disabled for this store. Only prepaid orders are accepted.
                 </div>
               </div>
 
@@ -254,7 +313,7 @@ export default function CheckoutPage() {
 
                 <button type="submit" disabled={loading}
                   className="w-full flex items-center justify-center gap-2 bg-brand-green text-white py-4 rounded-2xl font-extrabold text-base hover:bg-brand-gold hover:text-brand-green transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50">
-                  {loading ? 'Placing Order...' : <>Place Order <ArrowRight className="h-5 w-5" /></>}
+                  {loading ? 'Processing...' : <>Proceed to Pay <ArrowRight className="h-5 w-5" /></>}
                 </button>
 
                 <p className="text-center text-xs text-foreground/50">
@@ -265,6 +324,90 @@ export default function CheckoutPage() {
           </form>
         )}
       </div>
+
+      {/* Simulated Payment Gateway Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-card border border-border w-full max-w-md rounded-3xl p-6 shadow-2xl relative space-y-6 animate-in zoom-in-95 duration-200 text-foreground">
+            {paymentStage === 'idle' && (
+              <button
+                onClick={() => setShowPaymentModal(false)}
+                className="absolute top-4 right-4 p-1.5 bg-muted hover:bg-muted/80 rounded-full transition-colors"
+              >
+                <X className="h-5 w-5 text-foreground/50 hover:text-foreground" />
+              </button>
+            )}
+
+            <div className="text-center border-b border-border pb-4">
+              <h3 className="font-extrabold text-brand-green text-lg">🔒 Ayurwed Payment Gateway</h3>
+              <p className="text-xs text-foreground/50 mt-1">128-bit SSL Secure Simulated Transaction</p>
+            </div>
+
+            {paymentStage === 'idle' ? (
+              <div className="space-y-5">
+                <div className="bg-muted/50 rounded-2xl p-4 flex justify-between items-center">
+                  <div>
+                    <p className="text-xs text-foreground/50 font-bold uppercase">Amount to Pay</p>
+                    <p className="text-xl font-extrabold text-brand-green">{formatPrice(total)}</p>
+                  </div>
+                  <span className="text-2xl">🛡️</span>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-xs font-bold text-foreground/60 uppercase tracking-wide">Select Demo Method</p>
+                  
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'upi', label: 'UPI / QR', icon: '📱' },
+                      { id: 'card', label: 'Card', icon: '💳' },
+                      { id: 'netbanking', label: 'NetBanking', icon: '🏦' },
+                    ].map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => setSelectedPaymentType(m.id as any)}
+                        className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 text-xs font-bold transition-all ${
+                          selectedPaymentType === m.id
+                            ? 'border-brand-green bg-brand-green-light/20 text-brand-green'
+                            : 'border-border hover:bg-muted'
+                        }`}
+                      >
+                        <span className="text-lg">{m.icon}</span>
+                        <span>{m.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSimulatedPayment}
+                  className="w-full bg-brand-green text-white py-3.5 rounded-2xl font-extrabold hover:bg-brand-gold hover:text-brand-green transition-all shadow-lg"
+                >
+                  Pay {formatPrice(total)} (Simulated)
+                </button>
+              </div>
+            ) : paymentStage === 'processing' ? (
+              <div className="py-8 text-center space-y-4">
+                <div className="relative w-16 h-16 mx-auto">
+                  <div className="absolute inset-0 rounded-full border-4 border-brand-green-light/30"></div>
+                  <div className="absolute inset-0 rounded-full border-4 border-t-brand-green animate-spin"></div>
+                </div>
+                <p className="font-bold text-brand-green text-sm animate-pulse">{paymentProgressMsg}</p>
+                <p className="text-[10px] text-foreground/40">Please do not close this window or hit refresh.</p>
+              </div>
+            ) : (
+              <div className="py-8 text-center space-y-4">
+                <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/40 rounded-full flex items-center justify-center mx-auto text-emerald-500 text-3xl animate-bounce">
+                  ✓
+                </div>
+                <p className="font-extrabold text-brand-green text-lg">Payment Successful!</p>
+                <p className="text-xs text-foreground/50">Redirecting to order confirmation...</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -161,8 +161,13 @@ export default async function PrintPrescriptionPage(props: { params: Promise<{ a
         <div className="prescription-sheet w-full max-w-[800px] min-h-[1123px] bg-white border border-slate-200 print:border-none p-8 print:p-0 rounded-3xl print:rounded-none shadow-md print:shadow-none flex flex-col justify-between relative overflow-hidden">
           
           {/* Watermark Logo */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.08] select-none z-0">
-            <img src="/ayurwed.webp" alt="Watermark" className="w-[350px] h-[350px] object-contain" />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.06] select-none z-0">
+            <img 
+              src="/ayurwed.webp" 
+              alt="Watermark" 
+              className="w-[350px] h-[350px] object-contain" 
+              style={{ filter: 'grayscale(100%) contrast(1.2) brightness(0.8)' }}
+            />
           </div>
 
           {/* Header */}

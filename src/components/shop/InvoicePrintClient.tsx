@@ -85,7 +85,12 @@ export default function InvoicePrintClient({ order }: { order: any }) {
 
           {/* Watermark */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.06] select-none z-0">
-            <img src="/ayurwed.webp" alt="Watermark" className="w-[300px] h-[300px] object-contain" />
+            <img 
+              src="/ayurwed.webp" 
+              alt="Watermark" 
+              className="w-[300px] h-[300px] object-contain" 
+              style={{ filter: 'grayscale(100%) contrast(1.2) brightness(0.8)' }}
+            />
           </div>
 
           {/* Content */}

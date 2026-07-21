@@ -175,7 +175,7 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
           <p><strong>Consultant:</strong> {consultant.name}</p>
           <p><strong>Date:</strong> {date}</p>
           <p><strong>Time:</strong> {slot}</p>
-          <p><strong>Type:</strong> {type === 'VIDEO' ? 'Online' : 'In-Person'} ({visitType === 'INITIAL' ? 'First Consultation' : 'Follow-up'})</p>
+          <p><strong>Type:</strong> {type === 'VIDEO' ? 'Online' : 'In-Person'}</p>
           <p><strong>Fee Paid:</strong> {formatPrice(selectedFee)}</p>
         </div>
         <button
@@ -191,33 +191,6 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
   return (
     <form onSubmit={handleBooking} className="bg-card rounded-3xl p-8 border border-border shadow-sm space-y-6">
       <h3 className="text-xl font-bold text-brand-green">Schedule Consultation</h3>
-
-      {/* Appointment Type (Initial vs Follow-up) */}
-      <div className="space-y-3">
-        <label className="text-xs font-bold text-brand-green uppercase tracking-wider block">Appointment Type</label>
-        <div className="grid grid-cols-2 gap-3">
-          {([
-            { key: 'INITIAL', label: 'First Consultation', fee: consultant.consultationFee },
-            { key: 'FOLLOW_UP', label: 'Follow-up Visit', fee: consultant.followUpFee },
-          ] as const).map((mode) => {
-            return (
-              <button
-                key={mode.key}
-                type="button"
-                onClick={() => setVisitType(mode.key)}
-                className={`p-3 rounded-2xl border-2 text-center flex flex-col items-center justify-center gap-1 transition-all duration-200 ${
-                  visitType === mode.key
-                    ? 'border-brand-gold bg-brand-gold-light text-brand-gold-dark font-bold'
-                    : 'border-border hover:border-brand-green hover:bg-brand-green-light/30 text-brand-foreground/70'
-                }`}
-              >
-                <span className="text-xs">{mode.label}</span>
-                <span className="text-[10px] opacity-80">{formatPrice(mode.fee)}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
 
       {/* Type selection */}
       <div className="space-y-3">

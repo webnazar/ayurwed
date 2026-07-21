@@ -41,7 +41,7 @@ export default function AcfpInfoCard() {
       >
         <div className="p-6 space-y-4 text-sm text-brand-foreground/80 leading-relaxed">
           <p>
-            <strong>AYURWED Certified Practitioners (ACP)</strong> are verified Ayurvedic practitioners who have successfully completed the **Certificate in Ancient Intelligence (CAI)** program. They are recognized experts in utilizing the Ancient Intelligence platform to deliver personalized patient care.
+            <strong>AYURWED Certified Practitioners (ACP)</strong> are verified Ayurvedic practitioners who have successfully completed the **Certificate in Ancient Intelligence (CAI)** program. This credential signifies that the practitioner has mastered the deep, ancient intelligence of traditional Ayurveda integrated with modern Artificial Intelligence (AI), enabling them to leverage the Ayurwed platform to deliver highly personalized, state-of-the-art patient care.
           </p>
           <div className="space-y-2.5 pt-2">
             <p className="font-bold text-brand-green text-xs uppercase tracking-wider">

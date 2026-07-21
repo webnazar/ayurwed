@@ -117,55 +117,38 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
             <div className="space-y-4 flex-grow">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-center sm:justify-start">
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-green">{consultant.user?.name}</h1>
-                <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                  {consultant.isCaiCertified && (
-                    <span className="bg-brand-green/10 text-brand-green text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1 border border-brand-green/20">
-                      <Award className="h-3.5 w-3.5 text-brand-gold-dark" />
-                      <span>ACP Certified</span>
-                    </span>
-                  )}
-
-                </div>
               </div>
               
               <p className="text-sm font-bold text-brand-gold-dark uppercase tracking-wider">{consultant.specialization}</p>
-              
-              <div className="flex flex-wrap justify-center sm:justify-start gap-6 text-sm text-brand-foreground/70">
-                <div className="flex items-center gap-1.5">
-                  <Award className="h-4 w-4 text-brand-green" />
-                  <span>{consultant.experience} Years Experience</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Languages className="h-4 w-4 text-brand-green" />
-                  <span>{parsedLanguages.join(', ')}</span>
-                </div>
-              </div>
-
-              {consultant.isCaiCertified && (
-                <div className="pt-2">
-                  <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-black text-brand-green bg-brand-green/10 px-4 py-2 rounded-full border border-brand-green/20 shadow-sm">
-                    <Award className="h-4 w-4 text-brand-gold-dark animate-pulse-slow flex-shrink-0" />
-                    <span>✓ AYURWED Certified Practitioner (ACP)</span>
-                  </div>
-                </div>
-              )}
             </div>
+            {consultant.isCaiCertified && (
+              <div className="sm:absolute sm:top-10 sm:right-8 mt-6 sm:mt-0 flex-shrink-0 relative flex flex-col items-center justify-center text-center p-4 pt-6 bg-brand-green/10 border border-brand-green/20 rounded-2xl shadow-sm min-w-[160px]">
+                <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-card p-1.5 rounded-full border border-brand-green/20 shadow-sm text-brand-gold-dark">
+                  <Award className="h-7 w-7 animate-pulse-slow" />
+                </div>
+                <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-brand-green leading-tight block">
+                  AYURWED
+                </span>
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-brand-green/80 leading-tight block mt-1">
+                  Certified Practitioner
+                </span>
+                <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-brand-green/80 leading-tight block mt-0.5">
+                  (ACP)
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Three Redesigned Sections */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* 1. Professional Information */}
-            <div className="bg-card rounded-3xl p-6 border border-border shadow-sm flex flex-col justify-between">
+            <div className="bg-card rounded-3xl p-6 border border-border shadow-sm flex flex-col justify-between md:col-span-2">
               <div className="space-y-4">
                 <h3 className="text-base font-extrabold text-brand-green flex items-center gap-2 border-b border-border pb-3">
                   <Stethoscope className="h-5 w-5 text-brand-gold-dark" />
                   <span>Professional Info</span>
                 </h3>
                 <div className="divide-y divide-border/40">
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-sm text-brand-foreground/60 font-medium">Full Name</span>
-                    <span className="text-sm font-semibold text-brand-green">{consultant.user?.name}</span>
-                  </div>
                   <div className="flex items-center justify-between py-3">
                     <span className="text-sm text-brand-foreground/60 font-medium">Qualification</span>
                     <span className="text-sm font-semibold text-brand-foreground">{consultant.degree || 'BAMS'}</span>
@@ -175,65 +158,15 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
                     <span className="text-sm font-semibold text-brand-foreground">{consultant.experience} Years</span>
                   </div>
                   <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">Languages Spoken</span>
+                    <span className="text-sm font-semibold text-brand-foreground">{parsedLanguages.join(', ')}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-3">
                     <span className="text-sm text-brand-foreground/60 font-medium">Registration No.</span>
                     <span className="text-sm font-mono font-bold bg-brand-green-light/20 text-brand-green px-2.5 py-1 rounded-lg border border-brand-green/20">
                       {consultant.registrationNumber || 'AYUR-90248-IND'}
                     </span>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 2. Credentials */}
-            <div className="bg-card rounded-3xl p-6 border border-border shadow-sm flex flex-col justify-between">
-              <div className="space-y-4">
-                <h3 className="text-base font-extrabold text-brand-green flex items-center gap-2 border-b border-border pb-3">
-                  <Award className="h-5 w-5 text-brand-gold-dark" />
-                  <span>Credentials</span>
-                </h3>
-                <div className="divide-y divide-border/40">
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-sm text-brand-foreground/60 font-medium">ACP Title</span>
-                    {consultant.isCaiCertified ? (
-                      <span className="bg-brand-green/10 text-brand-green font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1 border border-brand-green/20">
-                        <CheckCircle className="h-3.5 w-3.5" /> Certified ACP
-                      </span>
-                    ) : (
-                      <span className="bg-brand-foreground/5 text-brand-foreground/40 font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1">
-                        <XCircle className="h-3.5 w-3.5" /> Not Certified
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-sm text-brand-foreground/60 font-medium">Platform Status</span>
-                    {consultant.isAcfp ? (
-                      <span className="bg-brand-gold/20 text-brand-gold-dark font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1 border border-brand-gold/30">
-                        <CheckCircle className="h-3.5 w-3.5" /> Active Access
-                      </span>
-                    ) : (
-                      <span className="bg-brand-foreground/5 text-brand-foreground/40 font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1">
-                        <XCircle className="h-3.5 w-3.5" /> Inactive
-                      </span>
-                    )}
-                  </div>
-                  {consultant.isAcfp && (
-                    <>
-                      {consultant.acfpVerifiedAt && (
-                        <div className="flex items-center justify-between py-3">
-                          <span className="text-sm text-brand-foreground/60 font-medium">Activation Date</span>
-                          <span className="text-sm font-semibold text-brand-green">
-                            {format(new Date(consultant.acfpVerifiedAt), 'dd MMMM yyyy')}
-                          </span>
-                        </div>
-                      )}
-                      <div className="flex items-center justify-between py-3">
-                        <span className="text-sm text-brand-foreground/60 font-medium">Access Tier</span>
-                        <span className="text-sm font-extrabold text-brand-gold-dark flex items-center gap-1">
-                          Full Platform <Award className="h-4 w-4 text-brand-gold-dark" />
-                        </span>
-                      </div>
-                    </>
-                  )}
                 </div>
               </div>
             </div>

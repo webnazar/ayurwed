@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Clock, Video, MessageSquare, PhoneCall, CheckCircle, ShieldCheck, MapPin } from 'lucide-react';
+import { Calendar, Clock, Video, MessageSquare, PhoneCall, CheckCircle, ShieldCheck, MapPin, Printer, Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatPrice } from '@/lib/utils';
 import { useSession, signIn } from 'next-auth/react';
@@ -155,6 +155,57 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
     }
   };
 
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Ayurwed Consultation Booking Confirmation</title>
+          <style>
+            body { font-family: system-ui, sans-serif; padding: 40px; color: #1e3a2f; background: #ffffff; }
+            .card { border: 1px solid #1e3a2f30; padding: 30px; border-radius: 20px; max-width: 500px; margin: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+            h1 { color: #1e3a2f; font-size: 24px; margin-bottom: 20px; text-align: center; }
+            .item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #1e3a2f20; font-size: 14px; }
+            .item strong { color: #1e3a2f80; }
+            .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #1e3a2f60; }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <h1>Booking Confirmation</h1>
+            <div class="item"><strong>Consultant:</strong> <span>${consultant.name}</span></div>
+            <div class="item"><strong>Date:</strong> <span>${date ? format(new Date(date), 'dd/MM/yyyy') : ''}</span></div>
+            <div class="item"><strong>Time:</strong> <span>${slot}</span></div>
+            <div class="item"><strong>Type:</strong> <span>${type === 'VIDEO' ? 'Online (Video)' : 'In Clinic'}</span></div>
+            <div class="item"><strong>Fee Paid:</strong> <span>${formatPrice(selectedFee)}</span></div>
+            <div class="footer">Thank you for choosing Ayurwed • Ancient Intelligence</div>
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+            }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
+  const handleShare = () => {
+    const shareText = `My consultation with ${consultant.name} is scheduled on ${date ? format(new Date(date), 'dd/MM/yyyy') : ''} at ${slot} via ${type === 'VIDEO' ? 'Online Video' : 'In Clinic'}. Fee paid: ${formatPrice(selectedFee)}.`;
+    if (navigator.share) {
+      navigator.share({
+        title: 'Ayurwed Consultation Booking',
+        text: shareText,
+        url: window.location.origin + `/doctors/${consultant.id}`,
+      }).catch(err => console.log(err));
+    } else {
+      navigator.clipboard.writeText(shareText);
+      toast.success('Booking details copied to clipboard!');
+    }
+  };
+
   if (bookingSuccess) {
     return (
       <div className="bg-card rounded-3xl p-8 border border-brand-green-border/15 shadow text-center space-y-6">
@@ -174,6 +225,26 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
           <p><strong>Type:</strong> {type === 'VIDEO' ? 'Online' : 'In Clinic'}</p>
           <p><strong>Fee Paid:</strong> {formatPrice(selectedFee)}</p>
         </div>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="flex items-center justify-center gap-2 border border-brand-green/20 hover:border-brand-green/40 bg-brand-green-light/10 text-brand-green font-semibold py-2.5 rounded-full text-xs transition-colors duration-200"
+          >
+            <Printer className="h-4 w-4 text-brand-green" />
+            <span>Print Receipt</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleShare}
+            className="flex items-center justify-center gap-2 border border-brand-green/20 hover:border-brand-green/40 bg-brand-green-light/10 text-brand-green font-semibold py-2.5 rounded-full text-xs transition-colors duration-200"
+          >
+            <Share2 className="h-4 w-4 text-brand-green" />
+            <span>Share Details</span>
+          </button>
+        </div>
+
         <button
           onClick={() => router.push('/consumer/dashboard/appointments')}
           className="w-full bg-brand-green hover:bg-brand-gold hover:text-brand-green text-white font-bold py-3 rounded-full transition-colors duration-200"
@@ -247,7 +318,7 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
       {/* Time Slots */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-brand-green uppercase tracking-wider block">Available Slots</label>
-        <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {availableSlots.length > 0 ? (
             availableSlots.map((rawTime) => {
               const time = formatTimeSlot(rawTime);

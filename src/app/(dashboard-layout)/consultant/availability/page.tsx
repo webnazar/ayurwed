@@ -25,6 +25,15 @@ export default async function ConsultantAvailabilityPage() {
 
   const bookedCount = await db.appointment.count({ where: { consultantId: profile.id, status: { in: ['PENDING', 'CONFIRMED'] } } });
 
+  let parsedAvailability = {};
+  try {
+    if (profile.availability) {
+      parsedAvailability = JSON.parse(profile.availability);
+    }
+  } catch (e) {
+    console.error('Failed to parse availability:', e);
+  }
+
   return (
     <div className="space-y-6">
       <div className="dashboard-header-card">
@@ -34,7 +43,7 @@ export default async function ConsultantAvailabilityPage() {
         </p>
       </div>
       <AvailabilityClient
-        initialAvailability={profile.availability}
+        initialAvailability={parsedAvailability}
         totalAppointments={profile._count.appointments}
         bookedCount={bookedCount}
       />

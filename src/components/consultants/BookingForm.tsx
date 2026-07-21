@@ -226,7 +226,7 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
             placeholder="dd/MM/yyyy"
             readOnly
             onClick={() => dateInputRef.current?.showPicker()}
-            className="w-full bg-brand-green-light/40 text-brand-foreground border border-border rounded-2xl py-3 px-4 pl-10 focus:outline-none focus:border-brand-gold text-sm cursor-pointer"
+            className="w-full bg-brand-green-light/40 text-brand-foreground border border-border rounded-2xl py-3 px-4 pr-10 focus:outline-none focus:border-brand-gold text-sm cursor-pointer"
           />
           <input
             ref={dateInputRef}
@@ -240,7 +240,7 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
             className="absolute inset-0 opacity-0 pointer-events-none"
             required
           />
-          <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-green" />
+          <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-green pointer-events-none" />
         </div>
       </div>
 

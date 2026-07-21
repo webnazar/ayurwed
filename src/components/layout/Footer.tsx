@@ -78,7 +78,7 @@ export default function Footer() {
             />
           </Link>
           <p className="text-sm text-brand-green/70 dark:text-muted-foreground leading-relaxed">
-            Ancient Intelligence • Modern Wellness. Connecting Indian heritage with modern clinical research for complete holistic health.
+            Ancient Intelligence. Connecting Indian heritage with modern clinical research for complete holistic health.
           </p>
           <div className="space-y-2 pt-1">
             <span className="text-[10px] font-bold text-brand-green dark:text-foreground uppercase tracking-wider block">Get the Mobile App</span>
@@ -166,8 +166,6 @@ export default function Footer() {
         <div>
           <h4 className="text-brand-green dark:text-foreground text-sm font-semibold tracking-wider uppercase mb-4">Ayurwed India</h4>
           <ul className="space-y-2 text-sm text-brand-green/70 dark:text-muted-foreground">
-            <li>Gat No 203, Plot No 4, Aqsa Colony</li>
-            <li>Aqsa Road, Malegaon 423203, Maharashtra INDIA</li>
             <li>Support: support@ayurwed.com</li>
             <li>Phone: +9271711722</li>
           </ul>

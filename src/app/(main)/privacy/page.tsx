@@ -14,47 +14,53 @@ export default function PrivacyPolicyPage() {
         <section>
           <h2 className="text-xl font-semibold text-brand-green mb-3">1. Information We Collect</h2>
           <p>
-            We collect information you provide directly to us, such as when you create or modify your account, request on-demand services, contact customer support, or otherwise communicate with us. This information may include: name, email, phone number, postal address, profile picture, payment method, items requested (for delivery services), delivery notes, and other information you choose to provide.
+            We collect information you provide directly to us when you register an account, request consultations, input practitioner registration details, create clinical prescriptions, or place order requests. This information may include:
           </p>
+          <ul className="list-disc pl-5 mt-2 space-y-1">
+            <li><strong>Personal Identity & Contact:</strong> Name, email address, phone number, physical mailing address, and login credentials.</li>
+            <li><strong>Professional Verification (for Practitioners):</strong> AYUSH or medical registration number, academic credentials, and supplier reference/procurement declarations.</li>
+            <li><strong>Health & Clinical Data:</strong> Patient case histories, diagnostic details, symptoms, and digital prescriptions drafted by practitioners.</li>
+            <li><strong>Fulfillment Preferences:</strong> Selected fulfillment modes (e.g. Clinic Pickup, Doctor Self-Dispatch) and order delivery destinations.</li>
+          </ul>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold text-brand-green mb-3">2. How We Use Information</h2>
           <p>
-            We may use the information we collect about you to:
+            We use the information we collect about you to:
           </p>
           <ul className="list-disc pl-5 mt-2 space-y-1">
-            <li>Provide, maintain, and improve our Services, including, for example, to facilitate payments, send receipts, provide products and services you request (and send related information), develop new features, provide customer support to Users and Drivers, develop safety features, authenticate users, and send product updates and administrative messages;</li>
-            <li>Perform internal operations, including, for example, to prevent fraud and abuse of our Services; to troubleshoot software bugs and operational problems; to conduct data analysis, testing, and research; and to monitor and analyze usage and activity trends;</li>
-            <li>Send or facilitate communications between you and a delivery partner, such as estimated times of arrival (ETAs);</li>
-            <li>Send you communications we think will be of interest to you, including information about products, services, promotions, news, and events of Ayurwed and other companies, where permissible and according to local applicable laws.</li>
+            <li>Operate, maintain, and secure the Ayurwed SaaS platform and clinical tools.</li>
+            <li>Facilitate scheduling, diagnostic communication, and digital prescription creation between patients and independent practitioners.</li>
+            <li>Enable independent practitioners to process fulfillment orders (compounding, packaging, local shipping, or in-clinic pickup notifications).</li>
+            <li>Verify credentials and ensure compliance with platform terms and professional standards.</li>
+            <li>Troubleshoot technical issues, identify bugs, and prevent fraudulent usage of the platform.</li>
           </ul>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold text-brand-green mb-3">3. Sharing of Information</h2>
           <p>
-            We may share the information we collect about you as described in this Statement or as described at the time of collection or sharing, including as follows:
+            As an intermediary platform, Ayurwed shares specific data to facilitate direct practitioner-patient interactions:
           </p>
           <ul className="list-disc pl-5 mt-2 space-y-1">
-            <li>With drivers to enable them to provide the Services you request. For example, we share your name, photo (if you provide one), average User rating given by drivers, and pickup and/or drop-off locations with drivers;</li>
-            <li>With other people, as directed by you, such as when you want to share your estimated time of arrival or split a fare with a friend;</li>
-            <li>With third parties to provide you a service you requested through a partnership or promotional offering made by a third party or us;</li>
-            <li><strong>Medical and Consultation Data:</strong> We strictly adhere to healthcare data protection norms. We do not sell or share your personal health information, consultation data, or other personal data with third parties for research or commercial purposes without your explicit, informed consent.</li>
+            <li><strong>Practitioner-Patient Link:</strong> We share patient demographics, contact details, and case files with the selected consulting practitioner to enable proper diagnosis.</li>
+            <li><strong>Order Processing Data:</strong> For prescription and retail product orders, customer shipping details are shared directly and exclusively with the fulfilling practitioner to organize dispatch or clinic collection. Ayurwed does not share this data with third-party logistics agents directly; any external shipping/postal services are booked independently by the fulfilling practitioner.</li>
+            <li><strong>Healthcare Confidentiality:</strong> Clinical files and diagnostic records are strictly confidential. We do not sell, rent, or share personal health information with marketing companies, research groups, or commercial partners without your explicit, informed consent.</li>
           </ul>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-brand-green mb-3">4. Analytics and Advertising Services Provided by Others</h2>
+          <h2 className="text-xl font-semibold text-brand-green mb-3">4. Data Security & Storage</h2>
           <p>
-            We may allow others to provide audience measurement and analytics services for us, to serve advertisements on our behalf across the Internet, and to track and report on the performance of those advertisements.
+            We implement state-of-the-art administrative, technical, and physical security controls to safeguard patient medical histories and doctor credentials. Information is stored in encrypted, highly secure database nodes to protect against data loss, theft, and unauthorized access.
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-brand-green mb-3">5. Security</h2>
+          <h2 className="text-xl font-semibold text-brand-green mb-3">5. Regulatory Disclosures</h2>
           <p>
-            We take reasonable measures to help protect information about you from loss, theft, misuse and unauthorized access, disclosure, alteration and destruction.
+            We may disclose information as necessary to satisfy any applicable law, regulation, legal process, or governmental request, including verifying practitioner registration numbers against regulatory bodies.
           </p>
         </section>
       </div>

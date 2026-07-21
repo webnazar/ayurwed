@@ -100,7 +100,7 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Doctor Bio & Details */}
         <div className="lg:col-span-2 space-y-8">
           
@@ -121,13 +121,13 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
                   {consultant.isCaiCertified && (
                     <span className="bg-brand-green/10 text-brand-green text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1 border border-brand-green/20">
                       <Award className="h-3.5 w-3.5 text-brand-gold-dark" />
-                      <span>CAI Certified</span>
+                      <span>ACP Certified</span>
                     </span>
                   )}
                   {consultant.isAcfp && (
                     <span className="bg-brand-gold/20 text-brand-gold-dark text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1 border border-brand-gold/30 shadow-sm">
                       <ShieldCheck className="h-3.5 w-3.5" />
-                      <span>ACFP Verified</span>
+                      <span>Platform Active</span>
                     </span>
                   )}
                 </div>
@@ -146,11 +146,11 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
                 </div>
               </div>
 
-              {consultant.isAcfp && (
+              {consultant.isCaiCertified && (
                 <div className="pt-2">
-                  <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-black text-brand-green bg-brand-gold/15 dark:bg-brand-gold/25 px-4 py-2 rounded-full border border-brand-gold/30 shadow-sm">
+                  <div className="inline-flex items-center gap-2 text-xs sm:text-sm font-black text-brand-green bg-brand-green/10 px-4 py-2 rounded-full border border-brand-green/20 shadow-sm">
                     <Award className="h-4 w-4 text-brand-gold-dark animate-pulse-slow flex-shrink-0" />
-                    <span>✓ AYURWED Certified Consultant & Fulfillment Partner (ACFP)</span>
+                    <span>✓ AYURWED Certified Practitioner (ACP)</span>
                   </div>
                 </div>
               )}
@@ -158,7 +158,7 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
           </div>
 
           {/* Three Redesigned Sections */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* 1. Professional Information */}
             <div className="bg-card rounded-3xl p-6 border border-border shadow-sm flex flex-col justify-between">
               <div className="space-y-4">
@@ -198,45 +198,46 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
                 </h3>
                 <div className="divide-y divide-border/40">
                   <div className="flex items-center justify-between py-3">
-                    <span className="text-sm text-brand-foreground/60 font-medium">CAI Certification</span>
-                    <span className="bg-brand-green/10 text-brand-green font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1 border border-brand-green/20">
-                      <CheckCircle className="h-3.5 w-3.5" /> Completed
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-sm text-brand-foreground/60 font-medium">ACFP Membership</span>
-                    {consultant.isAcfp ? (
-                      <span className="bg-brand-gold/20 text-brand-gold-dark font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1 border border-brand-gold/30">
-                        <CheckCircle className="h-3.5 w-3.5" /> Verified
+                    <span className="text-sm text-brand-foreground/60 font-medium">ACP Title</span>
+                    {consultant.isCaiCertified ? (
+                      <span className="bg-brand-green/10 text-brand-green font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1 border border-brand-green/20">
+                        <CheckCircle className="h-3.5 w-3.5" /> Certified ACP
                       </span>
                     ) : (
                       <span className="bg-brand-foreground/5 text-brand-foreground/40 font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1">
-                        <XCircle className="h-3.5 w-3.5" /> Unverified
+                        <XCircle className="h-3.5 w-3.5" /> Not Certified
                       </span>
                     )}
                   </div>
-                  {consultant.isAcfp ? (
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">Platform Status</span>
+                    {consultant.isAcfp ? (
+                      <span className="bg-brand-gold/20 text-brand-gold-dark font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1 border border-brand-gold/30">
+                        <CheckCircle className="h-3.5 w-3.5" /> Active Access
+                      </span>
+                    ) : (
+                      <span className="bg-brand-foreground/5 text-brand-foreground/40 font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1">
+                        <XCircle className="h-3.5 w-3.5" /> Inactive
+                      </span>
+                    )}
+                  </div>
+                  {consultant.isAcfp && (
                     <>
                       {consultant.acfpVerifiedAt && (
                         <div className="flex items-center justify-between py-3">
-                          <span className="text-sm text-brand-foreground/60 font-medium">Verification Date</span>
+                          <span className="text-sm text-brand-foreground/60 font-medium">Activation Date</span>
                           <span className="text-sm font-semibold text-brand-green">
                             {format(new Date(consultant.acfpVerifiedAt), 'dd MMMM yyyy')}
                           </span>
                         </div>
                       )}
                       <div className="flex items-center justify-between py-3">
-                        <span className="text-sm text-brand-foreground/60 font-medium">Membership Level</span>
+                        <span className="text-sm text-brand-foreground/60 font-medium">Access Tier</span>
                         <span className="text-sm font-extrabold text-brand-gold-dark flex items-center gap-1">
-                          Gold Tier <Award className="h-4 w-4 text-brand-gold-dark" />
+                          Full Platform <Award className="h-4 w-4 text-brand-gold-dark" />
                         </span>
                       </div>
                     </>
-                  ) : (
-                    <div className="flex items-center justify-between py-3">
-                      <span className="text-sm text-brand-foreground/60 font-medium">Membership Level</span>
-                      <span className="text-sm font-semibold text-brand-foreground/40">Standard</span>
-                    </div>
                   )}
                 </div>
               </div>
@@ -254,13 +255,13 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
                   <div className="flex items-center justify-between py-3">
                     <span className="text-sm text-brand-foreground/60 font-medium">Online Consultation</span>
                     <span className={`text-sm font-bold ${consultant.hasOnline ? 'text-emerald-700' : 'text-brand-foreground/40'}`}>
-                      {consultant.hasOnline ? '✓ First & Follow-up' : '—'}
+                      {consultant.hasOnline ? 'Enabled' : '—'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between py-3">
-                    <span className="text-sm text-brand-foreground/60 font-medium">Offline Consultation</span>
+                    <span className="text-sm text-brand-foreground/60 font-medium">Offline Clinic Practice</span>
                     <span className={`text-sm font-bold ${consultant.hasOffline ? 'text-emerald-700' : 'text-brand-foreground/40'}`}>
-                      {consultant.hasOffline ? '✓ First & Follow-up' : '—'}
+                      {consultant.hasOffline ? 'Enabled' : '—'}
                     </span>
                   </div>
                 </div>
@@ -268,25 +269,28 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
                 {/* Column 2 */}
                 <div className="space-y-0 divide-y divide-border/40 md:border-l md:border-border/30 md:pl-12">
                   <div className="flex items-center justify-between py-3">
-                    <span className="text-sm text-brand-foreground/60 font-medium">Medicine Fulfillment</span>
-                    <span className={`text-sm font-extrabold ${consultant.isAcfp ? 'text-brand-gold-dark' : 'text-brand-foreground/40'}`}>
-                      {consultant.isAcfp ? '✓ Required (ACFP)' : '—'}
+                    <span className="text-sm text-brand-foreground/60 font-medium">Dispensing Model</span>
+                    <span className="text-sm font-extrabold text-brand-green">
+                      {consultant.hasClinicPickup || consultant.hasSelfDispatch || consultant.hasAyurwedDelivery
+                        ? 'Prescription & Fulfillment'
+                        : 'Prescription Only'}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-sm text-brand-foreground/60 font-medium">Fulfillment Method</span>
-                    <span className="text-sm font-semibold text-brand-foreground capitalize">{consultant.fulfillmentMethod?.toLowerCase() || 'Courier'}</span>
-                  </div>
-                  {consultant.isAcfp && (
-                    <div className="flex items-center justify-between py-3">
-                      <span className="text-sm text-brand-foreground/60 font-medium">Fulfillment Options</span>
-                      <span className="text-sm font-bold text-brand-green text-right">
+                  {consultant.hasClinicPickup || consultant.hasSelfDispatch || consultant.hasAyurwedDelivery ? (
+                    <div className="flex items-start justify-between py-3 gap-4">
+                      <span className="text-sm text-brand-foreground/60 font-medium flex-shrink-0">Fulfillment Channels</span>
+                      <span className="text-xs font-bold text-brand-gold-dark text-right leading-tight">
                         {[
                           consultant.hasClinicPickup && 'Clinic Pickup',
-                          consultant.hasSelfDispatch && 'Self-Dispatch',
-                          consultant.hasAyurwedDelivery && 'Delivery'
+                          consultant.hasSelfDispatch && 'Doctor Self-Dispatch',
+                          consultant.hasAyurwedDelivery && 'Doctor Logistics Delivery'
                         ].filter(Boolean).join(', ') || 'None'}
                       </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between py-3">
+                      <span className="text-sm text-brand-foreground/60 font-medium">Fulfillment Support</span>
+                      <span className="text-sm font-semibold text-brand-foreground/40">None (Prescription Only)</span>
                     </div>
                   )}
                 </div>
@@ -294,8 +298,8 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
             </div>
           </div>
 
-          {/* ACFP Info Card */}
-          {consultant.isAcfp && <AcfpInfoCard />}
+          {/* ACP Info Card */}
+          {consultant.isCaiCertified && <AcfpInfoCard />}
 
           {/* Biography */}
           <div className="bg-card rounded-3xl p-8 border border-border shadow-sm space-y-4">

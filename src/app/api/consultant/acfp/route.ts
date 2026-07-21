@@ -24,36 +24,31 @@ export async function POST(req: NextRequest) {
     // Check if the doctor is CAI certified first
     if (!profile.isCaiCertified) {
       return NextResponse.json({ 
-        error: 'In order to practice and apply for ACFP verification, you must first complete the Certificate in Ancient Intelligence (CAI).' 
+        error: 'In order to practice and activate platform access, you must first complete the Certificate in Ancient Intelligence (CAI).' 
       }, { status: 400 });
     }
 
     // Check if they are already approved
     if (profile.isAcfp) {
-      return NextResponse.json({ error: 'You are already an AYURWED Certified Consultant & Fulfillment Partner.' }, { status: 400 });
+      return NextResponse.json({ error: 'Your platform access subscription is already active.' }, { status: 400 });
     }
 
-    // Check if they have an active pending application
-    if (profile.acfpVerifiedAt && !profile.isAcfp) {
-      return NextResponse.json({ error: 'You have already applied for ACFP. Your application is under review.' }, { status: 400 });
-    }
-
-    // Update the profile to ACFP pending status
+    // Update the profile to platform active status immediately (simulates yearly platform fee payment)
     const updatedProfile = await db.consultantProfile.update({
       where: { userId },
       data: {
-        isAcfp: false,
+        isAcfp: true,
         acfpVerifiedAt: new Date(),
       },
     });
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Your ACFP verification application has been submitted successfully and is under review.',
+      message: 'Your platform access subscription has been activated successfully.',
       profile: updatedProfile 
     });
   } catch (error) {
-    console.error('ACFP Verification Error:', error);
+    console.error('Platform Activation Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

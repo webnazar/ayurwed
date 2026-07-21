@@ -94,6 +94,8 @@ model ConsultantProfile {
   hasClinicPickup    Boolean        @default(false)
   hasSelfDispatch    Boolean        @default(false)
   hasAyurwedDelivery Boolean        @default(false)
+  procurementDeclaration Boolean   @default(false)
+  procurementReference   String?   @db.VarChar(255)
   appointments       Appointment[]
   user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   prescriptions      Prescription[]

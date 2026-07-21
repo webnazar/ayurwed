@@ -36,19 +36,19 @@ export default async function ConsultantDashboard() {
   let verifiedIcon = <ShieldAlert className="h-6 w-6" />;
 
   if (profile?.isVerified) {
-    verifiedText = 'Active Profile';
+    verifiedText = 'Profile Verified';
     verifiedColor = 'text-emerald-800 bg-emerald-100 dark:bg-emerald-950/30';
     verifiedIcon = <UserCheck className="h-6 w-6" />;
   }
 
   if (isPendingAcfp) {
-    verifiedText = 'ACFP Pending Approval';
+    verifiedText = 'Platform Pending Activation';
     verifiedColor = 'text-amber-700 bg-amber-100 dark:bg-amber-950/30 border border-amber-300/35';
     verifiedIcon = <ShieldAlert className="h-6 w-6 text-brand-gold-dark animate-pulse" />;
   }
 
   if (profile?.isAcfp) {
-    verifiedText = 'Verified ACFP Partner';
+    verifiedText = 'Platform Access Active';
     verifiedColor = 'text-brand-green bg-brand-gold/20 border border-brand-gold/30';
     verifiedIcon = <Award className="h-6 w-6 text-brand-gold-dark animate-pulse-slow" />;
   }
@@ -56,10 +56,10 @@ export default async function ConsultantDashboard() {
   return (
     <div className="space-y-8">
       <div className="dashboard-header-card relative overflow-hidden">
-        {profile?.isAcfp && (
-          <div className="absolute top-4 right-4 bg-brand-gold/25 border border-brand-gold text-brand-gold-dark text-xs font-black px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
-            <Award className="h-4 w-4" />
-            <span>ACFP Verified</span>
+        {profile?.isCaiCertified && (
+          <div className="absolute top-4 right-4 bg-brand-green/10 border border-brand-green/20 text-brand-green text-xs font-black px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+            <Award className="h-4 w-4 text-brand-gold-dark" />
+            <span>ACP Certified</span>
           </div>
         )}
         <h1 className="dashboard-header-title">Namaste, {session?.user?.name}!</h1>

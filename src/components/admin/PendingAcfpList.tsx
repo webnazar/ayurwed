@@ -27,7 +27,7 @@ export default function PendingAcfpList({ initialList }: PendingAcfpListProps) {
 
   const handleAction = async (profileId: number, action: 'approve' | 'reject') => {
     setProcessingId(profileId);
-    const toastId = toast.loading(`${action === 'approve' ? 'Approving' : 'Rejecting'} ACFP application...`);
+    const toastId = toast.loading(`${action === 'approve' ? 'Activating' : 'Deactivating'} Platform Access...`);
     try {
       const res = await fetch('/api/admin/acfp/approve', {
         method: 'POST',
@@ -38,8 +38,8 @@ export default function PendingAcfpList({ initialList }: PendingAcfpListProps) {
       if (res.ok) {
         toast.success(
           action === 'approve' 
-            ? 'ACFP Application Approved & Certified!' 
-            : 'ACFP Application Rejected & Reset.',
+            ? 'Platform Access Activated!' 
+            : 'Platform Access Deactivated.',
           { id: toastId }
         );
         setList(prev => prev.filter(c => c.id !== profileId));
@@ -64,11 +64,11 @@ export default function PendingAcfpList({ initialList }: PendingAcfpListProps) {
         <div className="flex items-center gap-2">
           <Award className="h-5.5 w-5.5 text-brand-gold-dark dark:text-brand-gold animate-pulse-slow" />
           <h2 className="font-extrabold text-brand-green dark:text-foreground text-lg">
-            Pending ACFP Partner Verifications
+            Platform Access Activations
           </h2>
         </div>
         <span className="bg-brand-gold text-brand-green font-black px-3 py-1 rounded-full text-xs animate-bounce">
-          {list.length} Action Required
+          {list.length} Pending
         </span>
       </div>
 
@@ -101,8 +101,8 @@ export default function PendingAcfpList({ initialList }: PendingAcfpListProps) {
                   </span>
                   {c.acfpVerifiedAt && (
                     <span className="text-brand-foreground/40 dark:text-muted-foreground/50 text-[10px] flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      Applied: {new Date(c.acfpVerifiedAt).toLocaleDateString()}
+                       <Calendar className="h-3 w-3" />
+                       Requested: {new Date(c.acfpVerifiedAt).toLocaleDateString()}
                     </span>
                   )}
                 </div>
@@ -129,7 +129,7 @@ export default function PendingAcfpList({ initialList }: PendingAcfpListProps) {
                   </>
                 ) : (
                   <>
-                    <Check className="h-4 w-4" /> Approve & Certify
+                    <Check className="h-4 w-4" /> Approve & Activate
                   </>
                 )}
               </button>

@@ -51,6 +51,9 @@ export default async function ConsultantProfilePage() {
       hasClinicPickup: profile.hasClinicPickup,
       hasSelfDispatch: profile.hasSelfDispatch,
       hasAyurwedDelivery: profile.hasAyurwedDelivery,
+      procurementDeclaration: profile.procurementDeclaration,
+      procurementReference: profile.procurementReference,
+      registrationNumber: profile.registrationNumber,
     }
   };
 

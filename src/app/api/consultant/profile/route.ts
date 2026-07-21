@@ -10,7 +10,9 @@ export async function PATCH(req: Request) {
     const { 
       targetUserId, name, avatar, degree, specialization, experience, bio, languages, consultationFee, followUpFee,
       isCaiCertified, isVerified, isAcfp, fulfillmentMethod,
-      hasClinicPickup, hasSelfDispatch, hasAyurwedDelivery
+      hasClinicPickup, hasSelfDispatch, hasAyurwedDelivery,
+      procurementDeclaration, procurementReference,
+      registrationNumber
     } = body;
 
     const isAdmin = session && (session.user as any).role === 'ADMIN';
@@ -49,6 +51,9 @@ export async function PATCH(req: Request) {
           hasClinicPickup: hasClinicPickup !== undefined ? Boolean(hasClinicPickup) : undefined,
           hasSelfDispatch: hasSelfDispatch !== undefined ? Boolean(hasSelfDispatch) : undefined,
           hasAyurwedDelivery: hasAyurwedDelivery !== undefined ? Boolean(hasAyurwedDelivery) : undefined,
+          procurementDeclaration: procurementDeclaration !== undefined ? Boolean(procurementDeclaration) : undefined,
+          procurementReference: procurementReference !== undefined ? procurementReference : undefined,
+          registrationNumber: registrationNumber !== undefined ? registrationNumber : undefined,
           // Admin override flags
           isCaiCertified: (isAdmin && isCaiCertified !== undefined) ? isCaiCertified : undefined,
           isVerified: (isAdmin && isVerified !== undefined) ? isVerified : undefined,

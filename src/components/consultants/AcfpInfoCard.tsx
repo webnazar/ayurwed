@@ -19,10 +19,10 @@ export default function AcfpInfoCard() {
           </div>
           <div>
             <h4 className="font-bold text-brand-green text-sm sm:text-base">
-              What is an AYURWED Certified Consultant & Fulfillment Partner?
+              What is an AYURWED Certified Practitioner (ACP)?
             </h4>
             <p className="text-[11px] text-brand-foreground/50 font-medium">
-              Click to learn about this exclusive clinical designation
+              Click to learn about this official clinical credential
             </p>
           </div>
         </div>
@@ -41,21 +41,21 @@ export default function AcfpInfoCard() {
       >
         <div className="p-6 space-y-4 text-sm text-brand-foreground/80 leading-relaxed">
           <p>
-            <strong>AYURWED Certified Consultant & Fulfillment Partners (ACFP)</strong> are verified Ayurvedic practitioners who have successfully completed AYURWED certification, adopted the Ancient Intelligence Prescription Platform, and are capable of providing end-to-end patient care.
+            <strong>AYURWED Certified Practitioners (ACP)</strong> are verified Ayurvedic practitioners who have successfully completed the **Certificate in Ancient Intelligence (CAI)** program. They are recognized experts in utilizing the Ancient Intelligence platform to deliver personalized patient care.
           </p>
           <div className="space-y-2.5 pt-2">
             <p className="font-bold text-brand-green text-xs uppercase tracking-wider">
-              They provide:
+              They utilize:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 'Personalized Consultation',
                 'AI-Assisted Prescription',
-                'Preparation-Based Treatment',
-                'Digital Patient Records',
-                'Offline Clinical Practice',
-                'Online Consultation',
-                'Medicine Fulfillment',
+                'Extract-Based Treatment Plans',
+                'Secure Digital Patient Records',
+                'In Clinic Consultations',
+                'Online Video Consultations',
+                'Ancient Extract Analysis',
                 'Long-Term Follow-up'
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-2 text-xs font-semibold text-brand-foreground/70">
@@ -66,7 +66,7 @@ export default function AcfpInfoCard() {
             </div>
           </div>
           <p className="text-xs text-brand-foreground/50 border-t border-brand-green-light/20 pt-3">
-            This designation represents AYURWED's commitment to quality, trust, and personalized Ayurvedic healthcare.
+            This designation represents AYURWED's commitment to clinical expertise, trust, and advanced Ayurvedic healthcare.
           </p>
         </div>
       </div>

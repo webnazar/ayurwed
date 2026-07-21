@@ -100,7 +100,7 @@ export default function ConsultantFulfillmentClient({ initialFulfillments }: { i
         };
       case 'AYURWED_DELIVERY':
         return {
-          label: 'AYURWED Delivery',
+          label: 'Doctor Logistics Delivery',
           icon: <Truck className="h-3 w-3 text-brand-gold-dark" />,
           badgeClass: 'bg-brand-gold/25 text-brand-gold-dark border border-brand-gold/30'
         };

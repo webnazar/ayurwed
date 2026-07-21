@@ -71,6 +71,9 @@ export default async function AdminEditProfilePage(props: { params: Promise<{ id
                 hasClinicPickup: user.consultantProfile.hasClinicPickup,
                 hasSelfDispatch: user.consultantProfile.hasSelfDispatch,
                 hasAyurwedDelivery: user.consultantProfile.hasAyurwedDelivery,
+                procurementDeclaration: user.consultantProfile.procurementDeclaration,
+                procurementReference: user.consultantProfile.procurementReference,
+                registrationNumber: user.consultantProfile.registrationNumber,
               }
             }}
           />

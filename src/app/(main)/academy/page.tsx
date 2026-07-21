@@ -341,10 +341,10 @@ export default async function AcademyPage() {
               Your Journey Beyond Certification
             </h2>
             <p className="text-sm sm:text-base md:text-lg text-brand-green-light leading-relaxed">
-              Completing the Certificate in Ancient Intelligence (CAI) makes eligible practitioners capable of applying to become an <strong>AYURWED Certified Consultant & Fulfillment Partner (ACFP)</strong>.
+              Completing the Certificate in Ancient Intelligence (CAI) awards practitioners the official title of <strong>AYURWED Certified Practitioner (ACP)</strong>.
             </p>
             <p className="text-xs sm:text-sm text-brand-green-light/80 max-w-2xl mx-auto">
-              This is not another course or certificate. It is a professional recognition and verified membership awarded to qualified practitioners who successfully complete clinical verification and become part of the trusted AYURWED network.
+              This is a permanent professional credential recognizing your expertise. To list your services, receive bookings, and use our clinical dashboard and digital prescription writer, doctors subscribe to our simple yearly Platform Access.
             </p>
           </div>
 
@@ -353,10 +353,10 @@ export default async function AcademyPage() {
             {[
               { step: '01', title: 'Learn', desc: 'Acquire foundational knowledge of AEIS™.' },
               { step: '02', title: 'Certificate in Ancient Intelligence (CAI)', desc: 'Complete the flagship educational program.' },
-              { step: '03', title: 'Apply for Verification', desc: 'Submit clinical credentials on your dashboard.' },
-              { step: '04', title: 'Clinic & Practitioner Verification', desc: 'Undergo rigorous practitioner & clinic verification.' },
-              { step: '05', title: 'Become AYURWED Certified Consultant & Fulfillment Partner (ACFP)', desc: 'Awarded premium badge and verified network status.' },
-              { step: '06', title: 'Start Receiving Patients', desc: 'Start providing end-to-end care and medicine fulfillment.' }
+              { step: '03', title: 'Earn ACP Title', desc: 'Officially become an AYURWED Certified Practitioner.' },
+              { step: '04', title: 'Activate Platform Access', desc: 'Pay the yearly platform access subscription.' },
+              { step: '05', title: 'Access Practice Tools', desc: 'Gain full access to virtual appointments, digital prescriptions, and practitioner dashboard.' },
+              { step: '06', title: 'Start Consulting', desc: 'Begin consulting patients and delivering personalized care.' }
             ].map((node, i) => (
               <div key={i} className="flex flex-col items-center text-center space-y-4 group relative">
                 {/* Step Circle */}

@@ -162,7 +162,7 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
         };
       case 'AYURWED_DELIVERY':
         return {
-          label: 'AYURWED Delivery',
+          label: 'Doctor Logistics Delivery',
           icon: <Truck className="h-3.5 w-3.5 text-brand-gold-dark" />,
           badgeClass: 'bg-brand-gold/25 text-brand-gold-dark border border-brand-gold/30'
         };
@@ -570,7 +570,7 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
                                           onChange={() => setSelectedMethods(prev => ({ ...prev, [a.prescription.fulfillment.id]: 'AYURWED_DELIVERY' }))}
                                           className="text-brand-green focus:ring-brand-green cursor-pointer"
                                         />
-                                        <span className="text-xs font-bold">AYURWED Delivery</span>
+                                        <span className="text-xs font-bold">Doctor Logistics Delivery</span>
                                       </label>
                                     )}
                                     {!a.consultant?.hasClinicPickup && !a.consultant?.hasSelfDispatch && !a.consultant?.hasAyurwedDelivery && (

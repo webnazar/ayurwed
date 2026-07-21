@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { Save, UserCircle, Stethoscope, Languages, Clock, Pencil, Truck } from 'lucide-react';
+import { Save, UserCircle, Stethoscope, Languages, Clock, Pencil, Truck, ShieldCheck } from 'lucide-react';
 import ImageUploadCrop from '@/components/admin/ImageUploadCrop';
 
 interface ConsultantProfileProps {
@@ -24,6 +24,9 @@ interface ConsultantProfileProps {
     hasClinicPickup?: boolean;
     hasSelfDispatch?: boolean;
     hasAyurwedDelivery?: boolean;
+    procurementDeclaration?: boolean;
+    procurementReference?: string | null;
+    registrationNumber?: string | null;
   };
 }
 
@@ -52,6 +55,16 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
     hasClinicPickup: data.profile.hasClinicPickup || false,
     hasSelfDispatch: data.profile.hasSelfDispatch || false,
     hasAyurwedDelivery: data.profile.hasAyurwedDelivery || false,
+    procurementDeclaration: data.profile.procurementDeclaration || false,
+    procurementReference: data.profile.procurementReference || '',
+    registrationNumber: data.profile.registrationNumber || '',
+  });
+
+  const [fulfillmentMode, setFulfillmentMode] = useState<'PRESCRIPTION_ONLY' | 'BOTH'>(() => {
+    if (data.profile.hasClinicPickup || data.profile.hasSelfDispatch || data.profile.hasAyurwedDelivery) {
+      return 'BOTH';
+    }
+    return 'PRESCRIPTION_ONLY';
   });
   
   const [saving, setSaving] = useState(false);
@@ -72,6 +85,7 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setSaving(true);
     
     // Parse comma-separated string back to array
@@ -79,6 +93,8 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
       .split(',')
       .map(lang => lang.trim())
       .filter(lang => lang.length > 0);
+
+    const isFulfilling = fulfillmentMode === 'BOTH';
 
     try {
       const res = await fetch('/api/consultant/profile', {
@@ -99,9 +115,12 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
           isVerified: form.isVerified,
           isAcfp: form.isAcfp,
           fulfillmentMethod: form.fulfillmentMethod,
-          hasClinicPickup: form.hasClinicPickup,
-          hasSelfDispatch: form.hasSelfDispatch,
-          hasAyurwedDelivery: form.hasAyurwedDelivery,
+          hasClinicPickup: isFulfilling,
+          hasSelfDispatch: isFulfilling,
+          hasAyurwedDelivery: false,
+          procurementDeclaration: isFulfilling ? form.procurementDeclaration : false,
+          procurementReference: isFulfilling ? form.procurementReference : '',
+          registrationNumber: form.registrationNumber,
         }),
       });
       if (res.ok) {
@@ -173,12 +192,20 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
         </h2>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="sm:col-span-2">
+          <div>
             <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5 flex items-center gap-1">
               <Stethoscope className="h-3.5 w-3.5" /> Degree / Qualifications *
             </label>
             <input required type="text" value={form.degree} onChange={e => setForm(f => ({ ...f, degree: e.target.value }))} 
               placeholder="e.g. BAMS, MD (Ayurveda)"
+              className={inp} />
+          </div>
+          <div>
+            <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5 flex items-center gap-1">
+              <ShieldCheck className="h-3.5 w-3.5 text-brand-gold-dark" /> Registration No *
+            </label>
+            <input required type="text" value={form.registrationNumber} onChange={e => setForm(f => ({ ...f, registrationNumber: e.target.value }))} 
+              placeholder="e.g. AYUSH-90248-IND"
               className={inp} />
           </div>
           <div>
@@ -226,72 +253,101 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
       {/* Fulfillment Settings */}
       <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-5">
         <h2 className="font-bold text-brand-green flex items-center gap-2 border-b border-brand-green-light pb-3">
-          <Truck className="h-5 w-5" /> Fulfillment Settings
+          <Truck className="h-5 w-5" /> Fulfillment & Practice Settings
         </h2>
-        <div className="space-y-4">
+        <div className="space-y-6">
           <p className="text-xs text-brand-foreground/70 leading-relaxed">
-            As an AYURWED Certified Consultant & Fulfillment Partner (ACFP), you are required to fulfill prescribed medicines. Please select the fulfillment options you support (select all that apply).
+            Select your preferred medicine dispensing model on the platform. Depending on your choice, patients will either purchase medicines independently or request fulfillment directly from you.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <label className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${
-              form.hasClinicPickup
-                ? 'border-brand-gold bg-brand-gold-light/40 text-brand-gold-dark font-bold'
-                : 'border-border hover:border-brand-green hover:bg-brand-green-light/30 text-brand-foreground/70'
-            }`}>
-              <input
-                type="checkbox"
-                checked={form.hasClinicPickup}
-                onChange={(e) => setForm(f => ({ ...f, hasClinicPickup: e.target.checked }))}
-                className="mt-1 text-brand-green focus:ring-brand-green cursor-pointer h-4 w-4 rounded"
-              />
-              <div>
-                <span className="text-sm font-bold block text-brand-green">Clinic Pickup</span>
-                <span className="text-[10px] text-brand-foreground/60 block mt-1 leading-normal">
-                  Give medicine in clinic directly to the patient.
-                </span>
-              </div>
-            </label>
 
-            <label className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${
-              form.hasSelfDispatch
-                ? 'border-brand-gold bg-brand-gold-light/40 text-brand-gold-dark font-bold'
-                : 'border-border hover:border-brand-green hover:bg-brand-green-light/30 text-brand-foreground/70'
-            }`}>
-              <input
-                type="checkbox"
-                checked={form.hasSelfDispatch}
-                onChange={(e) => setForm(f => ({ ...f, hasSelfDispatch: e.target.checked }))}
-                className="mt-1 text-brand-green focus:ring-brand-green cursor-pointer h-4 w-4 rounded"
-              />
+          {/* Mode Selector */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={() => setFulfillmentMode('PRESCRIPTION_ONLY')}
+              className={`text-left p-5 rounded-2xl border-2 transition-all duration-200 flex flex-col justify-between ${
+                fulfillmentMode === 'PRESCRIPTION_ONLY'
+                  ? 'border-brand-gold bg-brand-gold-light/40 shadow-sm'
+                  : 'border-border hover:border-brand-green hover:bg-brand-green-light/10'
+              }`}
+            >
               <div>
-                <span className="text-sm font-bold block text-brand-green">Doctor Self-Dispatch</span>
-                <span className="text-[10px] text-brand-foreground/60 block mt-1 leading-normal">
-                  Dispatch the prescribed medicines to the patient by yourself.
+                <span className="text-sm font-bold block text-brand-green mb-1">Option A: Prescription Only</span>
+                <span className="text-[11px] text-brand-foreground/75 leading-relaxed block">
+                  You only write prescriptions. Patients procure medicines independently outside of the platform. No inventory or shipping required from you.
                 </span>
               </div>
-            </label>
+            </button>
 
-            <label className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 ${
-              form.hasAyurwedDelivery
-                ? 'border-brand-gold bg-brand-gold-light/40 text-brand-gold-dark font-bold'
-                : 'border-border hover:border-brand-green hover:bg-brand-green-light/30 text-brand-foreground/70'
-            }`}>
-              <input
-                type="checkbox"
-                checked={form.hasAyurwedDelivery}
-                onChange={(e) => setForm(f => ({ ...f, hasAyurwedDelivery: e.target.checked }))}
-                className="mt-1 text-brand-green focus:ring-brand-green cursor-pointer h-4 w-4 rounded"
-              />
+            <button
+              type="button"
+              onClick={() => setFulfillmentMode('BOTH')}
+              className={`text-left p-5 rounded-2xl border-2 transition-all duration-200 flex flex-col justify-between ${
+                fulfillmentMode === 'BOTH'
+                  ? 'border-brand-gold bg-brand-gold-light/40 shadow-sm'
+                  : 'border-border hover:border-brand-green hover:bg-brand-green-light/10'
+              }`}
+            >
               <div>
-                <span className="text-sm font-bold block text-brand-green">AYURWED Delivery</span>
-                <span className="text-[10px] text-brand-foreground/60 block mt-1 leading-normal">
-                  AYURWED platform handles the delivery to the patient.
+                <span className="text-sm font-bold block text-brand-green mb-1">Option B: Prescription & Fulfillment (Both)</span>
+                <span className="text-[11px] text-brand-foreground/75 leading-relaxed block">
+                  You prescribe and dispense medicines under your practitioner registration. Patients can order prescribed medicines directly through your fulfillment options.
                 </span>
               </div>
-            </label>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Conditionally show Compliance & Procurement Declarations only for BOTH */}
+      {fulfillmentMode === 'BOTH' && (
+        <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-5">
+          <h2 className="font-bold text-brand-green flex items-center gap-2 border-b border-brand-green-light pb-3">
+            <ShieldCheck className="h-5 w-5 text-brand-gold-dark" />
+            <span>Compliance & Procurement Declarations</span>
+          </h2>
+          <div className="space-y-4">
+            <p className="text-xs text-brand-foreground/70 leading-relaxed">
+              To satisfy Ayurwed practitioner exemptions, you must declare your independent procurement and verify that all medicines/preparations are stocked and dispensed directly under your own registration.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5">
+                  Manufacturer/Supplier Account Reference *
+                </label>
+                <input
+                  required={fulfillmentMode === 'BOTH'}
+                  type="text"
+                  value={form.procurementReference}
+                  onChange={(e) => setForm(f => ({ ...f, procurementReference: e.target.value }))}
+                  placeholder="e.g., Account ID, Registration No, or Supplier Reference Details"
+                  className={inp}
+                />
+                <p className="text-[10px] text-brand-foreground/40 mt-1.5 pl-1">
+                  Enter your direct supplier/manufacturer account ID or reference under which you procure preparations.
+                </p>
+              </div>
+
+              <label className="flex items-start gap-3 p-4 bg-brand-green-light/10 border border-brand-green/10 rounded-2xl cursor-pointer hover:bg-brand-green-light/25 transition-colors">
+                <input
+                  type="checkbox"
+                  required={fulfillmentMode === 'BOTH'}
+                  checked={form.procurementDeclaration}
+                  onChange={(e) => setForm(f => ({ ...f, procurementDeclaration: e.target.checked }))}
+                  className="mt-1 h-4 w-4 rounded text-brand-green focus:ring-brand-green cursor-pointer"
+                />
+                <div>
+                  <span className="text-xs font-bold block text-brand-green">Independent Practitioner Exemption Agreement *</span>
+                  <span className="text-[11px] text-brand-foreground/75 block mt-1 leading-normal">
+                    I confirm that I independently procure, stock, and dispense all medicines/preparations under my own Ayurvedic practitioner registration. AYURWED does not supply, stock, invoice, or ship medicine on my behalf.
+                  </span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Admin Controls */}
       {data.adminTargetUserId && (

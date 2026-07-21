@@ -81,7 +81,6 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
   const [patientPhone, setPatientPhone] = useState(initialUserPhone);
   const [chronicDiseases, setChronicDiseases] = useState('');
   const [allergies, setAllergies] = useState('');
-  const [acknowledgedFulfillment, setAcknowledgedFulfillment] = useState(false);
 
   useEffect(() => {
     if (session?.user?.name && !patientName) {
@@ -104,11 +103,6 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
 
     if (!date || !slot) {
       toast.error('Please select a date and time slot');
-      return;
-    }
-
-    if (consultant.isAcfp && !acknowledgedFulfillment) {
-      toast.error('Please acknowledge the medicine fulfillment policy');
       return;
     }
 
@@ -175,7 +169,7 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
           <p><strong>Consultant:</strong> {consultant.name}</p>
           <p><strong>Date:</strong> {date}</p>
           <p><strong>Time:</strong> {slot}</p>
-          <p><strong>Type:</strong> {type === 'VIDEO' ? 'Online' : 'In-Person'}</p>
+          <p><strong>Type:</strong> {type === 'VIDEO' ? 'Online' : 'In Clinic'}</p>
           <p><strong>Fee Paid:</strong> {formatPrice(selectedFee)}</p>
         </div>
         <button
@@ -198,7 +192,7 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
         <div className="grid grid-cols-2 gap-3">
           {([
             { key: 'VIDEO', label: 'Online', icon: Video },
-            { key: 'OFFLINE', label: 'In-Person', icon: MapPin },
+            { key: 'OFFLINE', label: 'In Clinic', icon: MapPin },
           ] as const).map((mode) => {
             const Icon = mode.icon;
             return (
@@ -363,32 +357,6 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
           required
         />
       </div>
-
-      {/* ACFP Fulfillment Acknowledgment */}
-      {consultant.isAcfp && (
-        <label className="flex items-start gap-3 p-4 bg-brand-gold-light/20 border border-brand-gold/20 rounded-2xl cursor-pointer hover:bg-brand-gold-light/40 transition-colors">
-          <input
-            type="checkbox"
-            checked={acknowledgedFulfillment}
-            onChange={(e) => setAcknowledgedFulfillment(e.target.checked)}
-            required
-            className="mt-1 h-4 w-4 rounded text-brand-green focus:ring-brand-green cursor-pointer"
-          />
-          <div className="text-[11px] leading-relaxed text-brand-foreground/80">
-            <span className="font-bold text-brand-green block mb-0.5">Medicine Fulfillment Acknowledgment</span>
-            I understand that {consultant.name} will prepare and fulfill my prescribed Ayurvedic medicine plan via:
-            <ul className="list-disc pl-4 mt-1 space-y-0.5 text-brand-gold-dark font-extrabold">
-              {consultant.hasClinicPickup && <li>Clinic Pickup</li>}
-              {consultant.hasSelfDispatch && <li>Doctor Self-Dispatch</li>}
-              {consultant.hasAyurwedDelivery && <li>AYURWED Delivery</li>}
-              {!consultant.hasClinicPickup && !consultant.hasSelfDispatch && !consultant.hasAyurwedDelivery && (
-                <li className="italic text-brand-foreground/50">To be discussed with the doctor</li>
-              )}
-            </ul>
-            I agree to receive/collect the medicines after my consultation.
-          </div>
-        </label>
-      )}
 
       {/* Checkout and Fee summary */}
       <div className="bg-brand-gold-light/60 rounded-3xl p-5 border border-brand-gold/20 flex items-center justify-between">

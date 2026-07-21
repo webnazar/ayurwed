@@ -21,17 +21,17 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
 
   const handleApply = async () => {
     setLoading(true);
-    const toastId = toast.loading('Submitting ACFP verification...');
+    const toastId = toast.loading('Initializing Platform Access activation...');
     try {
       const res = await fetch('/api/consultant/acfp', {
         method: 'POST',
       });
       if (res.ok) {
-        toast.success('Congratulations! You are now an AYURWED Certified Consultant & Fulfillment Partner!', { id: toastId });
+        toast.success('Congratulations! Your Yearly Platform Access is now Active!', { id: toastId });
         router.refresh();
       } else {
         const err = await res.json();
-        toast.error(err.error || 'Failed to submit application.', { id: toastId });
+        toast.error(err.error || 'Failed to activate Platform Access.', { id: toastId });
       }
     } catch {
       toast.error('An unexpected error occurred.', { id: toastId });
@@ -45,7 +45,7 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
       <div className="border-b border-border pb-4">
         <h2 className="text-xl font-extrabold text-brand-green dark:text-foreground">Professional Credentials & Status</h2>
         <p className="text-xs text-brand-foreground/50 dark:text-muted-foreground mt-1">
-          Manage your educational standing and verified network membership options.
+          Manage your educational credentials and active platform subscription details.
         </p>
       </div>
 
@@ -70,7 +70,7 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
               </div>
               {isCaiCertified ? (
                 <span className="inline-flex items-center gap-1 bg-brand-green text-white dark:bg-brand-green dark:text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-brand-green/35 shadow-sm">
-                  <Check className="h-3 w-3" /> Certified
+                  <Check className="h-3 w-3" /> ACP Certified
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 bg-brand-gold/20 text-brand-gold-dark dark:text-brand-gold text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-brand-gold/30">
@@ -85,7 +85,7 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
                 Certificate in Ancient Intelligence (CAI)
               </h3>
               <p className="text-sm text-brand-foreground/70 dark:text-muted-foreground leading-relaxed">
-                The flagship educational certification of AYURWED Academy. Learn to integrate Ancient Intelligence, Artificial Intelligence, and the Ancient Intelligence Prescription Platform into your clinical practice.
+                Earn the title of **AYURWED Certified Practitioner (ACP)** upon completing our flagship educational program. Learn to integrate Ancient Intelligence, Artificial Intelligence, and the Ancient Intelligence Prescription Platform into your clinical practice.
               </p>
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
           </div>
         </div>
 
-        {/* CARD 2: AYURWED Certified Consultant & Fulfillment Partner (ACFP) */}
+        {/* CARD 2: Yearly Platform Subscription (Platform Fee) */}
         <div className={`relative overflow-hidden rounded-3xl border p-8 flex flex-col justify-between h-full transition-all duration-300 shadow-sm ${
           isAcfp 
             ? 'bg-brand-green-light/20 border-brand-green/20 dark:bg-brand-green-light/5 dark:border-brand-green/20' 
@@ -139,15 +139,15 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
               </div>
               {isAcfp ? (
                 <span className="inline-flex items-center gap-1 bg-brand-gold text-brand-green dark:bg-brand-gold/20 dark:text-brand-gold text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider border border-brand-gold shadow-sm">
-                  <Sparkles className="h-3 w-3" /> Verified Partner
+                  <Sparkles className="h-3 w-3" /> Platform Active
                 </span>
               ) : isPending ? (
                 <span className="inline-flex items-center gap-1 bg-brand-gold/20 text-brand-gold-dark dark:text-brand-gold text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-brand-gold/30 animate-pulse">
-                  Pending Audit
+                  Activation Pending
                 </span>
               ) : isCaiCertified ? (
                 <span className="inline-flex items-center gap-1 bg-brand-gold/20 text-brand-gold text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-brand-gold/30">
-                  Eligible to Apply
+                  Ready to Activate
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 bg-foreground/5 text-foreground/40 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-border">
@@ -158,13 +158,13 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
 
             <div className="space-y-2">
               <span className={`text-[10px] font-bold uppercase tracking-widest ${isCaiCertified && !isAcfp && !isPending ? 'text-brand-gold/80' : 'text-brand-foreground/40 dark:text-muted-foreground'}`}>
-                Option 02: Verified Network
+                Option 02: Yearly Subscription
               </span>
               <h3 className={`text-xl font-bold ${isCaiCertified && !isAcfp && !isPending ? 'text-white dark:text-foreground' : 'text-brand-green dark:text-foreground'}`}>
-                AYURWED Certified Partner (ACFP)
+                Yearly Platform Access
               </h3>
               <p className={`text-sm ${isCaiCertified && !isAcfp && !isPending ? 'text-brand-green-light dark:text-muted-foreground' : 'text-brand-foreground/70 dark:text-muted-foreground'} leading-relaxed`}>
-                Professional recognition and verified membership. Join a curated network of trusted Ayurvedic practitioners using Ancient Intelligence to deliver personalized patient care and medicine fulfillment.
+                Access to clinical practice tools. Keep your professional profile, scheduling systems, digital prescription writer, and patient tracking tools active on the platform with our simple yearly subscription.
               </p>
             </div>
           </div>
@@ -176,7 +176,7 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
                 className="w-full bg-brand-green/10 text-brand-green dark:bg-brand-green/20 dark:text-brand-green-light border border-brand-green/20 font-bold px-5 py-3 rounded-full text-sm flex items-center justify-center gap-2 cursor-not-allowed"
               >
                 <ShieldCheck className="h-4 w-4 text-brand-gold" />
-                <span>Verified & Active Partner</span>
+                <span>Subscription Active & Paid</span>
               </button>
             ) : isPending ? (
               <button
@@ -184,7 +184,7 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
                 className="w-full bg-brand-gold/10 text-brand-gold-dark dark:bg-brand-gold/10 dark:text-brand-gold border border-brand-gold/20 font-bold px-5 py-3 rounded-full text-sm flex items-center justify-center gap-2 cursor-not-allowed"
               >
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Under Administrative Review</span>
+                <span>Activation Under Review</span>
               </button>
             ) : isCaiCertified ? (
               <button
@@ -195,12 +195,12 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Submitting Application...</span>
+                    <span>Activating platform access...</span>
                   </>
                 ) : (
                   <>
                     <ShieldCheck className="h-4 w-4" />
-                    <span>Apply for ACFP Verification</span>
+                    <span>Pay Platform Fee & Activate</span>
                   </>
                 )}
               </button>

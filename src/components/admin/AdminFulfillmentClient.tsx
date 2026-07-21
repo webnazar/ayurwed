@@ -77,7 +77,7 @@ export default function AdminFulfillmentClient({ initialFulfillments }: { initia
         };
       case 'AYURWED_DELIVERY':
         return {
-          label: 'AYURWED Delivery',
+          label: 'Doctor Logistics Delivery',
           badgeClass: 'bg-brand-gold/15 text-brand-gold-dark border border-brand-gold/30'
         };
       default:
@@ -126,7 +126,7 @@ export default function AdminFulfillmentClient({ initialFulfillments }: { initia
             <option value="ALL">All Methods</option>
             <option value="CLINIC_PICKUP">Clinic Pickup</option>
             <option value="SELF_DISPATCH">Doctor Self-Dispatch</option>
-            <option value="AYURWED_DELIVERY">AYURWED Delivery</option>
+            <option value="AYURWED_DELIVERY">Doctor Logistics Delivery</option>
             <option value="COURIER">Courier (Legacy)</option>
             <option value="PICKUP">Pickup (Legacy)</option>
           </select>

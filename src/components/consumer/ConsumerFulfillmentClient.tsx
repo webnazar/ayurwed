@@ -129,7 +129,7 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
         };
       case 'AYURWED_DELIVERY':
         return {
-          label: 'AYURWED Delivery',
+          label: 'Doctor Logistics Delivery',
           icon: <Truck className="h-3 w-3 text-brand-gold-dark" />,
           badgeClass: 'bg-brand-gold/25 text-brand-gold-dark border border-brand-gold/30'
         };
@@ -184,7 +184,7 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
           <Package className="h-12 w-12 text-brand-gold mx-auto animate-pulse-slow" />
           <h3 className="text-xl font-bold text-brand-green">No Medicine Orders</h3>
           <p className="text-sm text-brand-foreground/60 max-w-sm mx-auto">
-            You don't have any medicine orders matching your current filter. Prescriptions finalized by ACFP partners will show up here automatically.
+            You don't have any medicine orders matching your current filter. Prescriptions finalized by certified practitioners will show up here automatically.
           </p>
         </div>
       ) : (
@@ -386,7 +386,7 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
                                     className="text-brand-green focus:ring-brand-green cursor-pointer"
                                   />
                                   <div className="text-xs">
-                                    <span className="block font-bold">AYURWED Delivery</span>
+                                    <span className="block font-bold">Doctor Logistics Delivery</span>
                                   </div>
                                 </label>
                               )}

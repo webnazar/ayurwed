@@ -117,13 +117,13 @@ export default function DoctorsGridClient({ consultants }: { consultants: Consul
                   {c.isCaiCertified && (
                     <span className="bg-brand-green/10 text-brand-green border border-brand-green/20 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Award className="h-2.5 w-2.5 text-brand-gold-dark" />
-                      <span>CAI Certified</span>
+                      <span>ACP Certified</span>
                     </span>
                   )}
                   {c.isAcfp && (
                     <span className="bg-brand-gold/20 text-brand-gold-dark border border-brand-gold/30 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
                       <ShieldCheck className="h-2.5 w-2.5" />
-                      <span>ACFP Verified</span>
+                      <span>Platform Active</span>
                     </span>
                   )}
                 </div>

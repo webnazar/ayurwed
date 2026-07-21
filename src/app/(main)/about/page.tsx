@@ -270,7 +270,7 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* Column 2: AYURWED Certified Fulfillment Partner (ACFP) */}
+            {/* Column 2: AYURWED Certified Practitioner (ACP) */}
             <div className="bg-gradient-to-br from-brand-green to-[#0d3419] text-white border border-brand-gold/30 rounded-[2rem] p-8 flex flex-col justify-between shadow-md relative overflow-hidden transition-all duration-300">
               {/* Background Accent */}
               <div className="absolute top-0 right-0 w-24 h-24 bg-brand-gold/10 rounded-bl-full"></div>
@@ -280,33 +280,32 @@ export default function AboutPage() {
                   <div className="bg-brand-gold/20 p-3 rounded-2xl text-brand-gold">
                     <Award className="h-6 w-6 animate-pulse-slow" />
                   </div>
-                  <span className="bg-brand-gold text-brand-green text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">Verified</span>
+                  <span className="bg-brand-gold text-brand-green text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">Certified</span>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-extrabold text-white">ACFP Designation</h3>
-                  <p className="text-xs font-bold text-brand-gold uppercase tracking-wider">Professional Recognition • Verified Membership</p>
+                  <h3 className="text-2xl font-extrabold text-white">ACP Designation</h3>
+                  <p className="text-xs font-bold text-brand-gold uppercase tracking-wider">Professional Recognition • Verified Status</p>
                   <p className="text-xs text-brand-green-light leading-relaxed">
-                    After successfully completing the required certification, practitioners may apply to become an AYURWED Certified Fulfillment Partner (ACFP). ACFP is an exclusive professional membership recognizing those meeting our highest standards.
+                    Earned upon completing the flagship CAI course. The AYURWED Certified Practitioner (ACP) designation is the official professional credential representing clinical mastery in Ancient Intelligence and AI-assisted patient care.
                   </p>
                 </div>
 
                 <div className="space-y-3 pt-2">
-                  <p className="text-xs font-bold text-brand-gold border-b border-white/10 pb-1.5">Approved ACFP Members Receive:</p>
+                  <p className="text-xs font-bold text-brand-gold border-b border-white/10 pb-1.5">ACP Certified Practitioners Receive:</p>
                   <ul className="space-y-2.5 text-xs text-brand-green-light">
                     {[
-                      'Verified AYURWED Consultant Profile',
-                      'Official ACFP Verification Badge',
-                      'Online & Clinic Consultation Access',
-                      'AI-Assisted Prescription Tools',
-                      'Secure Digital Patient Records',
-                      'Personalized Treatment Workflow',
-                      'Medicine Fulfillment Support',
+                      'Official ACP Certification Badge',
+                      'Verified Practitioner Credential',
+                      'AYURWED Certified Practitioner Status',
+                      'Access to AI-Assisted Clinical Support',
+                      'Professional Profile Listing',
+                      'Ecosystem Knowledge Base Access',
                       'Continuing Professional Education',
-                      'Priority Platform Benefits'
+                      'Exclusive Practitioner Workshops'
                     ].map((item, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-brand-gold flex-shrink-0 mt-0.5" />
+                        <CheckCircle2 className="h-4 w-4 text-brand-gold flex-shrink-0" />
                         <span className="text-white font-medium">{item}</span>
                       </li>
                     ))}

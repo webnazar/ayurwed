@@ -73,17 +73,19 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto layout-padding-minimal py-10 space-y-8">
-      {/* Breadcrumbs */}
-      <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-brand-foreground/60">
-        <Link href="/" className="hover:text-brand-green">Home</Link>
-        <ChevronRight className="h-3.5 w-3.5" />
-        <span className="text-brand-green font-semibold line-clamp-1">{product.name}</span>
-      </div>
+      {/* Navigation Row (Breadcrumbs & Back Button) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-brand-foreground/60">
+          <Link href="/" className="hover:text-brand-green">Home</Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <span className="text-brand-green font-semibold line-clamp-1">{product.name}</span>
+        </div>
 
-      <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-brand-green hover:text-brand-gold transition-colors">
-        <ArrowLeft className="h-4 w-4" />
-        Back to Home
-      </Link>
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-brand-green hover:text-brand-gold transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back to Home</span>
+        </Link>
+      </div>
 
       <ProductInteraction preparation={productData} />
 

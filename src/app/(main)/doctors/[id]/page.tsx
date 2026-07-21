@@ -84,20 +84,21 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
 
   return (
     <div className="max-w-7xl mx-auto layout-padding-minimal py-10 space-y-8">
-      {/* Breadcrumbs */}
-      <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-brand-foreground/60">
-        <Link href="/" className="hover:text-brand-green">Home</Link>
-        <ChevronRight className="h-3.5 w-3.5" />
-        <Link href="/doctors" className="hover:text-brand-green">Doctors</Link>
-        <ChevronRight className="h-3.5 w-3.5" />
-        <span className="text-brand-green font-semibold line-clamp-1">{consultant.user?.name}</span>
-      </div>
+      {/* Navigation Row (Breadcrumbs & Back Button) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-brand-foreground/60">
+          <Link href="/" className="hover:text-brand-green">Home</Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <Link href="/doctors" className="hover:text-brand-green">Doctors</Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <span className="text-brand-green font-semibold line-clamp-1">{consultant.user?.name}</span>
+        </div>
 
-      {/* Back Button */}
-      <Link href="/doctors" className="inline-flex items-center gap-2 text-sm font-bold text-brand-green hover:text-brand-gold transition-colors">
-        <ArrowLeft className="h-4 w-4" />
-        <span>Back to Doctors</span>
-      </Link>
+        <Link href="/doctors" className="inline-flex items-center gap-2 text-sm font-bold text-brand-green hover:text-brand-gold transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back to Doctors</span>
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Left Column: Doctor Bio & Details */}

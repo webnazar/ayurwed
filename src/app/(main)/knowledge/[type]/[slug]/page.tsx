@@ -56,20 +56,23 @@ export default async function ArticleDetailPage(props: ArticleDetailProps) {
 
   return (
     <div className="max-w-7xl mx-auto layout-padding-minimal py-10">
-      {/* Breadcrumb */}
-      <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-brand-foreground/60 mb-6">
-        <Link href="/" className="hover:text-brand-green">Home</Link>
-        <ChevronRight className="h-3.5 w-3.5" />
-        <Link href="/knowledge" className="hover:text-brand-green">Knowledge Hub</Link>
-        <ChevronRight className="h-3.5 w-3.5" />
-        <Link href={`/knowledge?type=${article.type}`} className="hover:text-brand-green">{typeLabel}</Link>
-        <ChevronRight className="h-3.5 w-3.5" />
-        <span className="text-brand-green font-semibold line-clamp-1">{article.title}</span>
-      </div>
+      {/* Navigation Row (Breadcrumbs & Back Button) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-brand-foreground/60">
+          <Link href="/" className="hover:text-brand-green">Home</Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <Link href="/knowledge" className="hover:text-brand-green">Knowledge Hub</Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <Link href={`/knowledge?type=${article.type}`} className="hover:text-brand-green">{typeLabel}</Link>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <span className="text-brand-green font-semibold line-clamp-1">{article.title}</span>
+        </div>
 
-      <Link href="/knowledge" className="inline-flex items-center gap-2 text-sm font-bold text-brand-green hover:text-brand-gold transition-colors mb-8">
-        <ArrowLeft className="h-4 w-4" /> Back to Knowledge Hub
-      </Link>
+        <Link href="/knowledge" className="inline-flex items-center gap-2 text-sm font-bold text-brand-green hover:text-brand-gold transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back to Knowledge Hub</span>
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Main Content */}

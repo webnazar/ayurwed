@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, Clock, Video, MessageSquare, PhoneCall, CheckCircle, ShieldCheck, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatPrice } from '@/lib/utils';
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { format } from 'date-fns';
 
 interface BookingFormProps {
   consultant: {
@@ -31,6 +32,7 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
   const { data: session } = useSession();
   const router = useRouter();
 
+  const dateInputRef = useRef<HTMLInputElement>(null);
   const [date, setDate] = useState('');
   const [slot, setSlot] = useState('');
   const [type, setType] = useState<'VIDEO' | 'OFFLINE'>('VIDEO');
@@ -167,7 +169,7 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
         </div>
         <div className="bg-brand-green-light/40 rounded-2xl p-4 text-left text-xs space-y-2 text-brand-green">
           <p><strong>Consultant:</strong> {consultant.name}</p>
-          <p><strong>Date:</strong> {date}</p>
+          <p><strong>Date:</strong> {date ? format(new Date(date), 'dd/MM/yyyy') : ''}</p>
           <p><strong>Time:</strong> {slot}</p>
           <p><strong>Type:</strong> {type === 'VIDEO' ? 'Online' : 'In Clinic'}</p>
           <p><strong>Fee Paid:</strong> {formatPrice(selectedFee)}</p>
@@ -219,6 +221,15 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
         <label className="text-xs font-bold text-brand-green uppercase tracking-wider block">Select Date</label>
         <div className="relative">
           <input
+            type="text"
+            value={date ? format(new Date(date), 'dd/MM/yyyy') : ''}
+            placeholder="dd/MM/yyyy"
+            readOnly
+            onClick={() => dateInputRef.current?.showPicker()}
+            className="w-full bg-brand-green-light/40 text-brand-foreground border border-border rounded-2xl py-3 px-4 pl-10 focus:outline-none focus:border-brand-gold text-sm cursor-pointer"
+          />
+          <input
+            ref={dateInputRef}
             type="date"
             value={date}
             onChange={(e) => {
@@ -226,7 +237,7 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
               setSlot('');
             }}
             min={new Date().toISOString().split('T')[0]}
-            className="w-full bg-brand-green-light/40 text-brand-foreground border border-border rounded-2xl py-3 px-4 pl-10 focus:outline-none focus:border-brand-gold text-sm"
+            className="absolute inset-0 opacity-0 pointer-events-none"
             required
           />
           <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-green" />

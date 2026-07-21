@@ -160,27 +160,28 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
           {/* Three Redesigned Sections */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 1. Professional Information */}
-            <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-4 flex flex-col justify-between">
+            <div className="bg-card rounded-3xl p-6 border border-border shadow-sm flex flex-col justify-between">
               <div className="space-y-4">
-                <h3 className="text-base font-extrabold text-brand-green flex items-center gap-2 border-b border-brand-green-light pb-2">
-                  <Stethoscope className="h-4.5 w-4.5 text-brand-gold-dark" /> Professional Info
+                <h3 className="text-base font-extrabold text-brand-green flex items-center gap-2 border-b border-border pb-3">
+                  <Stethoscope className="h-5 w-5 text-brand-gold-dark" />
+                  <span>Professional Info</span>
                 </h3>
-                <div className="space-y-3 text-xs text-brand-foreground/80">
-                  <div>
-                    <span className="block text-brand-foreground/40 font-bold uppercase tracking-wider text-[9px] mb-0.5">Full Name</span>
-                    <span className="font-bold text-sm text-brand-green">{consultant.user?.name}</span>
+                <div className="divide-y divide-border/40">
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">Full Name</span>
+                    <span className="text-sm font-semibold text-brand-green">{consultant.user?.name}</span>
                   </div>
-                  <div>
-                    <span className="block text-brand-foreground/40 font-bold uppercase tracking-wider text-[9px] mb-0.5">Qualification</span>
-                    <span className="font-semibold text-brand-foreground">{consultant.degree || 'BAMS'}</span>
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">Qualification</span>
+                    <span className="text-sm font-semibold text-brand-foreground">{consultant.degree || 'BAMS'}</span>
                   </div>
-                  <div>
-                    <span className="block text-brand-foreground/40 font-bold uppercase tracking-wider text-[9px] mb-0.5">Experience</span>
-                    <span className="font-semibold text-brand-foreground">{consultant.experience} Years</span>
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">Experience</span>
+                    <span className="text-sm font-semibold text-brand-foreground">{consultant.experience} Years</span>
                   </div>
-                  <div>
-                    <span className="block text-brand-foreground/40 font-bold uppercase tracking-wider text-[9px] mb-0.5">Registration Number</span>
-                    <span className="font-mono font-bold bg-brand-green-light/10 text-brand-green px-2 py-0.5 rounded border border-brand-green-border/20">
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">Registration No.</span>
+                    <span className="text-sm font-mono font-bold bg-brand-green-light/20 text-brand-green px-2.5 py-1 rounded-lg border border-brand-green/20">
                       {consultant.registrationNumber || 'AYUR-90248-IND'}
                     </span>
                   </div>
@@ -188,103 +189,110 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
               </div>
             </div>
 
-            {/* 2. AYURWED Credentials */}
-            <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-4 flex flex-col justify-between">
+            {/* 2. Credentials */}
+            <div className="bg-card rounded-3xl p-6 border border-border shadow-sm flex flex-col justify-between">
               <div className="space-y-4">
-                <h3 className="text-base font-extrabold text-brand-green flex items-center gap-2 border-b border-brand-green-light pb-2">
-                  <Award className="h-4.5 w-4.5 text-brand-gold-dark" /> Credentials
+                <h3 className="text-base font-extrabold text-brand-green flex items-center gap-2 border-b border-border pb-3">
+                  <Award className="h-5 w-5 text-brand-gold-dark" />
+                  <span>Credentials</span>
                 </h3>
-                <div className="space-y-3.5 text-xs text-brand-foreground/80">
-                  <div className="flex items-center justify-between">
-                    <span className="text-brand-foreground/60 font-medium">CAI Certification</span>
-                    <span className="bg-brand-green/10 text-brand-green font-extrabold text-[10px] px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-brand-green-border/20">
-                      <CheckCircle className="h-3 w-3" /> Completed
+                <div className="divide-y divide-border/40">
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">CAI Certification</span>
+                    <span className="bg-brand-green/10 text-brand-green font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1 border border-brand-green/20">
+                      <CheckCircle className="h-3.5 w-3.5" /> Completed
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-brand-foreground/60 font-medium">ACFP Membership</span>
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">ACFP Membership</span>
                     {consultant.isAcfp ? (
-                      <span className="bg-brand-gold/20 text-brand-gold-dark font-extrabold text-[10px] px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-brand-gold/30">
-                        <CheckCircle className="h-3 w-3" /> Verified
+                      <span className="bg-brand-gold/20 text-brand-gold-dark font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1 border border-brand-gold/30">
+                        <CheckCircle className="h-3.5 w-3.5" /> Verified
                       </span>
                     ) : (
-                      <span className="bg-brand-foreground/5 text-brand-foreground/40 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                        <XCircle className="h-3 w-3" /> Unverified
+                      <span className="bg-brand-foreground/5 text-brand-foreground/40 font-extrabold text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1">
+                        <XCircle className="h-3.5 w-3.5" /> Unverified
                       </span>
                     )}
                   </div>
-                  {consultant.isAcfp && consultant.acfpVerifiedAt && (
-                    <div>
-                      <span className="block text-brand-foreground/40 font-bold uppercase tracking-wider text-[9px] mb-0.5">Verification Date</span>
-                      <span className="font-semibold text-brand-green">
-                        {format(new Date(consultant.acfpVerifiedAt), 'dd MMMM yyyy')}
-                      </span>
+                  {consultant.isAcfp ? (
+                    <>
+                      {consultant.acfpVerifiedAt && (
+                        <div className="flex items-center justify-between py-3">
+                          <span className="text-sm text-brand-foreground/60 font-medium">Verification Date</span>
+                          <span className="text-sm font-semibold text-brand-green">
+                            {format(new Date(consultant.acfpVerifiedAt), 'dd MMMM yyyy')}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between py-3">
+                        <span className="text-sm text-brand-foreground/60 font-medium">Membership Level</span>
+                        <span className="text-sm font-extrabold text-brand-gold-dark flex items-center gap-1">
+                          Gold Tier <Award className="h-4 w-4 text-brand-gold-dark" />
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-between py-3">
+                      <span className="text-sm text-brand-foreground/60 font-medium">Membership Level</span>
+                      <span className="text-sm font-semibold text-brand-foreground/40">Standard</span>
                     </div>
                   )}
-                  <div className="pt-1 flex items-center gap-1">
-                    <span className="block text-brand-foreground/40 font-bold uppercase tracking-wider text-[9px] mr-1">Verification Badge:</span>
-                    {consultant.isAcfp ? (
-                      <span className="text-brand-gold text-sm font-extrabold">🏆 Gold</span>
-                    ) : (
-                      <span className="text-brand-foreground/30 text-xs">None</span>
-                    )}
-                  </div>
                 </div>
               </div>
             </div>
 
-            {/* 3. Practice Information (Full-width on desktop) */}
+            {/* 3. Practice Information */}
             <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-4 md:col-span-2">
-              <h3 className="text-base font-extrabold text-brand-green flex items-center gap-2 border-b border-brand-green-light pb-2">
-                <Briefcase className="h-4.5 w-4.5 text-brand-gold-dark" /> Practice Info & Settings
+              <h3 className="text-base font-extrabold text-brand-green flex items-center gap-2 border-b border-border pb-3">
+                <Briefcase className="h-5 w-5 text-brand-gold-dark" />
+                <span>Practice Info & Settings</span>
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3.5 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-brand-foreground/60 font-medium">Online Consultation</span>
-                  <span className={`font-bold ${consultant.hasOnline ? 'text-emerald-700' : 'text-brand-foreground/40'}`}>
-                    {consultant.hasOnline ? '✓ Available' : '—'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-brand-foreground/60 font-medium">Offline Consultation</span>
-                  <span className={`font-bold ${consultant.hasOffline ? 'text-emerald-700' : 'text-brand-foreground/40'}`}>
-                    {consultant.hasOffline ? '✓ Available' : '—'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between border-t sm:border-t-0 border-brand-green-light/20 pt-3 sm:pt-0">
-                  <span className="text-brand-foreground/60 font-medium">Medicine Fulfillment</span>
-                  <span className={`font-black ${consultant.isAcfp ? 'text-brand-gold-dark' : 'text-brand-foreground/40'}`}>
-                    {consultant.isAcfp ? '✓ Required (ACFP)' : '—'}
-                  </span>
-                </div>
-                {consultant.isAcfp && (
-                  <div className="flex flex-col gap-1 border-t sm:border-t-0 border-brand-green-light/20 pt-3 sm:pt-0">
-                    <span className="text-brand-foreground/60 font-medium mb-1">Supported Fulfillment Options</span>
-                    <div className="flex flex-col gap-1.5 pl-2">
-                      {consultant.hasClinicPickup && (
-                        <span className="text-brand-green font-bold flex items-center gap-1.5">
-                          ✓ Clinic Pickup
-                        </span>
-                      )}
-                      {consultant.hasSelfDispatch && (
-                        <span className="text-brand-green font-bold flex items-center gap-1.5">
-                          ✓ Doctor Self-Dispatch
-                        </span>
-                      )}
-                      {consultant.hasAyurwedDelivery && (
-                        <span className="text-brand-green font-bold flex items-center gap-1.5">
-                          ✓ AYURWED Delivery
-                        </span>
-                      )}
-                      {!consultant.hasClinicPickup && !consultant.hasSelfDispatch && !consultant.hasAyurwedDelivery && (
-                        <span className="text-brand-foreground/40 italic">None configured yet</span>
-                      )}
-                    </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-0 md:gap-x-12 divide-y md:divide-y-0 divide-border/40">
+                {/* Column 1 */}
+                <div className="space-y-0 divide-y divide-border/40">
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">Online Consultation</span>
+                    <span className={`text-sm font-bold ${consultant.hasOnline ? 'text-emerald-700' : 'text-brand-foreground/40'}`}>
+                      {consultant.hasOnline ? '✓ Available' : '—'}
+                    </span>
                   </div>
-                )}
-                <div className="flex items-center justify-between border-t border-brand-green-light/20 pt-3 sm:col-span-2">
-                  <span className="text-brand-foreground/60 font-medium">Follow-up Consultation</span>
-                  <span className="font-bold text-emerald-700">✓ Available</span>
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">Offline Consultation</span>
+                    <span className={`text-sm font-bold ${consultant.hasOffline ? 'text-emerald-700' : 'text-brand-foreground/40'}`}>
+                      {consultant.hasOffline ? '✓ Available' : '—'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">Follow-up Consults</span>
+                    <span className="text-sm font-bold text-emerald-700">✓ Available</span>
+                  </div>
+                </div>
+
+                {/* Column 2 */}
+                <div className="space-y-0 divide-y divide-border/40 md:border-l md:border-border/30 md:pl-12">
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">Medicine Fulfillment</span>
+                    <span className={`text-sm font-extrabold ${consultant.isAcfp ? 'text-brand-gold-dark' : 'text-brand-foreground/40'}`}>
+                      {consultant.isAcfp ? '✓ Required (ACFP)' : '—'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-sm text-brand-foreground/60 font-medium">Fulfillment Method</span>
+                    <span className="text-sm font-semibold text-brand-foreground capitalize">{consultant.fulfillmentMethod?.toLowerCase() || 'Courier'}</span>
+                  </div>
+                  {consultant.isAcfp && (
+                    <div className="flex items-center justify-between py-3">
+                      <span className="text-sm text-brand-foreground/60 font-medium">Fulfillment Options</span>
+                      <span className="text-sm font-bold text-brand-green text-right">
+                        {[
+                          consultant.hasClinicPickup && 'Clinic Pickup',
+                          consultant.hasSelfDispatch && 'Self-Dispatch',
+                          consultant.hasAyurwedDelivery && 'Delivery'
+                        ].filter(Boolean).join(', ') || 'None'}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

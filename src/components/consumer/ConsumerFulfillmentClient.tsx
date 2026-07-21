@@ -70,7 +70,7 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
 
   const handleConfirmOrder = async (fulfillmentId: number) => {
     const selectedMethod = selectedMethods[fulfillmentId] || 'SELF_DISPATCH';
-    toast.loading('Confirming medicine order...', { id: 'order' });
+    toast.loading('Confirming product order...', { id: 'order' });
     try {
       const res = await fetch('/api/consumer/fulfillment', {
         method: 'PATCH',
@@ -84,7 +84,7 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
       }
 
       toast.dismiss('order');
-      toast.success('Medicine order placed successfully!');
+      toast.success('Product order placed successfully!');
 
       setFulfillments(prev =>
         prev.map(f => (f.id === fulfillmentId ? { ...f, status: 'CONFIRMED', method: selectedMethod } : f))
@@ -182,9 +182,9 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
       {filteredOrders.length === 0 ? (
         <div className="bg-card rounded-3xl p-16 text-center border border-border shadow-sm space-y-4">
           <Package className="h-12 w-12 text-brand-gold mx-auto animate-pulse-slow" />
-          <h3 className="text-xl font-bold text-brand-green">No Medicine Orders</h3>
+          <h3 className="text-xl font-bold text-brand-green">No Product Orders</h3>
           <p className="text-sm text-brand-foreground/60 max-w-sm mx-auto">
-            You don't have any medicine orders matching your current filter. Prescriptions finalized by certified practitioners will show up here automatically.
+            You don't have any product orders matching your current filter. Prescriptions finalized by certified practitioners will show up here automatically.
           </p>
         </div>
       ) : (
@@ -409,7 +409,7 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
                               <>
                                 <p className="font-bold text-brand-green">Courier Dispatch details</p>
                                 <p>
-                                  Your consultant will pack and dispatch your Ayurvedic medicines.
+                                  Your consultant will pack and dispatch your Ayurvedic products.
                                 </p>
                                 {order.trackingNumber && (
                                   <p className="pt-1.5">
@@ -424,7 +424,7 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
                               <>
                                 <p className="font-bold text-brand-green">Clinic Pickup location</p>
                                 <p>
-                                  Please collect your medicine pack directly from the consultant's clinic once status is "Ready for Pickup".
+                                  Please collect your product pack directly from the consultant's clinic once status is "Ready for Pickup".
                                 </p>
                                 <p className="italic text-[10px] text-brand-foreground/60">
                                   Clinic details: Check doctor profile details or contact clinic support.
@@ -440,7 +440,7 @@ export default function ConsumerFulfillmentClient({ initialFulfillments }: { ini
 
                 {/* Medicine Items List */}
                 <div className="space-y-3">
-                  <span className="text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider block">Prescribed Medicines</span>
+                  <span className="text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider block">Prescribed Products</span>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {order.prescription.items.map(item => (
                       <div key={item.id} className="bg-white rounded-2xl p-4 border border-border shadow-sm space-y-2 text-xs">

@@ -70,7 +70,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const menuItems = {
     CONSUMER: [
       { name: 'My Appointments', href: '/consumer/dashboard/appointments', icon: Calendar },
-      { name: 'Medicine Orders', href: '/consumer/dashboard/fulfillment', icon: Package },
+      { name: 'Product Orders', href: '/consumer/dashboard/fulfillment', icon: Package },
       ...(isEnrolled ? [{ name: 'My Courses', href: '/consumer/dashboard/courses', icon: BookOpen }] : []),
     ],
     CONSULTANT: [

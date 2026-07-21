@@ -41,8 +41,8 @@ export default async function ConsumerFulfillmentPage() {
   return (
     <div className="space-y-6">
       <div className="dashboard-header-card">
-        <h1 className="dashboard-header-title">My Medicine Orders</h1>
-        <p className="dashboard-header-subtitle">Track the preparation and delivery of your prescribed Ayurvedic medicines.</p>
+        <h1 className="dashboard-header-title">My Product Orders</h1>
+        <p className="dashboard-header-subtitle">Track the preparation and delivery of your prescribed Ayurvedic products.</p>
       </div>
       <ConsumerFulfillmentClient initialFulfillments={fulfillments as any} />
     </div>

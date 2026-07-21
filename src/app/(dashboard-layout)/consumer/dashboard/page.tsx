@@ -33,7 +33,7 @@ export default async function ConsumerDashboard() {
         <div className="space-y-2">
           <h1 className="dashboard-header-title">Welcome, {session?.user?.name}!</h1>
           <p className="dashboard-header-subtitle">
-            Your Ayurveda wellness hub — manage consultations, track courses, and discover preparations.
+            Your Ayurveda wellness hub — manage consultations and track courses.
           </p>
         </div>
         <div className="hidden md:block bg-brand-gold/15 p-3 rounded-full text-brand-gold">
@@ -42,10 +42,11 @@ export default async function ConsumerDashboard() {
       </div>
 
       {/* Quick Explore Links */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { label: 'Explore Preparations', href: '/preparations', icon: Leaf, desc: 'Discover Ayurvedic products' },
+          { label: 'Browse Academy', href: '/academy', icon: BookOpen, desc: 'Learn Ayurvedic wisdom' },
           { label: 'Find Doctors', href: '/doctors', icon: Calendar, desc: 'Book an expert consultation' },
+          { label: 'Knowledge Hub', href: '/knowledge', icon: Leaf, desc: 'Read health articles & guides' },
         ].map(({ label, href, icon: Icon, desc }) => (
           <Link key={href} href={href}
             className="bg-card rounded-3xl p-5 border border-border shadow-sm hover:shadow-md transition-all group flex items-center gap-4">

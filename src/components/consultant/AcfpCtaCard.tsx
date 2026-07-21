@@ -63,7 +63,7 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
             <div className="flex justify-between items-start">
               <div className={`p-3 rounded-2xl ${
                 isCaiCertified 
-                  ? 'bg-brand-green/15 text-brand-green dark:text-brand-green-light' 
+                  ? 'bg-brand-green/15 text-brand-green dark:text-brand-green' 
                   : 'bg-brand-gold/15 text-brand-gold-dark dark:text-brand-gold'
               }`}>
                 <BookOpen className="h-6 w-6" />
@@ -173,7 +173,7 @@ export default function AcfpCtaCard({ isCaiCertified, isAcfp, isPending }: AcfpC
             {isAcfp ? (
               <button
                 disabled
-                className="w-full bg-brand-green/10 text-brand-green dark:bg-brand-green/20 dark:text-brand-green-light border border-brand-green/20 font-bold px-5 py-3 rounded-full text-sm flex items-center justify-center gap-2 cursor-not-allowed"
+                className="w-full bg-brand-green/10 text-brand-green dark:bg-brand-green/20 dark:text-brand-green border border-brand-green/20 font-bold px-5 py-3 rounded-full text-sm flex items-center justify-center gap-2 cursor-not-allowed"
               >
                 <ShieldCheck className="h-4 w-4 text-brand-gold" />
                 <span>Subscription Active & Paid</span>

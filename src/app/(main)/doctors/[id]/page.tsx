@@ -254,18 +254,14 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
                   <div className="flex items-center justify-between py-3">
                     <span className="text-sm text-brand-foreground/60 font-medium">Online Consultation</span>
                     <span className={`text-sm font-bold ${consultant.hasOnline ? 'text-emerald-700' : 'text-brand-foreground/40'}`}>
-                      {consultant.hasOnline ? '✓ Available' : '—'}
+                      {consultant.hasOnline ? '✓ First & Follow-up' : '—'}
                     </span>
                   </div>
                   <div className="flex items-center justify-between py-3">
                     <span className="text-sm text-brand-foreground/60 font-medium">Offline Consultation</span>
                     <span className={`text-sm font-bold ${consultant.hasOffline ? 'text-emerald-700' : 'text-brand-foreground/40'}`}>
-                      {consultant.hasOffline ? '✓ Available' : '—'}
+                      {consultant.hasOffline ? '✓ First & Follow-up' : '—'}
                     </span>
-                  </div>
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-sm text-brand-foreground/60 font-medium">Follow-up Consults</span>
-                    <span className="text-sm font-bold text-emerald-700">✓ Available</span>
                   </div>
                 </div>
 

@@ -124,12 +124,7 @@ export default async function ConsultantDetailPage(props: ConsultantDetailPagePr
                       <span>ACP Certified</span>
                     </span>
                   )}
-                  {consultant.isAcfp && (
-                    <span className="bg-brand-gold/20 text-brand-gold-dark text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-1 border border-brand-gold/30 shadow-sm">
-                      <ShieldCheck className="h-3.5 w-3.5" />
-                      <span>Platform Active</span>
-                    </span>
-                  )}
+
                 </div>
               </div>
               

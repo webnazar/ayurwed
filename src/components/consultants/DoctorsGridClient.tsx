@@ -120,12 +120,7 @@ export default function DoctorsGridClient({ consultants }: { consultants: Consul
                       <span>ACP Certified</span>
                     </span>
                   )}
-                  {c.isAcfp && (
-                    <span className="bg-brand-gold/20 text-brand-gold-dark border border-brand-gold/30 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                      <ShieldCheck className="h-2.5 w-2.5" />
-                      <span>Platform Active</span>
-                    </span>
-                  )}
+
                 </div>
 
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground pt-1">

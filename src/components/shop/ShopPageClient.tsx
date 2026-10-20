@@ -109,7 +109,13 @@ export default function ShopPageClient({
   const { openCart, totalItems, addItem } = useCart();
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
-  const maxPrice = useMemo(() => Math.ceil(Math.max(...products.map(p => p.sellingPrice), 500) / 100) * 100, [products]);
+  const maxPrice = useMemo(() => {
+    if (!products || products.length === 0) return 5000;
+    const validPrices = products
+      .map((p) => Number(p.sellingPrice))
+      .filter((p) => typeof p === 'number' && !isNaN(p) && p > 0);
+    return Math.ceil(Math.max(...validPrices, 500) / 100) * 100;
+  }, [products]);
   const [priceMax, setPriceMax] = useState<number>(maxPrice);
 
   const toggleCat = (c: string) =>

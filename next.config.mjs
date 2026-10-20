@@ -7,6 +7,10 @@ const nextConfig = {
   output: 'standalone',
   outputFileTracingRoot: __dirname,
   serverExternalPackages: ['@prisma/client'],
+  experimental: {
+    workerThreads: false,
+    cpus: 2,
+  },
   images: {
     remotePatterns: [
       {

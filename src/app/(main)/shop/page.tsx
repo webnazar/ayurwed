@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import ShopPageClient from '@/components/shop/ShopPageClient';
 import type { Metadata } from 'next';
 import { PRODUCT_CATEGORIES } from '@/lib/constants';
+import { serialize } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'AYURWED Shop — Authentic Classical Ayurvedic Medicines & Products',
@@ -49,54 +50,34 @@ interface ShopPageProps {
 }
 
 export default async function ShopPage(props: ShopPageProps) {
-  const searchParams = props.searchParams ? await props.searchParams : {};
+  let searchParams: { [key: string]: string | string[] | undefined } = {};
+  try {
+    searchParams = props.searchParams ? await props.searchParams : {};
+  } catch (err) {
+    console.error('Error reading searchParams in ShopPage:', err);
+  }
+
   const categoryParam = typeof searchParams.category === 'string'
     ? searchParams.category
     : Array.isArray(searchParams.category)
-      ? searchParams.category[0]
+      ? searchParams.category[0] || ''
       : '';
   const searchParam = typeof searchParams.search === 'string'
     ? searchParams.search
     : Array.isArray(searchParams.search)
-      ? searchParams.search[0]
+      ? searchParams.search[0] || ''
       : '';
 
-  const fetchIndications = async () => {
-    try {
-      return await db.indication.findMany({
-        where: { isActive: true },
-        select: { id: true, name: true, symptomsKeywords: true },
-        orderBy: { name: 'asc' },
-      });
-    } catch {
-      // Fallback for stale cached Prisma client
-      const simple = await db.indication.findMany({
-        where: { isActive: true },
-        select: { id: true, name: true },
-        orderBy: { name: 'asc' },
-      });
-      return simple.map(i => ({ ...i, symptomsKeywords: null }));
-    }
-  };
+  let products: any[] = [];
+  let manufacturers: any[] = [];
+  let dbIndications: any[] = [];
+  let dbSymptoms: any[] = [];
+  let dbCategories: any[] = [];
 
-  const fetchSymptoms = async () => {
+  try {
+    // 1. Fetch shop products safely
     try {
-      if ((db as any).symptom) {
-        return await (db as any).symptom.findMany({
-          where: { isActive: true },
-          select: { id: true, name: true },
-          orderBy: { name: 'asc' },
-        });
-      }
-      return [];
-    } catch {
-      return [];
-    }
-  };
-
-  const fetchShopProducts = async () => {
-    try {
-      return await db.product.findMany({
+      products = await db.product.findMany({
         where: { isActive: true },
         orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
         include: {
@@ -107,61 +88,120 @@ export default async function ShopPage(props: ShopPageProps) {
         },
       });
     } catch {
-      const items = await db.product.findMany({
-        where: { isActive: true },
-        orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
-        include: {
-          manufacturer: { select: { id: true, companyName: true } },
-          indications: { select: { id: true, name: true } },
-        },
-      });
-      return items.map((item) => ({ ...item, symptoms: [], categoryRef: null }));
+      try {
+        const items = await db.product.findMany({
+          where: { isActive: true },
+          orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+          include: {
+            manufacturer: { select: { id: true, companyName: true } },
+            indications: { select: { id: true, name: true } },
+          },
+        });
+        products = items.map((item) => ({ ...item, symptoms: [], categoryRef: null }));
+      } catch {
+        products = [];
+      }
     }
-  };
 
-  const fetchCategories = async () => {
+    // 2. Fetch verified manufacturers safely
     try {
-      return await db.category.findMany({
+      manufacturers = await db.manufacturer.findMany({
+        where: { isVerified: true },
+        select: { id: true, companyName: true },
+        orderBy: { companyName: 'asc' },
+      });
+    } catch (err) {
+      console.error('Error fetching manufacturers on ShopPage:', err);
+      manufacturers = [];
+    }
+
+    // 3. Fetch indications safely
+    try {
+      dbIndications = await db.indication.findMany({
+        where: { isActive: true },
+        select: { id: true, name: true, symptomsKeywords: true },
+        orderBy: { name: 'asc' },
+      });
+    } catch {
+      try {
+        const simple = await db.indication.findMany({
+          where: { isActive: true },
+          select: { id: true, name: true },
+          orderBy: { name: 'asc' },
+        });
+        dbIndications = simple.map((i) => ({ ...i, symptomsKeywords: null }));
+      } catch {
+        dbIndications = [];
+      }
+    }
+
+    // 4. Fetch symptoms safely
+    try {
+      if ((db as any).symptom) {
+        dbSymptoms = await (db as any).symptom.findMany({
+          where: { isActive: true },
+          select: { id: true, name: true },
+          orderBy: { name: 'asc' },
+        });
+      }
+    } catch {
+      dbSymptoms = [];
+    }
+
+    // 5. Fetch dynamic categories safely
+    try {
+      dbCategories = await db.category.findMany({
         where: { isActive: true },
         orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
         select: { id: true, name: true },
       });
     } catch {
-      return [];
+      dbCategories = [];
     }
-  };
+  } catch (globalDbErr) {
+    console.error('Global DB error on ShopPage:', globalDbErr);
+  }
 
-  const [products, manufacturers, dbIndications, dbSymptoms, dbCategories] = await Promise.all([
-    fetchShopProducts(),
-    db.manufacturer.findMany({
-      where: { isVerified: true },
-      select: { id: true, companyName: true },
-      orderBy: { companyName: 'asc' },
-    }),
-    fetchIndications(),
-    fetchSymptoms(),
-    fetchCategories(),
-  ]);
-
-  const safeProducts = products.map((p) => ({
-    ...p,
-    category: p.categoryRef?.name || p.category,
-    mrp: Number(p.mrp),
-    sellingPrice: Number(p.sellingPrice),
-    images: (() => { try { return JSON.parse(p.images || '[]'); } catch { return []; } })(),
+  // Sanitize products to plain JSON primitives (no Decimal / Date object leakage to client component)
+  const safeProducts = (products || []).map((p) => ({
+    id: p.id,
+    name: p.name || '',
+    slug: p.slug || '',
+    shortDesc: p.shortDesc || null,
+    botanicalName: p.botanicalName || null,
+    type: p.type || null,
+    category: p.categoryRef?.name || p.category || null,
+    mrp: Number(p.mrp) || 0,
+    sellingPrice: Number(p.sellingPrice) || 0,
+    stock: typeof p.stock === 'number' ? p.stock : 0,
+    unit: p.unit || null,
+    images: (() => {
+      try {
+        if (Array.isArray(p.images)) return p.images;
+        if (typeof p.images === 'string') return JSON.parse(p.images || '[]');
+        return [];
+      } catch {
+        return [];
+      }
+    })(),
+    isFeatured: Boolean(p.isFeatured),
+    tags: p.tags || null,
+    manufacturer: p.manufacturer ? { id: p.manufacturer.id, companyName: p.manufacturer.companyName } : null,
+    indications: Array.isArray(p.indications) ? p.indications.map((ind: any) => ({ id: ind.id, name: ind.name })) : [],
   }));
 
-  const dbCategoryNames = dbCategories.map((c) => c.name);
+  const dbCategoryNames = (dbCategories || []).map((c) => c?.name).filter(Boolean);
   const fromDb = safeProducts.map((p) => p.category).filter(Boolean) as string[];
   const extra = fromDb.filter((c) => !dbCategoryNames.includes(c));
   const categories = dbCategoryNames.length > 0
     ? [...dbCategoryNames, ...new Set(extra)]
     : [...PRODUCT_CATEGORIES, ...new Set(extra)];
 
-  const indicationsList = dbIndications.flatMap((i) => {
+  const indicationsList = (dbIndications || []).flatMap((i) => {
+    if (!i?.name) return [];
     const list = [i.name];
-    if (i.symptomsKeywords) {
-      const keywords = i.symptomsKeywords.split(',').map((k) => k.trim()).filter(Boolean);
+    if (i.symptomsKeywords && typeof i.symptomsKeywords === 'string') {
+      const keywords = i.symptomsKeywords.split(',').map((k: string) => k.trim()).filter(Boolean);
       list.push(...keywords);
     }
     return list;
@@ -169,11 +209,11 @@ export default async function ShopPage(props: ShopPageProps) {
 
   return (
     <ShopPageClient
-      products={safeProducts}
-      manufacturers={manufacturers}
-      categories={categories}
-      dbIndications={indicationsList}
-      rawIndications={dbIndications}
+      products={serialize(safeProducts)}
+      manufacturers={serialize(manufacturers || [])}
+      categories={serialize(categories)}
+      dbIndications={serialize(indicationsList)}
+      rawIndications={serialize(dbIndications || [])}
       initialCategory={categoryParam}
       initialSearch={searchParam}
     />

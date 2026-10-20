@@ -83,46 +83,62 @@ const POPULAR_CATEGORIES = [
 ];
 
 export default async function HomePage() {
-  // 1. Fetch active carousels
-  const carousels = await db.carousel.findMany({
-    where: { isActive: true },
-    orderBy: { sortOrder: 'asc' },
-  });
+  let carousels: any[] = [];
+  let displayProducts: any[] = [];
+  let testimonials: any[] = [];
 
-  // 2. Fetch Featured & Top eCommerce Products
-  const featuredDbProducts = await db.product.findMany({
-    where: { isActive: true, isFeatured: true },
-    include: {
-      manufacturer: { select: { id: true, companyName: true } },
-      indications: { select: { id: true, name: true } },
-    },
-    take: 8,
-    orderBy: { createdAt: 'desc' },
-  });
+  try {
+    // 1. Fetch active carousels
+    carousels = await db.carousel.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: 'asc' },
+    });
+  } catch (err) {
+    console.error('Error fetching carousels on HomePage:', err);
+  }
 
-  let displayProducts = featuredDbProducts;
-  if (displayProducts.length < 4) {
-    const additional = await db.product.findMany({
-      where: {
-        isActive: true,
-        id: { notIn: featuredDbProducts.map((p) => p.id) },
-      },
+  try {
+    // 2. Fetch Featured & Top eCommerce Products
+    const featuredDbProducts = await db.product.findMany({
+      where: { isActive: true, isFeatured: true },
       include: {
         manufacturer: { select: { id: true, companyName: true } },
         indications: { select: { id: true, name: true } },
       },
-      take: 8 - displayProducts.length,
+      take: 8,
       orderBy: { createdAt: 'desc' },
     });
-    displayProducts = [...displayProducts, ...additional];
+
+    displayProducts = featuredDbProducts;
+    if (displayProducts.length < 4) {
+      const additional = await db.product.findMany({
+        where: {
+          isActive: true,
+          id: { notIn: featuredDbProducts.map((p) => p.id) },
+        },
+        include: {
+          manufacturer: { select: { id: true, companyName: true } },
+          indications: { select: { id: true, name: true } },
+        },
+        take: 8 - displayProducts.length,
+        orderBy: { createdAt: 'desc' },
+      });
+      displayProducts = [...displayProducts, ...additional];
+    }
+  } catch (err) {
+    console.error('Error fetching products on HomePage:', err);
   }
 
-  // 3. Fetch active testimonials
-  const testimonials = await db.testimonial.findMany({
-    where: { isActive: true },
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-    take: 3,
-  });
+  try {
+    // 3. Fetch active testimonials
+    testimonials = await db.testimonial.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+      take: 3,
+    });
+  } catch (err) {
+    console.error('Error fetching testimonials on HomePage:', err);
+  }
 
   // 4. Fetch dynamic categories from Category master
   const fetchCategories = async () => {

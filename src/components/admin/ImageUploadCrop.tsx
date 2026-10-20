@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useCallback } from 'react';
 import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
 import { Upload, CropIcon, Check, X, ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 

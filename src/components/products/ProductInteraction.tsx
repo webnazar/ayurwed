@@ -115,10 +115,13 @@ export default function ExtractInteraction({ preparation }: ExtractInteractionPr
           {/* Ayuri Neutral Note */}
           <div className="bg-gradient-to-r from-brand-green-light to-emerald-50 border border-border rounded-2xl p-4 flex gap-3">
             <Sparkles className="h-5 w-5 text-brand-green flex-shrink-0 mt-0.5" />
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <p className="text-xs font-bold text-brand-green">Ayuri's Note</p>
               <p className="text-xs text-brand-foreground/70 leading-relaxed">
                 Here are preparations that may be relevant to your wellness journey. I recommend consulting a certified Ayurvedic practitioner before use — they can guide you based on your unique Prakriti (body constitution).
+              </p>
+              <p className="text-[10px] font-semibold text-amber-800 bg-amber-100/70 border border-amber-200 px-2.5 py-1 rounded-lg mt-1 inline-block">
+                *Disclaimer: Educational guidance only — not a substitute for professional medical advice or clinical diagnosis.
               </p>
             </div>
           </div>

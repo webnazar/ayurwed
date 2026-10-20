@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { ShoppingBag, MapPin, Phone, User, Home, ChevronRight, Package, Trash2, Plus, Minus, ArrowRight, CheckCircle, X } from 'lucide-react';
+import { ShoppingBag, MapPin, Phone, User, Home, Building2, ChevronRight, Package, Trash2, Plus, Minus, ArrowRight, CheckCircle, X } from 'lucide-react';
 import { useCart } from '@/components/shop/CartContext';
 import toast from 'react-hot-toast';
+import StateSelect from '@/components/ui/StateSelect';
 
 const formatPrice = (n: number) =>
   new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
@@ -24,13 +25,51 @@ export default function CheckoutPage() {
   const [selectedPaymentType, setSelectedPaymentType] = useState<'upi' | 'card' | 'netbanking'>('upi');
   const [paymentProgressMsg, setPaymentProgressMsg] = useState('');
 
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; calculatedDiscount: number } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  const discountAmount = appliedCoupon ? appliedCoupon.calculatedDiscount : 0;
   const shipping = subtotal >= 500 ? 0 : subtotal > 0 ? 60 : 0;
-  const total = subtotal + shipping;
+  const total = Math.max(0, subtotal - discountAmount + shipping);
+
+  const handleApplyCoupon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+
+    try {
+      const res = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: couponCode, subtotal }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Invalid coupon');
+
+      setAppliedCoupon({
+        code: data.coupon.code,
+        calculatedDiscount: data.coupon.calculatedDiscount,
+      });
+      toast.success(`Coupon ${data.coupon.code} applied! Saved ₹${data.coupon.calculatedDiscount}`);
+    } catch (err: any) {
+      toast.error(err.message || 'Invalid coupon code');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+    toast.success('Coupon removed');
+  };
 
   const [form, setForm] = useState({
     name: '',
     phone: '',
     address: '',
+    landmark: '',
     city: '',
     state: '',
     pincode: '',
@@ -50,6 +89,7 @@ export default function CheckoutPage() {
               name: data.profile.user?.name || f.name || session.user.name || '',
               phone: data.profile.user?.phone || f.phone,
               address: data.profile.address || f.address,
+              landmark: data.profile.landmark || f.landmark || '',
               city: data.profile.city || f.city,
               state: data.profile.state || f.state,
               pincode: data.profile.pincode || f.pincode,
@@ -95,6 +135,7 @@ export default function CheckoutPage() {
             name: form.name,
             phone: form.phone,
             address: form.address,
+            landmark: form.landmark || null,
             city: form.city,
             state: form.state,
             pincode: form.pincode,
@@ -102,6 +143,7 @@ export default function CheckoutPage() {
           paymentMethod: 'PREPAID',
           paymentStatus: 'PAID',
           notes: form.notes || null,
+          couponCode: appliedCoupon?.code || undefined,
         }),
       });
 
@@ -149,8 +191,8 @@ export default function CheckoutPage() {
             <Link href="/shop" className="bg-brand-green text-white py-3 rounded-xl font-bold hover:bg-brand-gold hover:text-brand-green transition-colors">
               Continue Shopping
             </Link>
-            <Link href="/shop/orders" className="bg-card border border-border py-3 rounded-xl font-bold text-brand-green hover:bg-muted transition-colors">
-              View My Orders
+            <Link href="/user/myorders" className="bg-card border border-border py-3 rounded-xl font-bold text-brand-green hover:bg-muted transition-colors">
+              View My Shop Orders
             </Link>
           </div>
         </div>
@@ -213,15 +255,24 @@ export default function CheckoutPage() {
                   </div>
                   <div className="sm:col-span-2">
                     <label className={lbl}><Home className="h-3 w-3 inline mr-1" />Address *</label>
-                    <textarea required rows={3} value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} className={`${inp} resize-none`} placeholder="House no., Street, Area, Landmark" />
+                    <textarea required rows={3} value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} className={`${inp} resize-none`} placeholder="House no., Street, Flat/Apartment, Area" />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className={lbl}><Building2 className="h-3 w-3 inline mr-1" />Landmark (Optional)</label>
+                    <input type="text" value={form.landmark} onChange={e => setForm(f => ({ ...f, landmark: e.target.value }))} className={inp} placeholder="Near Hospital, School, Metro Station, Mall, etc." />
                   </div>
                   <div>
                     <label className={lbl}>City *</label>
                     <input required type="text" value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} className={inp} placeholder="City" />
                   </div>
                   <div>
-                    <label className={lbl}>State</label>
-                    <input type="text" value={form.state} onChange={e => setForm(f => ({ ...f, state: e.target.value }))} className={inp} placeholder="State" />
+                    <label className={lbl}>State *</label>
+                    <StateSelect
+                      value={form.state}
+                      onChange={val => setForm(f => ({ ...f, state: val }))}
+                      placeholder="Type or select state..."
+                      required
+                    />
                   </div>
                   <div>
                     <label className={lbl}>Pincode *</label>
@@ -292,9 +343,43 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
+                {/* Promo Coupon Code Box */}
+                <div className="pt-2">
+                  {appliedCoupon ? (
+                    <div className="bg-emerald-600 text-white rounded-2xl p-3 px-4 text-xs font-extrabold flex items-center justify-between shadow-xs">
+                      <span>🎫 Coupon <code className="bg-white/20 px-2 py-0.5 rounded font-black tracking-widest text-amber-200">{appliedCoupon.code}</code> Applied (-{formatPrice(discountAmount)})</span>
+                      <button type="button" onClick={handleRemoveCoupon} className="text-white/80 hover:text-white underline text-[11px] font-bold">Remove</button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                        placeholder="Promo Code (e.g. WELCOME10)"
+                        className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-xs font-bold uppercase tracking-wider text-foreground focus:outline-none focus:border-brand-green"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleApplyCoupon}
+                        disabled={couponLoading || !couponCode.trim()}
+                        className="bg-brand-green hover:bg-brand-gold hover:text-brand-green text-white font-extrabold px-4 py-2.5 rounded-xl text-xs transition-all shadow-xs shrink-0 disabled:opacity-50"
+                      >
+                        {couponLoading ? 'Checking...' : 'Apply'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                 {/* Totals */}
                 <div className="space-y-2 text-sm border-t border-border pt-4">
                   <div className="flex justify-between text-foreground/70"><span>Subtotal</span><span className="font-semibold">{formatPrice(subtotal)}</span></div>
+                  {appliedCoupon && (
+                    <div className="flex justify-between text-emerald-600 font-extrabold">
+                      <span>Coupon Discount ({appliedCoupon.code})</span>
+                      <span>-{formatPrice(discountAmount)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-foreground/70">
                     <span>Shipping</span>
                     <span className={`font-semibold ${shipping === 0 ? 'text-emerald-600' : ''}`}>

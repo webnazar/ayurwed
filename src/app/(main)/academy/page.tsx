@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { 
   BookOpen, GraduationCap, Star, CheckCircle2, Video, Users, Award, 
-  ArrowRight, PlayCircle, Network, Leaf, Target, Cpu, Brain, FlaskConical, 
+  ArrowRight, Network, Leaf, Target, Cpu, Brain, FlaskConical, 
   Layers, ShieldCheck, Microscope, Database, Workflow, Sparkles, HelpCircle, FileText
 } from 'lucide-react';
 import { Metadata } from 'next';
@@ -10,11 +10,40 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 import EnrollButton from '@/components/academy/EnrollButton';
+import SampleCertificateSection from '@/components/academy/SampleCertificateSection';
 
 export const metadata: Metadata = {
-  title: 'Academy | AYURWED',
-  description: 'Master the Ancient Extract Intelligence System (AEIS™) with our flagship Certificate in Ancient Intelligence (CAI) program.',
+  title: 'AYURWED Academy — Certificate in Ancient Intelligence (CAI)',
+  description: 'Master Ayurveda and modern Artificial Intelligence for clinical consulting, holistic treatment, and AI-assisted digital prescription. Includes complimentary prescription software during your subscription period.',
+  keywords: ['AYURWED Academy', 'Certificate in Ancient Intelligence', 'CAI Program', 'Ayurveda and AI', 'AI Ayurveda Consulting', 'Ayurvedic Prescription Software', 'CAI Certification'],
+  alternates: {
+    canonical: 'https://www.ayurwed.com/academy',
+  },
+  openGraph: {
+    title: 'AYURWED Academy — Certificate in Ancient Intelligence (CAI)',
+    description: 'Master Ayurveda and modern Artificial Intelligence for clinical consulting, holistic treatment, and AI-assisted digital prescription.',
+    url: 'https://www.ayurwed.com/academy',
+    siteName: 'AYURWED',
+    locale: 'en_IN',
+    type: 'website',
+    images: [
+      {
+        url: 'https://www.ayurwed.com/icon.png',
+        width: 512,
+        height: 512,
+        alt: 'AYURWED Academy — CAI Program',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AYURWED Academy — Certificate in Ancient Intelligence (CAI)',
+    description: 'Master Ayurveda and modern AI for clinical consulting and digital prescription.',
+    images: ['https://www.ayurwed.com/icon.png'],
+  },
 };
+
+export const revalidate = 0;
 
 export default async function AcademyPage() {
   const session = await getServerSession(authOptions);
@@ -30,9 +59,39 @@ export default async function AcademyPage() {
     initialEnrolled = !!enrollment;
   }
 
+  let coursePrice = 9999;
+  let courseDiscountPrice: number | null = 4999;
+  let couponCode: string | null = null;
+  let couponDiscountPrice: number | null = null;
+
+  try {
+    const rows: any[] = await db.$queryRawUnsafe(`SELECT price, discountPrice, couponCode, couponDiscountPrice FROM courses WHERE slug = 'cai' LIMIT 1`);
+    if (rows && rows.length > 0) {
+      coursePrice = Number(rows[0].price || 9999);
+      if (rows[0].discountPrice !== null && rows[0].discountPrice !== undefined) {
+        courseDiscountPrice = Number(rows[0].discountPrice);
+      }
+      if (rows[0].couponCode) {
+        couponCode = String(rows[0].couponCode);
+      }
+      if (rows[0].couponDiscountPrice !== null && rows[0].couponDiscountPrice !== undefined) {
+        couponDiscountPrice = Number(rows[0].couponDiscountPrice);
+      }
+    }
+  } catch (err) {
+    try {
+      const rows: any[] = await db.$queryRawUnsafe(`SELECT price FROM courses WHERE slug = 'cai' LIMIT 1`);
+      if (rows && rows.length > 0) {
+        coursePrice = Number(rows[0].price || 9999);
+      }
+    } catch (e) {
+      console.error('Course pricing fetch fallback:', e);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#fdf6e3] dark:bg-background">
-      
+
       {/* 1. Hero Section */}
       <section className="relative overflow-hidden pt-20 pb-24 sm:pt-32 sm:pb-36 bg-gradient-to-b from-brand-green/5 to-transparent">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
@@ -42,7 +101,7 @@ export default async function AcademyPage() {
 
         <div className="max-w-7xl mx-auto layout-padding-minimal text-center relative z-10">
           <div className="inline-flex items-center gap-2 bg-brand-gold/20 text-brand-gold-dark px-4 py-2 rounded-full text-sm font-bold uppercase tracking-widest mb-4 border border-brand-gold/30">
-            <Award className="h-4 w-4" /> Flagship Certification
+            <Award className="h-4 w-4" /> Ayurveda + Artificial Intelligence
           </div>
           
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-brand-green tracking-tight leading-[1.1] mb-6 max-w-5xl mx-auto">
@@ -51,17 +110,29 @@ export default async function AcademyPage() {
             </span> <br className="hidden md:block" /> (CAI)
           </h1>
           
-          <p className="text-lg sm:text-xl text-brand-foreground/80 max-w-3xl mx-auto mb-10 leading-relaxed font-medium">
-            Understand, analyze, and apply humanity's ancient knowledge systems using modern scientific thinking and artificial intelligence. CAI serves as the educational foundation of the AYURWED ecosystem.
+          <p className="text-lg sm:text-xl text-brand-foreground/80 max-w-3xl mx-auto mb-6 leading-relaxed font-medium">
+            Bridging classical Ayurvedic wisdom with modern Artificial Intelligence. Master AI-assisted clinical consulting, intelligent diagnosis, evidence-based treatment design, and digital prescription writing.
           </p>
+
+          {/* Software Inclusion Pill */}
+          <div className="inline-flex items-center gap-2 bg-brand-green/10 text-brand-green px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold mb-10 border border-brand-green/20">
+            <Sparkles className="h-4 w-4 text-brand-gold" />
+            <span>Includes Complimentary Access to <strong>AI Prescription Software</strong> throughout your subscription period</span>
+          </div>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="#aeis" className="w-full sm:w-auto px-8 py-4 btn-green rounded-full text-lg shadow-xl hover:shadow-2xl flex items-center justify-center gap-2">
-              Explore Program <ArrowRight className="h-5 w-5" />
+            <Link href="#curriculum" className="w-full sm:w-80 px-6 py-4 btn-green rounded-full text-lg shadow-xl hover:shadow-2xl flex items-center justify-center gap-2">
+              Explore Curriculum <ArrowRight className="h-5 w-5" />
             </Link>
-            <Link href="#intro-video" className="w-full sm:w-auto px-8 py-4 btn-outline text-lg rounded-full flex items-center justify-center gap-2">
-              <PlayCircle className="h-5 w-5" /> Introduction Video
-            </Link>
+            <EnrollButton
+              variant="hero"
+              isLoggedIn={!!session}
+              initialEnrolled={initialEnrolled}
+              coursePrice={coursePrice}
+              courseDiscountPrice={courseDiscountPrice}
+              couponCode={couponCode}
+              couponDiscountPrice={couponDiscountPrice}
+            />
           </div>
         </div>
       </section>
@@ -85,32 +156,39 @@ export default async function AcademyPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 bg-brand-green/10 text-brand-green px-3 py-1 rounded-full text-sm font-bold uppercase tracking-widest border border-brand-green/20">
-                <BookOpen className="h-4 w-4" /> Philosophy
+                <BookOpen className="h-4 w-4" /> The Modern Approach
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-brand-green leading-tight">
-                Ancient civilizations did not create products; they created intelligent systems.
+                Classical Ayurveda Empowered by Artificial Intelligence.
               </h2>
               <p className="text-brand-foreground/70 text-lg leading-relaxed">
-                Unlike traditional educational programs that focus on isolated products or remedies, CAI introduces learners to the <strong className="text-brand-green">Ancient Extract Intelligence System (AEIS™)</strong>—a structured framework that transforms ancient wisdom into an organized, scalable, and AI-enabled knowledge architecture.
+                Ayurveda is humanity's most comprehensive ancient health science. Modern Artificial Intelligence is our most powerful analytical tool. The <strong className="text-brand-green">Certificate in Ancient Intelligence (CAI)</strong> brings both together into a unified clinical practice model.
               </p>
               <p className="text-brand-foreground/70 text-lg leading-relaxed">
-                Most programs teach finished formulations. We teach the <strong className="text-brand-gold-dark">intelligence behind extracts</strong>, their properties, interactions, synergies, and applications. You will learn formulation logic rather than memorizing products.
+                Rather than memorizing isolated formulas, you learn how to combine <strong className="text-brand-gold-dark">Prakriti & Vikriti clinical assessment</strong> with cutting-edge AI reasoning. Discover how AI assists your diagnosis, enhances treatment planning, cross-checks herbal contraindications, and powers rapid digital prescription generation.
               </p>
+              
+              <div className="p-4 rounded-2xl bg-brand-gold/10 border border-brand-gold/30 text-sm text-brand-foreground/90 flex items-start gap-3">
+                <Sparkles className="h-5 w-5 text-brand-gold-dark shrink-0 mt-0.5" />
+                <span>
+                  <strong>Included with Course Enrollment:</strong> Enrolled students and active subscribers receive <strong>Complimentary Access to the AYURWED AI Digital Prescription Software</strong> for the entire duration of their subscription period.
+                </span>
+              </div>
             </div>
             
             <div className="bg-gradient-to-br from-brand-green to-brand-green-dark rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden">
                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-               <h3 className="text-2xl font-bold mb-6 relative z-10">Integrated Framework</h3>
+               <h3 className="text-2xl font-bold mb-6 relative z-10">Curriculum Pillars</h3>
                <ul className="space-y-4 relative z-10">
                  {[
-                   'Ancient Knowledge Intelligence',
-                   'Botanical Intelligence',
-                   'Extract Intelligence',
-                   'Combination Intelligence',
-                   'Application Intelligence',
-                   'Artificial Intelligence'
+                   'Classical Ayurvedic Fundamentals & Diagnostic Logic',
+                   'Ayurvedic Clinical Consulting in the Modern Era',
+                   'Holistic Treatment Architecture & Herbal Formulations',
+                   'AI-Assisted Patient Diagnosis & Symptom Analysis',
+                   'Digital Prescription Writing & Protocol Verification',
+                   'Complimentary Clinical Software Suite during Subscription'
                  ].map((item, i) => (
-                   <li key={i} className="flex items-center gap-3 font-semibold text-brand-green-light text-lg">
+                   <li key={i} className="flex items-center gap-3 font-semibold text-brand-green-light text-base sm:text-lg">
                      <CheckCircle2 className="h-5 w-5 text-brand-gold flex-shrink-0" /> {item}
                    </li>
                  ))}
@@ -147,45 +225,45 @@ export default async function AcademyPage() {
          </div>
       </section>
 
-      {/* 4. AEIS 6 Layers */}
-      <section id="aeis" className="py-24 bg-[#fdf6e3] dark:bg-background">
+      {/* 4. The 6 Pillars of AI in Ayurveda */}
+      <section id="curriculum" className="py-24 bg-[#fdf6e3] dark:bg-background">
         <div className="max-w-7xl mx-auto layout-padding-minimal">
           <div className="text-center mb-16 space-y-4">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-brand-green">The Ancient Extract Intelligence System (AEIS™)</h2>
-            <p className="text-brand-foreground/70 max-w-2xl mx-auto text-lg">The CAI curriculum is structurally built around six fundamental layers of intelligence.</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-brand-green">The 6 Pillars of Ayurveda + Artificial Intelligence</h2>
+            <p className="text-brand-foreground/70 max-w-2xl mx-auto text-lg">A modern clinical framework designed for practicing Ayurvedic physicians, researchers, and wellness practitioners.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { 
-                icon: BookOpen, title: '1. Ancient Knowledge', 
-                desc: 'Understanding traditional systems of knowledge, observation, and wisdom.',
-                topics: ['Origins of systems', 'Preservation traditions', 'Natural laws', 'Historical frameworks', 'Wisdom-based decisions']
+                icon: BookOpen, title: '1. Ayurvedic Philosophy & Diagnostic Logic', 
+                desc: 'Foundational principles of Tridosha, Dhatus, Srotas, Prakriti, and Vikriti evaluated through systematic logic.',
+                topics: ['Tridosha balance principles', 'Prakriti & Vikriti profiling', 'Nadi & Rogi Pariksha logic', 'Classical diagnostic methods', 'Pathology & Samprapti']
               },
               { 
-                icon: Leaf, title: '2. Botanical Intelligence', 
-                desc: 'Understanding plants as highly evolved knowledge systems.',
-                topics: ['Botanical classification', 'Traditional plant uses', 'Plant energetics', 'Functional categories', 'Historical applications']
+                icon: Leaf, title: '2. Dravyaguna & Botanical Intelligence', 
+                desc: 'Understanding Ayurvedic herbs, gunas, rasas, veerya, vipaka, and active pharmacological principles.',
+                topics: ['Classical Dravyaguna Vidnyan', 'Phytochemical profiles', 'Synergistic herbal combinations', 'Herbal safety & toxicity review', 'Quality & authentication standards']
               },
               { 
-                icon: FlaskConical, title: '3. Extract Intelligence', 
-                desc: 'The foundation of the Academy\'s proprietary methodology.',
-                topics: ['Extraction science', 'Standardization principles', 'Active constituents', 'Potency and concentration', 'Quality assessment']
+                icon: Brain, title: '3. AI-Assisted Clinical Consulting', 
+                desc: 'Leveraging AI copilot tools to streamline patient intake, history taking, and symptoms assessment.',
+                topics: ['Patient intake structuring', 'AI-assisted symptom evaluation', 'Dosha imbalance indicators', 'Differential diagnosis assistance', 'Virtual consulting best practices']
               },
               { 
-                icon: Network, title: '4. Combination Intelligence', 
-                desc: 'Understanding how multiple extracts work together synergistically.',
-                topics: ['Synergy principles', 'Complementary actions', 'Supporting extracts', 'Combination architecture', 'Multi-target approaches']
+                icon: Network, title: '4. Treatment Architecture & Synergy', 
+                desc: 'Formulating comprehensive Ayurvedic treatment protocols including Shamana, Shodhana, diet, and lifestyle.',
+                topics: ['Personalized Ahara & Vihara', 'Formulation synergies', 'Classical vs modern extract preparations', 'Lifestyle medicine integration', 'Follow-up tracking protocols']
               },
               { 
-                icon: Target, title: '5. Application Intelligence', 
-                desc: 'Translating extract intelligence into practical health outcomes.',
-                topics: ['Wellness applications', 'Cognitive & Metabolic support', 'Stress and resilience', 'Performance optimization', 'Lifestyle integration']
+                icon: FileText, title: '5. AI Digital Prescription Platform', 
+                desc: 'Mastering modern digital prescription writing with AI contraindication checks and dosage calculators.',
+                topics: ['Digital prescription creation', 'Drug-herb interaction alerts', 'Automated dosage calculations', 'Patient instruction clarity', 'Complimentary software access']
               },
               { 
-                icon: Cpu, title: '6. Artificial Intelligence', 
-                desc: 'Using modern AI to expand and accelerate human understanding.',
-                topics: ['AI-assisted learning', 'Knowledge graph exploration', 'Pattern discovery', 'Intelligent research', 'Predictive formulation']
+                icon: Cpu, title: '6. AI Research & Predictive Ayurveda', 
+                desc: 'Using machine learning to explore clinical trial databases, classical compendiums, and predictive health patterns.',
+                topics: ['Classical text indexing & search', 'Predictive outcome modeling', 'Case documentation workflows', 'Clinical evidence synthesis', 'Ethical AI practice guidelines']
               }
             ].map((layer, idx) => (
               <div key={idx} className="bg-card border border-border rounded-3xl p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group">
@@ -214,45 +292,45 @@ export default async function AcademyPage() {
          <div className="max-w-4xl mx-auto layout-padding-minimal">
             <div className="text-center mb-16 space-y-4">
               <h2 className="text-3xl sm:text-4xl font-extrabold text-brand-green">Curriculum Structure</h2>
-              <p className="text-brand-foreground/70 text-lg">A 7-module comprehensive journey culminating in a practical Capstone Project.</p>
+              <p className="text-brand-foreground/70 text-lg">A 7-module comprehensive journey in modern Ayurvedic consulting and AI prescription.</p>
             </div>
 
             <div className="space-y-6">
               {[
                 {
-                  mod: 'Module 1', title: 'Foundations of Ancient Intelligence',
-                  outcomes: 'Understand intelligence beyond information, explore ancient traditions, and civilizational knowledge systems.',
-                  assessment: 'AI-generated scenario analysis & foundational examination.'
+                  mod: 'Module 1', title: 'Foundations of Ayurveda & Modern Diagnostic Science',
+                  outcomes: 'Master classical Ayurvedic tenets (Prakriti, Vikriti, Doshas, Dhatus) and map them to modern clinical terminology and diagnostic metrics.',
+                  assessment: 'AI-guided clinical assessment case simulation.'
                 },
                 {
-                  mod: 'Module 2', title: 'Botanical Intelligence',
-                  outcomes: 'Understand the role of plants in ancient systems, classification, and functional properties.',
-                  assessment: 'Botanical intelligence case studies & AI tutor discussions.'
+                  mod: 'Module 2', title: 'Dravyaguna Vidnyan & Botanical Intelligence',
+                  outcomes: 'In-depth study of classical medicinal herbs, phytoconstituents, extract ratios, and bioavailability in contemporary clinical practice.',
+                  assessment: 'Botanical formulation case studies & AI tutor interactive quiz.'
                 },
                 {
-                  mod: 'Module 3', title: 'Extract Intelligence & Preparation-Based Prescription',
-                  outcomes: 'Understand extracts as knowledge units. Learn extraction science, standardization, and preparation-based clinical prescription.',
-                  assessment: 'AI-generated extraction scenarios & practical analysis.'
+                  mod: 'Module 3', title: 'AI-Assisted Patient Intake & Clinical Consultation',
+                  outcomes: 'Learn structured methodologies for in-clinic and remote virtual consultations using AI to quickly analyze patient history and symptoms.',
+                  assessment: 'Live mock consultation with AI patient avatars.'
                 },
                 {
-                  mod: 'Module 4', title: 'Combination Intelligence',
-                  outcomes: 'Understand formulation architecture and how intelligent combinations are created synergistically.',
-                  assessment: 'AI-generated formulation challenges & combination design.'
+                  mod: 'Module 4', title: 'Holistic Treatment Architecture & Multi-Herbal Formulations',
+                  outcomes: 'Design comprehensive treatment pathways combining Shamana therapies, Ahara (diet), Vihara (lifestyle), and targeted herbal formulations.',
+                  assessment: 'Clinical treatment plan design & formulation challenge.'
                 },
                 {
-                  mod: 'Module 5', title: 'Digital Clinical Workflow & Patient Management',
-                  outcomes: 'Master the AYURWED Ecosystem, patient management dashboards, and digital clinical workflows.',
-                  assessment: 'Real-world application simulations & decision exercises.'
+                  mod: 'Module 5', title: 'Digital Prescription Writer & Software Mastery',
+                  outcomes: 'Hands-on training with the AYURWED AI Prescription Software. Generate standardized prescriptions, auto-calculate dosages, and verify drug-herb interactions. (Full software access included during subscription).',
+                  assessment: 'Digital prescription generation & contraindication verification project.'
                 },
                 {
-                  mod: 'Module 6', title: 'AI and the Ancient Intelligence Prescription Platform',
-                  outcomes: 'Learn how to integrate the Ancient Intelligence Prescription Platform and AI-assisted learning for predictive research and diagnosis.',
-                  assessment: 'AI-assisted exploration projects & knowledge synthesis.'
+                  mod: 'Module 6', title: 'AI in Clinical Research, Evidence & Practice Growth',
+                  outcomes: 'Utilize AI to query ancient treatises, summarize modern clinical trials, maintain compliant medical records, and scale practice operations.',
+                  assessment: 'Research synthesis project & practice workflow audit.'
                 },
                 {
-                  mod: 'Module 7', title: 'Capstone Project & Ecosystem Integration',
-                  outcomes: 'Apply the AEIS™ to solve a contemporary challenge. Identify extracts, design combinations, prescribe preparations, and integrate into the AYURWED ecosystem.',
-                  assessment: 'Evaluated by the AI Examiner and academic reviewers.'
+                  mod: 'Module 7', title: 'Clinical Capstone: End-to-End Patient Management',
+                  outcomes: 'Execute a complete end-to-end patient workflow: intake analysis, AI-assisted diagnosis, custom treatment design, and digital prescription issuance.',
+                  assessment: 'Final review by the AI Clinical Examiner & Academic Board.'
                 }
               ].map((module, i) => (
                 <div key={i} className="flex flex-col md:flex-row gap-6 bg-[#fdf6e3] dark:bg-background border border-border p-6 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-gold/50 transition-colors">
@@ -341,22 +419,22 @@ export default async function AcademyPage() {
               Your Journey Beyond Certification
             </h2>
             <p className="text-sm sm:text-base md:text-lg text-brand-green-light leading-relaxed">
-              Completing the Certificate in Ancient Intelligence (CAI) awards practitioners the official title of <strong>AYURWED Certified Practitioner (ACP)</strong>.
+              Completing the Certificate in Ancient Intelligence (CAI) awards practitioners the official title of <strong>CAI Certified Doctor / Practitioner</strong>.
             </p>
             <p className="text-xs sm:text-sm text-brand-green-light/80 max-w-2xl mx-auto">
-              This is a permanent professional credential recognizing your expertise. To list your services, receive bookings, and use our clinical dashboard and digital prescription writer, doctors subscribe to our simple yearly Platform Access.
+              Your certification is a lifelong academic achievement. During your active subscription period, you enjoy full, complimentary access to the AYURWED AI Clinical Prescription Software suite and priority practitioner directory listing.
             </p>
           </div>
 
           {/* Flowchart Timeline */}
           <div className="mt-16 grid grid-cols-1 md:grid-cols-6 gap-8 relative">
             {[
-              { step: '01', title: 'Learn', desc: 'Acquire foundational knowledge of AEIS™.' },
-              { step: '02', title: 'Certificate in Ancient Intelligence (CAI)', desc: 'Complete the flagship educational program.' },
-              { step: '03', title: 'Earn ACP Title', desc: 'Officially become an AYURWED Certified Practitioner.' },
-              { step: '04', title: 'Activate Platform Access', desc: 'Pay the yearly platform access subscription.' },
-              { step: '05', title: 'Access Practice Tools', desc: 'Gain full access to virtual appointments, digital prescriptions, and practitioner dashboard.' },
-              { step: '06', title: 'Start Consulting', desc: 'Begin consulting patients and delivering personalized care.' }
+              { step: '01', title: 'Enroll & Learn', desc: 'Master classical Ayurveda and modern clinical AI tools.' },
+              { step: '02', title: 'Complete CAI Course', desc: 'Finish 7 modules and the end-to-end clinical capstone.' },
+              { step: '03', title: 'Earn CAI Credential', desc: 'Receive your verified Certificate in Ancient Intelligence.' },
+              { step: '04', title: 'Active Subscription', desc: 'Maintain your annual doctor directory & software subscription.' },
+              { step: '05', title: 'AI Prescription Suite', desc: 'Use complimentary digital prescription software with AI checks during your subscription.' },
+              { step: '06', title: 'Consult & Grow', desc: 'Deliver authentic Ayurvedic care, virtual visits, and digital treatment plans.' }
             ].map((node, i) => (
               <div key={i} className="flex flex-col items-center text-center space-y-4 group relative">
                 {/* Step Circle */}
@@ -380,36 +458,46 @@ export default async function AcademyPage() {
         </div>
       </section>
 
+      {/* Sample Certificate Showcase Section */}
+      <SampleCertificateSection />
+
       {/* 8. Outcomes & CTA */}
-      <section className="py-24 bg-card border-t border-border">
+      <section id="enroll" className="py-24 bg-card border-t border-border">
         <div className="max-w-5xl mx-auto layout-padding-minimal">
           <div className="bg-[#fdf6e3] dark:bg-background border border-border rounded-[2.5rem] p-8 sm:p-12 text-center shadow-xl">
              <GraduationCap className="h-16 w-16 text-brand-gold mx-auto mb-6" />
-             <h2 className="text-3xl sm:text-4xl font-extrabold text-brand-green mb-6">Become a Certified Expert</h2>
+             <h2 className="text-3xl sm:text-4xl font-extrabold text-brand-green mb-6">Become a CAI Certified Practitioner</h2>
              
              <p className="text-brand-foreground/70 text-lg mb-10 max-w-2xl mx-auto">
-               Upon completion, graduates will possess the ability to bridge Ancient Intelligence, Extract Intelligence, and Artificial Intelligence—creating solutions for health, research, and enterprise.
+               Empower your clinical practice by fusing classical Ayurvedic healing with cutting-edge AI diagnostic assistants and automated digital prescriptions.
              </p>
              
              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left max-w-3xl mx-auto mb-12">
                {[
-                 'Analyze botanical and extract intelligence',
-                 'Design intelligent extract combinations',
-                 'Apply ancient principles to modern challenges',
-                 'Utilize AI for research and discovery',
-                 'Think systematically across disciplines',
-                 'Contribute to the evolution of AEIS™'
+                 'Master AI-driven symptom analysis & Prakriti assessment',
+                 'Formulate precise Ayurvedic treatment & lifestyle regimens',
+                 'Issue verified digital prescriptions with drug-herb interaction checks',
+                 'Complimentary AI Prescription Software access during subscription',
+                 'Elevate patient trust with verified CAI credentials on your profile',
+                 'Access continuous updates in modern Ayurvedic clinical AI'
                ].map((outcome, i) => (
                  <div key={i} className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-brand-green/10 text-brand-green flex items-center justify-center flex-shrink-0">
                       <Star className="h-4 w-4" />
                     </div>
                     <span className="text-sm font-semibold text-brand-foreground/80">{outcome}</span>
-                  </div>
+                 </div>
                ))}
              </div>
 
-             <EnrollButton isLoggedIn={!!session} initialEnrolled={initialEnrolled} />
+              <EnrollButton
+                isLoggedIn={!!session}
+                initialEnrolled={initialEnrolled}
+                coursePrice={coursePrice}
+                courseDiscountPrice={courseDiscountPrice}
+                couponCode={couponCode}
+                couponDiscountPrice={couponDiscountPrice}
+              />
           </div>
         </div>
       </section>

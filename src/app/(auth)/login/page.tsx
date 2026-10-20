@@ -148,7 +148,7 @@ function LoginContent() {
             </div>
           </form>
 
-          <div className="mt-6 border-t border-brand-green-light pt-6 text-center text-xs text-brand-foreground/60 space-y-2">
+          <div className="mt-6 border-t border-brand-green-light pt-6 text-center text-xs text-brand-foreground/60">
             <p>
               New to Ayurwed?{' '}
               <Link href="/register" className="font-semibold text-brand-gold hover:text-brand-green">

@@ -3,77 +3,201 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Search, SlidersHorizontal, X, ShoppingBag, Tag, Building2,
-  ArrowUpDown, CheckSquare, Square, ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, CheckSquare, Square, ListFilter
 } from 'lucide-react';
 import ShopProductCard from './ShopProductCard';
 import CartDrawer from './CartDrawer';
 import { useCart } from './CartContext';
+import ShopFilterPillsHeader, { SortKey } from './ShopFilterPillsHeader';
+import { HEALTH_SYMPTOMS } from '@/lib/constants';
 
 interface Product {
-  id: number; name: string; slug: string; shortDesc: string | null; category: string | null;
-  mrp: number; sellingPrice: number; stock: number; unit: string | null; images: string[];
-  isFeatured: boolean; manufacturer?: { id: number; companyName: string } | null;
+  id: number;
+  name: string;
+  slug: string;
+  shortDesc: string | null;
+  botanicalName?: string | null;
+  type?: string | null;
+  category: string | null;
+  mrp: number;
+  sellingPrice: number;
+  stock: number;
+  unit: string | null;
+  images: string[];
+  isFeatured: boolean;
+  tags?: string | null;
+  manufacturer?: { id: number; companyName: string } | null;
+  indications?: { id: number; name: string }[];
 }
-interface Manufacturer { id: number; companyName: string; }
 
-type SortKey = 'featured' | 'price_asc' | 'price_desc' | 'name_asc' | 'newest';
+interface Manufacturer {
+  id: number;
+  companyName: string;
+}
 
-const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-  { key: 'featured',   label: 'Featured First' },
-  { key: 'price_asc',  label: 'Price: Low to High' },
-  { key: 'price_desc', label: 'Price: High to Low' },
-  { key: 'name_asc',   label: 'Name: A → Z' },
-  { key: 'newest',     label: 'Newest First' },
+interface RawIndication {
+  id: number;
+  name: string;
+  symptomsKeywords: string | null;
+}
+
+const PREPARATION_TYPES = [
+  { id: '', label: 'All Formulations' },
+  { id: 'READY_PRODUCT', label: 'Ready Product' },
+  { id: 'CAPSULE', label: 'Capsules' },
+  { id: 'TABLET', label: 'Tablets' },
+  { id: 'POWDER', label: 'Powders (Churna)' },
+  { id: 'LIQUID_EXTRACT', label: 'Liquid Extracts (Asava/Arishta)' },
+  { id: 'OIL', label: 'Ayurvedic Oils (Taila)' },
+  { id: 'CREAM', label: 'Creams & Ointments' },
 ];
 
-function discount(mrp: number, sp: number) {
-  return mrp > sp ? Math.round(((mrp - sp) / mrp) * 100) : 0;
-}
-
 export default function ShopPageClient({
-  products, manufacturers, categories,
-}: { products: Product[]; manufacturers: Manufacturer[]; categories: string[] }) {
+  products,
+  manufacturers,
+  categories,
+  dbIndications = [],
+  rawIndications = [],
+  initialCategory = '',
+  initialSearch = '',
+}: {
+  products: Product[];
+  manufacturers: Manufacturer[];
+  categories: string[];
+  dbIndications?: string[];
+  rawIndications?: RawIndication[];
+  initialCategory?: string;
+  initialSearch?: string;
+}) {
+  const allSymptomsList = useMemo(() => {
+    const combined = [...HEALTH_SYMPTOMS, ...dbIndications];
+    return Array.from(new Set(combined)).sort();
+  }, [dbIndications]);
 
-  const [search, setSearch]             = useState('');
-  const [selectedCats, setSelectedCats] = useState<string[]>([]);
-  const [selectedMfr, setSelectedMfr]   = useState(0);
-  const [sortKey, setSortKey]           = useState<SortKey>('featured');
-  const [inStockOnly, setInStockOnly]   = useState(false);
-  const [showSidebar, setShowSidebar]   = useState(true);
-  const [catExpanded, setCatExpanded]   = useState(true);
-  const [mfrExpanded, setMfrExpanded]   = useState(true);
-  const [catSearch, setCatSearch]       = useState('');
-  const [mfrSearch, setMfrSearch]       = useState('');
-  const [visibleCount, setVisibleCount] = useState(9);
-  const { openCart, totalItems } = useCart();
+  const resolvedInitialCat = useMemo(() => {
+    if (!initialCategory) return '';
+    const match = categories.find(
+      c => c.toLowerCase() === initialCategory.toLowerCase() ||
+           c.toLowerCase().replace(/[^a-z0-9]+/g, '-') === initialCategory.toLowerCase().replace(/[^a-z0-9]+/g, '-') ||
+           c.toLowerCase().includes(initialCategory.toLowerCase()) ||
+           initialCategory.toLowerCase().includes(c.toLowerCase())
+    );
+    return match || initialCategory;
+  }, [initialCategory, categories]);
 
+  const [search, setSearch] = useState(initialSearch || '');
+  const [selectedCats, setSelectedCats] = useState<string[]>(
+    resolvedInitialCat ? [resolvedInitialCat] : []
+  );
+  const [selectedMfr, setSelectedMfr] = useState(0);
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [symptomMatchMode, setSymptomMatchMode] = useState<'OR' | 'AND'>('OR');
+  const [sortKey, setSortKey] = useState<SortKey>('featured');
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
+  const [catExpanded, setCatExpanded] = useState(true);
+  const [symExpanded, setSymExpanded] = useState(true);
+  const [mfrExpanded, setMfrExpanded] = useState(true);
+  const [typeExpanded, setTypeExpanded] = useState(true);
+
+  const [catSearch, setCatSearch] = useState('');
+  const [symSearch, setSymSearch] = useState('');
+  const [mfrSearch, setMfrSearch] = useState('');
+  const [visibleCount, setVisibleCount] = useState(12);
+
+  const { openCart, totalItems, addItem } = useCart();
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
-  // Derive max price from products
   const maxPrice = useMemo(() => Math.ceil(Math.max(...products.map(p => p.sellingPrice), 500) / 100) * 100, [products]);
   const [priceMax, setPriceMax] = useState<number>(maxPrice);
 
   const toggleCat = (c: string) =>
     setSelectedCats(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]);
 
-  const activeFilterCount = selectedCats.length + (selectedMfr ? 1 : 0) + (inStockOnly ? 1 : 0) + (priceMax < maxPrice ? 1 : 0);
+  const toggleSymptom = (s: string) =>
+    setSelectedSymptoms(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
+
+  const activeFilterCount =
+    selectedCats.length + selectedSymptoms.length + (selectedMfr ? 1 : 0) + (selectedType ? 1 : 0) + (inStockOnly ? 1 : 0) + (priceMax < maxPrice ? 1 : 0);
 
   const clearFilters = () => {
-    setSelectedCats([]); setSelectedMfr(0); setInStockOnly(false);
+    setSelectedCats([]); setSelectedSymptoms([]); setSelectedMfr(0); setSelectedType(''); setInStockOnly(false);
     setPriceMax(maxPrice); setSearch('');
-    setCatSearch(''); setMfrSearch('');
-    setVisibleCount(9);
+    setCatSearch(''); setSymSearch(''); setMfrSearch('');
+    setVisibleCount(12);
   };
+
+  const matchedSymptomIndications = useMemo(() => {
+    if (!search.trim() || !rawIndications.length) return [];
+    const q = search.toLowerCase().trim();
+    return rawIndications.filter(ind =>
+      ind.name.toLowerCase().includes(q) ||
+      (ind.symptomsKeywords && ind.symptomsKeywords.toLowerCase().includes(q))
+    );
+  }, [search, rawIndications]);
 
   const filtered = useMemo(() => {
     let list = [...products];
-    if (search) list = list.filter(p =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.shortDesc?.toLowerCase().includes(search.toLowerCase()) ||
-      p.category?.toLowerCase().includes(search.toLowerCase())
-    );
-    if (selectedCats.length) list = list.filter(p => p.category && selectedCats.includes(p.category));
-    if (selectedMfr) list = list.filter(p => p.manufacturer?.id === selectedMfr);
+
+    // Sales Channel / Target Audience Filtering (B2C consumer catalog)
+    list = list.filter(p => {
+      const aud = (p as any).targetAudience || 'BOTH';
+      return aud === 'B2C' || aud === 'BOTH';
+    });
+
+    if (search.trim()) {
+      const q = search.toLowerCase().trim();
+      const matchedIndicationNames = matchedSymptomIndications.map(i => i.name.toLowerCase());
+
+      list = list.filter(p => {
+        const formattedType = (p.type || 'READY_PRODUCT').replace('_', ' ');
+        const prodText = `${p.name} ${p.botanicalName || ''} ${formattedType} ${p.shortDesc || ''} ${p.category || ''} ${p.tags || ''}`.toLowerCase();
+        if (prodText.includes(q)) return true;
+        return matchedIndicationNames.some(indName => {
+          const mainKey = indName.split('(')[0].trim();
+          return prodText.includes(mainKey);
+        });
+      });
+    }
+
+    if (selectedCats.length) {
+      list = list.filter(p => {
+        if (!p.category) return false;
+        if (selectedCats.includes(p.category)) return true;
+        return selectedCats.some(cat => {
+          const catNorm = cat.toLowerCase().replace(/[^a-z0-9]+/g, '');
+          const prodCatNorm = p.category!.toLowerCase().replace(/[^a-z0-9]+/g, '');
+          return catNorm === prodCatNorm || catNorm.includes(prodCatNorm) || prodCatNorm.includes(catNorm);
+        });
+      });
+    }
+
+    if (selectedMfr) {
+      list = list.filter(p => p.manufacturer?.id === selectedMfr);
+    }
+
+    if (selectedType) {
+      list = list.filter(p => (p.type || 'READY_PRODUCT') === selectedType);
+    }
+
+    if (selectedSymptoms.length > 0) {
+      list = list.filter(p => {
+        const prodText = `${p.name} ${p.shortDesc || ''} ${p.tags || ''}`.toLowerCase();
+        if (symptomMatchMode === 'AND') {
+          return selectedSymptoms.every(sym => {
+            const symKeyword = sym.toLowerCase().split('(')[0].trim();
+            return prodText.includes(symKeyword);
+          });
+        } else {
+          return selectedSymptoms.some(sym => {
+            const symKeyword = sym.toLowerCase().split('(')[0].trim();
+            return prodText.includes(symKeyword);
+          });
+        }
+      });
+    }
+
     if (inStockOnly) list = list.filter(p => p.stock > 0);
     list = list.filter(p => p.sellingPrice <= priceMax);
 
@@ -85,44 +209,33 @@ export default function ShopPageClient({
       case 'newest':     list.sort((a, b) => b.id - a.id); break;
     }
     return list;
-  }, [products, search, selectedCats, selectedMfr, inStockOnly, priceMax, sortKey]);
+  }, [products, search, selectedCats, selectedMfr, selectedType, selectedSymptoms, symptomMatchMode, inStockOnly, priceMax, sortKey, matchedSymptomIndications]);
 
-  // Reset visible count when any filter changes
   useEffect(() => {
-    setVisibleCount(9);
-  }, [search, selectedCats, selectedMfr, inStockOnly, priceMax, sortKey]);
+    setVisibleCount(12);
+  }, [search, selectedCats, selectedMfr, selectedType, selectedSymptoms, symptomMatchMode, inStockOnly, priceMax, sortKey]);
 
-  // Infinite scroll trigger via IntersectionObserver
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && visibleCount < filtered.length) {
-          setVisibleCount(prev => prev + 9);
+          setVisibleCount(prev => prev + 12);
         }
       },
       { threshold: 0.1 }
     );
-
     const currentLoader = loaderRef.current;
-    if (currentLoader) {
-      observer.observe(currentLoader);
-    }
-
-    return () => {
-      if (currentLoader) {
-        observer.unobserve(currentLoader);
-      }
-    };
+    if (currentLoader) observer.observe(currentLoader);
+    return () => { if (currentLoader) observer.unobserve(currentLoader); };
   }, [filtered.length, visibleCount]);
 
   const visibleProducts = useMemo(() => {
     return filtered.slice(0, visibleCount);
   }, [filtered, visibleCount]);
 
-  /* ── Shared sidebar content ─────────────────────────────── */
+  /* ── Filter Sidebar ── */
   const FilterSidebar = ({ onClose }: { onClose?: () => void }) => (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="font-extrabold text-brand-green flex items-center gap-2 text-sm">
           <SlidersHorizontal className="h-4 w-4" /> Filters
@@ -142,6 +255,117 @@ export default function ShopPageClient({
             </button>
           )}
         </div>
+      </div>
+
+      {/* Formulation Type Filter (B2B & B2C) */}
+      <div className="space-y-2 pt-2 border-t border-border/60">
+        <button
+          onClick={() => setTypeExpanded(v => !v)}
+          className="w-full flex items-center justify-between text-xs font-extrabold text-brand-green uppercase tracking-widest"
+        >
+          <span className="flex items-center gap-1.5">
+            <ListFilter className="h-3.5 w-3.5" /> Formulation Type
+          </span>
+          {typeExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+        </button>
+        {typeExpanded && (
+          <div className="flex flex-col gap-1 pt-1 max-h-48 overflow-y-auto">
+            {PREPARATION_TYPES.map(pt => (
+              <button
+                key={pt.id}
+                onClick={() => setSelectedType(pt.id)}
+                className={`text-xs font-bold px-3 py-1.5 rounded-xl text-left border transition-colors flex items-center justify-between ${
+                  selectedType === pt.id
+                    ? 'bg-brand-green text-white border-transparent'
+                    : 'border-border text-foreground/70 hover:border-brand-green/40'
+                }`}
+              >
+                <span>{pt.label}</span>
+                {selectedType === pt.id && <span className="text-[10px] font-extrabold">✓</span>}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Health Concerns & Symptoms Section */}
+      <div className="space-y-2 pt-2 border-t border-border/60">
+        <button
+          onClick={() => setSymExpanded(v => !v)}
+          className="w-full flex items-center justify-between text-xs font-extrabold text-amber-800 dark:text-amber-300 uppercase tracking-widest"
+        >
+          <span className="flex items-center gap-1.5">
+            <span>🩺</span> Health Concerns & Symptoms
+          </span>
+          {symExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+        </button>
+
+        {symExpanded && (
+          <div className="space-y-2 pt-1">
+            <div className="flex items-center justify-between bg-amber-500/10 border border-amber-500/20 p-2 rounded-xl text-[10px]">
+              <span className="font-extrabold text-amber-900 dark:text-amber-300">Match Mode:</span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setSymptomMatchMode('OR')}
+                  className={`px-2 py-0.5 rounded-lg font-bold transition-colors ${
+                    symptomMatchMode === 'OR' ? 'bg-amber-600 text-white' : 'bg-card text-foreground/60 hover:text-foreground'
+                  }`}
+                >
+                  ANY (OR)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSymptomMatchMode('AND')}
+                  className={`px-2 py-0.5 rounded-lg font-bold transition-colors ${
+                    symptomMatchMode === 'AND' ? 'bg-amber-600 text-white' : 'bg-card text-foreground/60 hover:text-foreground'
+                  }`}
+                >
+                  ALL (AND)
+                </button>
+              </div>
+            </div>
+
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-foreground/40" />
+              <input
+                type="text"
+                placeholder="Search symptoms (e.g. pain, sleep)..."
+                value={symSearch}
+                onChange={e => setSymSearch(e.target.value)}
+                className="w-full pl-7 pr-7 py-1.5 bg-muted/60 border border-border rounded-xl text-xs focus:outline-none focus:border-amber-500/40 text-foreground placeholder:text-foreground/40"
+              />
+              {symSearch && (
+                <button onClick={() => setSymSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground">
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-1 max-h-44 overflow-y-auto pr-1">
+              {allSymptomsList
+                .filter(s => s.toLowerCase().includes(symSearch.toLowerCase()))
+                .map(s => {
+                  const isChecked = selectedSymptoms.includes(s);
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => toggleSymptom(s)}
+                      className={`text-xs font-semibold px-2.5 py-1.5 rounded-xl text-left border flex items-center justify-between transition-colors ${
+                        isChecked
+                          ? 'bg-amber-500/15 border-amber-500/40 text-amber-900 dark:text-amber-300 font-bold'
+                          : 'border-border text-foreground/70 hover:border-amber-500/30'
+                      }`}
+                    >
+                      <span className="truncate pr-1">{s}</span>
+                      {isChecked ? <CheckSquare className="h-3.5 w-3.5 text-amber-600 flex-shrink-0" /> : <Square className="h-3.5 w-3.5 text-foreground/30 flex-shrink-0" />}
+                    </button>
+                  );
+                })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* In-Stock Toggle */}
@@ -223,14 +447,14 @@ export default function ShopPageClient({
         )}
       </div>
 
-      {/* Manufacturer */}
+      {/* Brand */}
       {manufacturers.length > 0 && (
         <div className="space-y-2">
           <button
             onClick={() => setMfrExpanded(v => !v)}
             className="w-full flex items-center justify-between text-xs font-extrabold text-foreground/60 uppercase tracking-widest"
           >
-            <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" /> Manufacturer</span>
+            <span className="flex items-center gap-1.5"><Building2 className="h-3 w-3" /> Brand</span>
             {mfrExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
           </button>
           {mfrExpanded && (
@@ -239,7 +463,7 @@ export default function ShopPageClient({
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-foreground/40" />
                 <input
                   type="text"
-                  placeholder="Search manufacturers..."
+                  placeholder="Search brands..."
                   value={mfrSearch}
                   onChange={e => setMfrSearch(e.target.value)}
                   className="w-full pl-7 pr-7 py-1.5 bg-muted/60 border border-border rounded-xl text-xs focus:outline-none focus:border-brand-green/40 text-foreground placeholder:text-foreground/40"
@@ -256,7 +480,7 @@ export default function ShopPageClient({
                   className={`text-xs font-bold px-3 py-1.5 rounded-xl text-left border transition-colors ${
                     !selectedMfr ? 'bg-brand-green text-white border-transparent' : 'border-border text-foreground/60 hover:border-brand-green'
                   }`}
-                >All Manufacturers</button>
+                >All Brands</button>
                 {manufacturers
                   .filter(m => m.companyName.toLowerCase().includes(mfrSearch.toLowerCase()))
                   .map(m => (
@@ -280,111 +504,95 @@ export default function ShopPageClient({
       <CartDrawer />
 
       <div className="min-h-screen bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
-
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-
-          {/* Search + Sort Bar */}
-          <div className="flex flex-col sm:flex-row gap-3 mb-6 sticky top-16 z-20 bg-background/95 backdrop-blur-sm py-3 -mx-4 sm:-mx-6 px-4 sm:px-6 border-b border-border">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/40" />
-              <input
-                type="text" placeholder="Search products…" value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="w-full pl-11 pr-10 py-2.5 bg-card border border-border rounded-2xl text-sm focus:outline-none focus:border-brand-gold shadow-sm text-foreground placeholder:text-foreground/40" />
-              {search && (
-                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground">
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-
-            {/* Sort */}
-            <div className="relative">
-              <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/40 pointer-events-none" />
-              <select
-                value={sortKey} onChange={e => setSortKey(e.target.value as SortKey)}
-                className="pl-9 pr-8 py-2.5 bg-card border border-border rounded-2xl text-sm focus:outline-none focus:border-brand-gold appearance-none text-foreground font-semibold cursor-pointer shadow-sm w-full sm:w-52"
-              >
-                {SORT_OPTIONS.map(o => <option key={o.key} value={o.key}>{o.label}</option>)}
-              </select>
-            </div>
-
-            {/* Filter Toggle Button */}
-            <button
-              onClick={() => setShowSidebar(v => !v)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl font-bold text-sm border transition-colors ${
-                showSidebar ? 'bg-brand-green text-white border-brand-green' : 'bg-card border-border text-foreground/70 hover:border-brand-green'
-              }`}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              {showSidebar ? 'Hide Filters' : 'Filters'} {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}
-            </button>
-
-            {/* Cart */}
-            <button onClick={openCart}
-              className="relative flex items-center gap-2 bg-brand-green text-white px-4 py-2.5 rounded-2xl font-bold text-sm hover:bg-brand-gold hover:text-brand-green transition-colors shadow-sm">
-              <ShoppingBag className="h-4 w-4" />
-              Cart
-              {totalItems > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center">
-                  {totalItems}
+          {/* ── Top Bar: Ayurwed Catalog Banner ── */}
+          <div className="bg-card border border-border rounded-3xl p-4 sm:p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-extrabold bg-brand-green-light text-brand-green px-3 py-1 rounded-full uppercase tracking-wider">
+                  Ayurwed Catalog
                 </span>
-              )}
-            </button>
+                <span className="text-xs font-bold text-foreground/50">
+                  Classical &amp; Wellness Formulations
+                </span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-brand-green">
+                Authentic Ayurvedic Remedies &amp; Formulations
+              </h1>
+              <p className="text-xs sm:text-sm text-foreground/70">
+                Browse authentic ready remedies, classical churnas, single herbs, and daily supplements crafted in adherence to Ayurvedic traditions.
+              </p>
+            </div>
           </div>
 
-          {/* Active Filter Pills */}
-          {activeFilterCount > 0 && (
-            <div className="flex flex-wrap gap-2 mb-5">
-              {selectedCats.map(c => (
-                <span key={c} className="flex items-center gap-1.5 bg-brand-green-light text-brand-green text-xs font-bold px-3 py-1 rounded-full border border-brand-green/20">
-                  <Tag className="h-3 w-3" />{c}
-                  <button onClick={() => toggleCat(c)} className="hover:text-rose-500 transition-colors"><X className="h-3 w-3" /></button>
-                </span>
-              ))}
-              {selectedMfr > 0 && (
-                <span className="flex items-center gap-1.5 bg-brand-gold-light text-brand-gold-dark text-xs font-bold px-3 py-1 rounded-full border border-brand-gold/20">
-                  <Building2 className="h-3 w-3" />{manufacturers.find(m => m.id === selectedMfr)?.companyName}
-                  <button onClick={() => setSelectedMfr(0)} className="hover:text-rose-500 transition-colors"><X className="h-3 w-3" /></button>
-                </span>
-              )}
-              {inStockOnly && (
-                <span className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-                  In Stock
-                  <button onClick={() => setInStockOnly(false)} className="hover:text-rose-500 transition-colors"><X className="h-3 w-3" /></button>
-                </span>
-              )}
-              {priceMax < maxPrice && (
-                <span className="flex items-center gap-1.5 bg-muted text-foreground/70 text-xs font-bold px-3 py-1 rounded-full border border-border">
-                  ≤ ₹{priceMax.toLocaleString('en-IN')}
-                  <button onClick={() => setPriceMax(maxPrice)} className="hover:text-rose-500 transition-colors"><X className="h-3 w-3" /></button>
-                </span>
-              )}
-              <button onClick={clearFilters} className="text-xs font-bold text-rose-500 hover:underline px-2">
-                Clear all
-              </button>
-            </div>
-          )}
+          {/* Filter Pills Header */}
+          <ShopFilterPillsHeader
+            search={search}
+            setSearch={setSearch}
+            selectedType={selectedType}
+            setSelectedType={setSelectedType}
+            selectedCats={selectedCats}
+            toggleCat={toggleCat}
+            setSelectedCats={setSelectedCats}
+            selectedMfr={selectedMfr}
+            setSelectedMfr={setSelectedMfr}
+            selectedSymptoms={selectedSymptoms}
+            toggleSymptom={toggleSymptom}
+            setSelectedSymptoms={setSelectedSymptoms}
+            symptomMatchMode={symptomMatchMode}
+            setSymptomMatchMode={setSymptomMatchMode}
+            sortKey={sortKey}
+            setSortKey={setSortKey}
+            inStockOnly={inStockOnly}
+            setInStockOnly={setInStockOnly}
+            priceMax={priceMax}
+            setPriceMax={setPriceMax}
+            maxPrice={maxPrice}
+            showSidebar={showSidebar}
+            setShowSidebar={setShowSidebar}
+            activeFilterCount={activeFilterCount}
+            clearFilters={clearFilters}
+            categories={categories}
+            manufacturers={manufacturers}
+            products={products}
+            openCart={openCart}
+            totalItems={totalItems}
+          />
 
-          {/* Layout: sidebar + grid */}
-          <div className="flex gap-4 sm:gap-6 items-start">
+          {/* Main Full-Width Content Container */}
+          <div className="w-full min-w-0">
+              {/* Symptom Search Intelligence Banner */}
+              {search.trim() && matchedSymptomIndications.length > 0 && (
+                <div className="mb-4 bg-amber-500/10 border border-amber-500/25 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-xs">
+                  <div className="flex items-start gap-2.5 text-amber-950 dark:text-amber-200">
+                    <span className="text-lg leading-none">🩺</span>
+                    <div className="space-y-0.5">
+                      <p className="font-extrabold text-amber-900 dark:text-amber-300">
+                        Symptom Search Intelligence Active
+                      </p>
+                      <p className="text-brand-foreground/80 leading-relaxed">
+                        Searching <code className="bg-amber-500/20 px-1.5 py-0.5 rounded font-bold">&quot;{search}&quot;</code> matched clinical indication{matchedSymptomIndications.length > 1 ? 's' : ''}: <strong>{matchedSymptomIndications.map(i => i.name).join(', ')}</strong>.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newSyms = Array.from(new Set([...selectedSymptoms, ...matchedSymptomIndications.map(i => i.name)]));
+                      setSelectedSymptoms(newSyms);
+                    }}
+                    className="bg-amber-600 hover:bg-amber-700 text-white font-extrabold px-3.5 py-2 rounded-xl transition-colors flex-shrink-0"
+                  >
+                    + Add to Symptom Filters
+                  </button>
+                </div>
+              )}
 
-            {/* Sidebar */}
-            <aside className={`flex-shrink-0 bg-card border border-border rounded-2xl sm:rounded-3xl p-3 sm:p-5 sticky top-28 sm:top-36 transition-all duration-300 ${
-              showSidebar ? 'w-40 xs:w-48 sm:w-56 md:w-60 lg:w-64 block' : 'w-0 hidden'
-            }`}>
-              <FilterSidebar onClose={() => setShowSidebar(false)} />
-            </aside>
-
-            {/* Product Grid */}
-            <div className="flex-1 min-w-0">
-              {/* Result count */}
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-sm text-foreground/60">
-                  Showing <span className="font-extrabold text-brand-green">{filtered.length}</span> of {products.length} products
+              {/* Count */}
+              <div className="flex items-center justify-between mb-4 text-sm">
+                <p className="text-foreground/60">
+                  Showing <span className="font-extrabold text-brand-green">{filtered.length}</span> of {products.length} formulations
                 </p>
               </div>
 
@@ -394,15 +602,29 @@ export default function ShopPageClient({
                     <ShoppingBag className="h-12 w-12 text-foreground/20" />
                   </div>
                   <h3 className="text-xl font-bold text-foreground/50">No products found</h3>
-                  <p className="text-sm text-foreground/40">Try adjusting your filters or search</p>
+                  <p className="text-sm text-foreground/40 max-w-sm">
+                    No Ayurvedic formulations match your current symptom or category filters. Try resetting filters.
+                  </p>
                   <button onClick={clearFilters} className="bg-brand-green text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-brand-gold hover:text-brand-green transition-colors">
-                    Clear Filters
+                    Clear All Filters
                   </button>
                 </div>
               ) : (
+                /* Grid View (B2C Catalog) */
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {visibleProducts.map(p => <ShopProductCard key={p.id} product={p} />)}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {visibleProducts.map(p => (
+                      <ShopProductCard
+                        key={p.id}
+                        product={p}
+                        mode="B2C"
+                        onSelectSymptom={(sym) => {
+                          if (!selectedSymptoms.includes(sym)) {
+                            setSelectedSymptoms([...selectedSymptoms, sym]);
+                          }
+                        }}
+                      />
+                    ))}
                   </div>
 
                   {visibleCount < filtered.length && (
@@ -418,7 +640,6 @@ export default function ShopPageClient({
             </div>
           </div>
         </div>
-      </div>
     </>
   );
 }

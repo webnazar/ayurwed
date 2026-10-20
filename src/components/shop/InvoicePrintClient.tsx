@@ -69,8 +69,12 @@ export default function InvoicePrintClient({ order }: { order: any }) {
             ))}
           </div>
           <button onClick={handlePrint}
-            className="flex items-center gap-2 bg-[#045829] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#034520] transition-colors">
+            className="flex items-center gap-2 bg-[#045829] text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#034520] transition-colors shadow-xs">
             <Printer className="h-4 w-4" /> Print Invoice
+          </button>
+          <button onClick={handlePrint}
+            className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-800 transition-colors shadow-xs">
+            <Download className="h-4 w-4" /> Save as PDF
           </button>
         </div>
       </div>

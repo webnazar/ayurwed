@@ -17,3 +17,40 @@ export const PRODUCT_CATEGORIES = [
   'Lotion',
   'Other',
 ];
+
+export const HEALTH_SYMPTOMS = [
+  'Acid Reflux & Acidity',
+  'Acne & Pimples',
+  'Arthritis (Sandhivata)',
+  'Asthma & Respiratory',
+  'Back Pain',
+  'Constipation (Vibandha)',
+  'Cough & Cold',
+  'Diabetes & Blood Sugar',
+  'Digestive Issues (Agnimandya)',
+  'Dry Skin & Itching',
+  'Eye Care',
+  'Fatigue & Vitality',
+  'Gas & Bloating',
+  'Hair Fall & Dandruff',
+  'Hypertension & High BP',
+  'Immunity Support',
+  'Insomnia & Sleep',
+  'Joint & Muscle Pain',
+  'Liver Care & Detox',
+  'Memory & Brain Health',
+  'Sinusitis & Nasal Block',
+  'Skin Health & Eczema',
+  'Skin Rash & Allergies',
+  'Stress & Anxiety',
+  'Weight Management',
+];
+
+export const SYMPTOM_QUICK_CHIPS = [
+  { id: 'digestive', label: 'Digestion & Acidity', icon: '🥗', symptoms: ['Digestive Issues (Agnimandya)', 'Acid Reflux & Acidity', 'Gas & Bloating', 'Constipation (Vibandha)'] },
+  { id: 'joint', label: 'Joint & Muscle Pain', icon: '🦴', symptoms: ['Joint & Muscle Pain', 'Arthritis (Sandhivata)', 'Back Pain'] },
+  { id: 'stress', label: 'Stress & Sleep', icon: '🧘', symptoms: ['Stress & Anxiety', 'Insomnia & Sleep', 'Memory & Brain Health'] },
+  { id: 'immunity', label: 'Immunity & Cold', icon: '🛡️', symptoms: ['Immunity Support', 'Cough & Cold', 'Asthma & Respiratory', 'Fatigue & Vitality'] },
+  { id: 'hair-skin', label: 'Hair & Skin Care', icon: '💆', symptoms: ['Hair Fall & Dandruff', 'Skin Health & Eczema', 'Acne & Pimples', 'Dry Skin & Itching'] },
+  { id: 'metabolic', label: 'Blood Sugar & Detox', icon: '⚡', symptoms: ['Diabetes & Blood Sugar', 'Weight Management', 'Liver Care & Detox'] },
+];

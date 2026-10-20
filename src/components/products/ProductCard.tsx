@@ -4,10 +4,10 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Star, ArrowRight, Sparkles } from 'lucide-react';
-import { Preparation } from '@prisma/client';
+import { Product } from '@prisma/client';
 
 interface ExtractCardProps {
-  preparation: Preparation;
+  preparation: Product;
 }
 
 export default function ExtractCard({ preparation }: ExtractCardProps) {
@@ -36,7 +36,7 @@ export default function ExtractCard({ preparation }: ExtractCardProps) {
       )}
 
       {/* Preparation Image */}
-      <div className="relative h-56 bg-muted overflow-hidden flex-shrink-0 flex items-center justify-center group-hover:bg-muted/80 transition-colors duration-300">
+      <div className="relative aspect-square bg-muted overflow-hidden flex-shrink-0 flex items-center justify-center group-hover:bg-muted/80 transition-colors duration-300">
         <Image
           src={thumbnail}
           alt={preparation.name}
@@ -52,7 +52,7 @@ export default function ExtractCard({ preparation }: ExtractCardProps) {
       <div className="p-5 flex-grow flex flex-col justify-between space-y-3">
         <div className="space-y-1">
           <span className="text-[10px] font-bold text-brand-gold-dark uppercase tracking-widest">
-            {preparation.type.replace('_', ' ')}
+            {(preparation.type || 'READY_PRODUCT').replace('_', ' ')}
           </span>
           <h3 className="text-sm font-bold text-title-primary group-hover:text-brand-gold transition-colors duration-200 line-clamp-2">
             {preparation.name}
@@ -80,7 +80,7 @@ export default function ExtractCard({ preparation }: ExtractCardProps) {
             )}
           </div>
           <Link
-            href={`/preparations/${preparation.slug}`}
+            href={`/shop/${preparation.slug}`}
             className="btn-primary text-xs px-4 py-2 rounded-full flex items-center gap-1.5"
           >
             Explore <ArrowRight className="h-3.5 w-3.5" />

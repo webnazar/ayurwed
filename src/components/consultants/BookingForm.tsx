@@ -26,9 +26,19 @@ interface BookingFormProps {
   };
   initialUserPhone?: string;
   initialVisitType?: 'INITIAL' | 'FOLLOW_UP';
+  existingAppointment?: {
+    id: number;
+    scheduledAt: string;
+    status: string;
+    type: string;
+    patientName: string | null;
+    doctorName?: string;
+    isFreeBlocked?: boolean;
+    reason?: string;
+  } | null;
 }
 
-export default function BookingForm({ consultant, initialUserPhone = '', initialVisitType = 'INITIAL' }: BookingFormProps) {
+export default function BookingForm({ consultant, initialUserPhone = '', initialVisitType = 'INITIAL', existingAppointment }: BookingFormProps) {
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -246,11 +256,84 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
         </div>
 
         <button
-          onClick={() => router.push('/consumer/dashboard/appointments')}
+          onClick={() => router.push('/consumer/dashboard')}
           className="w-full bg-brand-green hover:bg-brand-gold hover:text-brand-green text-white font-bold py-3 rounded-full transition-colors duration-200"
         >
           Go to Dashboard
         </button>
+      </div>
+    );
+  }
+
+  if (existingAppointment) {
+    const isFreeBlocked = existingAppointment.isFreeBlocked;
+    return (
+      <div className={`bg-card rounded-3xl p-8 border shadow-sm text-center space-y-5 ${
+        isFreeBlocked ? 'border-amber-500/40' : 'border-brand-gold/30'
+      }`}>
+        <div className={`p-4 rounded-full inline-flex mx-auto ${
+          isFreeBlocked ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400' : 'bg-brand-gold/15 text-brand-gold-dark'
+        }`}>
+          {isFreeBlocked ? <ShieldCheck className="h-10 w-10 animate-pulse-slow" /> : <Clock className="h-10 w-10 animate-pulse-slow" />}
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-xl font-extrabold text-brand-green">
+            {isFreeBlocked ? 'Free Consultation Limit Reached' : 'Active Consultation Exists'}
+          </h3>
+          <p className="text-xs sm:text-sm text-brand-foreground/75 leading-relaxed">
+            {existingAppointment.reason || (
+              isFreeBlocked 
+                ? 'To ensure fair access and prevent spam, free consultations are limited to one active session per patient.' 
+                : `You already have an active appointment scheduled with Dr. ${consultant.name}.`
+            )}
+          </p>
+        </div>
+
+        <div className="bg-brand-gold/10 border border-brand-gold/20 rounded-2xl p-4 text-left text-xs space-y-2 text-foreground">
+          {existingAppointment.doctorName && (
+            <div className="flex items-center justify-between border-b border-border/40 pb-2">
+              <span className="text-muted-foreground font-semibold">Doctor:</span>
+              <span className="font-bold text-brand-green">Dr. {existingAppointment.doctorName}</span>
+            </div>
+          )}
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground font-semibold">Status:</span>
+            <span className="font-extrabold text-brand-gold-dark bg-brand-gold/20 px-2.5 py-0.5 rounded-full uppercase">
+              {existingAppointment.status}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground font-semibold">Scheduled Date:</span>
+            <span className="font-bold text-foreground">
+              {format(new Date(existingAppointment.scheduledAt), 'dd/MM/yyyy')}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground font-semibold">Scheduled Time:</span>
+            <span className="font-bold text-foreground">
+              {format(new Date(existingAppointment.scheduledAt), 'hh:mm a')}
+            </span>
+          </div>
+          {existingAppointment.patientName && (
+            <div className="flex items-center justify-between border-t border-border/40 pt-2">
+              <span className="text-muted-foreground font-semibold">Patient:</span>
+              <span className="font-bold text-brand-green">{existingAppointment.patientName}</span>
+            </div>
+          )}
+        </div>
+
+        <p className="text-[11px] text-muted-foreground italic">
+          {isFreeBlocked 
+            ? 'Anti-spam protection: You will be able to book another free session once your current free session is completed or cancelled.' 
+            : 'You will be able to schedule a new consultation once your current session is marked as completed or cancelled.'}
+        </p>
+
+        <Link
+          href="/consumer/dashboard"
+          className="w-full bg-brand-green hover:bg-brand-gold hover:text-brand-green text-white font-bold py-3 px-6 rounded-full transition-all duration-200 inline-block text-xs shadow-sm"
+        >
+          Go to Dashboard
+        </Link>
       </div>
     );
   }
@@ -338,7 +421,7 @@ export default function BookingForm({ consultant, initialUserPhone = '', initial
               );
             })
           ) : (
-            <div className="col-span-2 text-center py-4 text-xs text-brand-foreground/50 italic bg-brand-green-light/10 border border-dashed border-border rounded-xl">
+            <div className="col-span-full text-center py-4 text-xs text-brand-foreground/50 italic bg-brand-green-light/10 border border-dashed border-border rounded-xl">
               {date ? 'No availability slots defined on this day.' : 'Please select a date to view available slots.'}
             </div>
           )}

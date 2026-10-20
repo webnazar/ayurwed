@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { Search, Filter, X, Calendar, Clock, CheckCircle2, XCircle, Video, Phone, MessageSquare, Link as LinkIcon, HeartHandshake, MapPin, Printer, Truck, Info } from 'lucide-react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { Search, Filter, X, Calendar, Clock, CheckCircle2, XCircle, Video, Phone, MessageSquare, Link as LinkIcon, HeartHandshake, MapPin, Printer, Truck, Info, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatPrice } from '@/lib/utils';
 import Link from 'next/link';
@@ -28,10 +28,10 @@ interface Appointment {
 }
 
 const statusStyles: Record<ApptStatus, string> = {
-  PENDING: 'bg-amber-100 text-amber-700',
-  CONFIRMED: 'bg-blue-100 text-blue-700',
-  COMPLETED: 'bg-emerald-100 text-emerald-700',
-  CANCELLED: 'bg-rose-100 text-rose-700',
+  PENDING: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-300/30',
+  CONFIRMED: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-300/30',
+  COMPLETED: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-300/30',
+  CANCELLED: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-300/30',
 };
 
 const typeIcon: Record<string, React.ReactNode> = {
@@ -45,9 +45,81 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
   const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
-  const [filterDate, setFilterDate] = useState('');
+  const [dateInputText, setDateInputText] = useState('');
   const [cancelling, setCancelling] = useState<number | null>(null);
   const [cancelModalId, setCancelModalId] = useState<number | null>(null);
+
+  // Master-Detail Collapsible State & Batch Pagination
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [displayCount, setDisplayCount] = useState(12);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Custom Theme-Adaptive Status Dropdown State
+  const [statusOpen, setStatusOpen] = useState(false);
+  const statusDropdownRef = useRef<HTMLDivElement | null>(null);
+  const hiddenDateRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setDisplayCount(prev => prev + 12);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (sentinelRef.current) observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(e.target as Node)) {
+        setStatusOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const formatDateDDMMYYYY = (dateStr: string) => {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  // Convert "28/07/2026", "28-07-2026", or "2026-07-28" text into "YYYY-MM-DD" for appointment matching
+  const filterDateIso = useMemo(() => {
+    if (!dateInputText.trim()) return '';
+    const text = dateInputText.trim();
+    const parts = text.split(/[\/\.-]/);
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+      } else {
+        const day = parts[0].padStart(2, '0');
+        const month = parts[1].padStart(2, '0');
+        const year = parts[2].length === 2 ? `20${parts[2]}` : parts[2];
+        if (year.length === 4) {
+          return `${year}-${month}-${day}`;
+        }
+      }
+    }
+    return '';
+  }, [dateInputText]);
+
+  const handleNativeDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (val) {
+      const [y, m, d] = val.split('-');
+      setDateInputText(`${d}/${m}/${y}`);
+    } else {
+      setDateInputText('');
+    }
+  };
 
   // Track selected method for each appointment's pending fulfillment
   const [selectedMethods, setSelectedMethods] = useState<Record<number, string>>(() => {
@@ -81,11 +153,25 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
 
   const filtered = useMemo(() => {
     let list = appointments;
-    if (search) list = list.filter(a => a.consultant?.user?.name?.toLowerCase().includes(search.toLowerCase()));
+    if (search) {
+      const q = search.toLowerCase().trim();
+      list = list.filter(a => (
+        a.consultant?.user?.name?.toLowerCase().includes(q) ||
+        a.patientName?.toLowerCase().includes(q) ||
+        a.concern?.toLowerCase().includes(q) ||
+        `#${a.id}`.includes(q)
+      ));
+    }
     if (filterStatus) list = list.filter(a => a.status === filterStatus);
-    if (filterDate) list = list.filter(a => new Date(a.scheduledAt).toISOString().split('T')[0] === filterDate);
+    if (filterDateIso) {
+      list = list.filter(a => {
+        const d = new Date(a.scheduledAt);
+        const apptDateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        return apptDateStr === filterDateIso;
+      });
+    }
     return list;
-  }, [appointments, search, filterStatus, filterDate]);
+  }, [appointments, search, filterStatus, filterDateIso]);
 
   const cancelAppointment = async (id: number) => {
     setCancelling(id);
@@ -181,30 +267,30 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total Booked', value: stats.total, icon: Calendar, color: 'text-brand-green bg-brand-green-light' },
-          { label: 'Upcoming', value: stats.upcoming, icon: Clock, color: 'text-blue-600 bg-blue-50' },
-          { label: 'Completed', value: stats.completed, icon: CheckCircle2, color: 'text-emerald-600 bg-emerald-50' },
-          { label: 'Cancelled', value: stats.cancelled, icon: XCircle, color: 'text-rose-600 bg-rose-50' },
+          { label: 'Total Booked', value: stats.total, icon: Calendar, color: 'text-brand-green bg-brand-green/15 dark:bg-brand-green/20' },
+          { label: 'Upcoming', value: stats.upcoming, icon: Clock, color: 'text-blue-600 dark:text-blue-400 bg-blue-500/15 dark:bg-blue-500/20' },
+          { label: 'Completed', value: stats.completed, icon: CheckCircle2, color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/15 dark:bg-emerald-500/20' },
+          { label: 'Cancelled', value: stats.cancelled, icon: XCircle, color: 'text-rose-600 dark:text-rose-400 bg-rose-500/15 dark:bg-rose-500/20' },
         ].map(s => (
           <div key={s.label} className="bg-card rounded-2xl p-5 border border-border shadow-sm flex items-center gap-4">
             <div className={`p-3 rounded-2xl ${s.color}`}><s.icon className="h-5 w-5" /></div>
             <div>
-              <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">{s.label}</span>
-              <span className="text-xl font-extrabold text-brand-green">{s.value}</span>
+              <span className="text-[10px] text-muted-foreground block font-bold uppercase tracking-wider">{s.label}</span>
+              <span className="text-xl font-extrabold text-foreground">{s.value}</span>
             </div>
           </div>
         ))}
       </div>
 
       {/* Book New Appointment Card */}
-      <div className="bg-brand-gold-light/40 border border-brand-gold/30 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+      <div className="bg-card border border-border rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-brand-green text-white rounded-full flex-shrink-0">
             <HeartHandshake className="h-6 w-6" />
           </div>
           <div>
             <h3 className="text-lg font-extrabold text-brand-green">Need another consultation?</h3>
-            <p className="text-sm text-brand-foreground/70">Browse our directory of certified Ayurvedic doctors and book a session today.</p>
+            <p className="text-sm text-muted-foreground">Browse our directory of certified Ayurvedic doctors and book a session today.</p>
           </div>
         </div>
         <Link href="/doctors" className="bg-brand-green hover:bg-brand-gold hover:text-brand-green text-white font-bold px-8 py-3 rounded-xl transition-colors whitespace-nowrap shadow-sm flex-shrink-0">
@@ -216,95 +302,203 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
       <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6 border-b border-border">
           <div className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/40" />
-            <input type="text" placeholder="Search doctor name..." value={search} onChange={e => setSearch(e.target.value)}
-              className="pl-9 bg-brand-gold-light/40 border border-border rounded-2xl py-2.5 px-4 text-sm focus:outline-none w-full" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input type="text" placeholder="Search doctor or patient name, #ID..." value={search} onChange={e => setSearch(e.target.value)}
+              className="pl-9 bg-card text-foreground border border-border rounded-2xl py-2.5 px-4 text-sm focus:outline-none w-full placeholder:text-muted-foreground/60" />
           </div>
-          <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/40" />
-            <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)}
-              className="pl-9 bg-brand-gold-light/40 border border-border rounded-2xl py-2.5 px-4 text-sm focus:outline-none w-full sm:w-auto" />
-          </div>
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/40" />
-            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-              className="pl-9 bg-brand-gold-light/40 border border-border rounded-2xl py-2.5 pr-4 text-sm focus:outline-none appearance-none">
-              <option value="">All Statuses</option>
-              {(['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'] as ApptStatus[]).map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
+
+          <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            {/* Dual-Mode Date Filter */}
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                placeholder="dd/mm/yyyy"
+                value={dateInputText}
+                onChange={e => setDateInputText(e.target.value)}
+                className="pl-3.5 pr-9 bg-card text-foreground border border-border rounded-2xl py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-brand-green/30 focus:border-brand-green w-36 placeholder:text-muted-foreground/60 transition-all shadow-xs"
+                title="Type date as dd/mm/yyyy or click calendar icon"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  try {
+                    hiddenDateRef.current?.showPicker();
+                  } catch {
+                    hiddenDateRef.current?.focus();
+                  }
+                }}
+                className="absolute right-2.5 p-1 text-muted-foreground hover:text-brand-green rounded-lg transition-colors"
+                title="Open calendar picker"
+              >
+                <Calendar className="h-4 w-4" />
+              </button>
+              <input
+                ref={hiddenDateRef}
+                type="date"
+                onChange={handleNativeDateChange}
+                className="sr-only"
+              />
+            </div>
+
+            {/* Custom Theme Status Dropdown */}
+            <div ref={statusDropdownRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setStatusOpen(!statusOpen)}
+                className="flex items-center gap-2 bg-card text-foreground border border-border rounded-2xl px-3.5 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-brand-green/30 focus:border-brand-green hover:bg-muted/50 transition-all shadow-xs"
+              >
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span>{filterStatus ? filterStatus : 'All Statuses'}</span>
+                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${statusOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {statusOpen && (
+                <div className="absolute right-0 mt-2 w-44 bg-card border border-border rounded-2xl shadow-xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-150 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => { setFilterStatus(''); setStatusOpen(false); }}
+                    className={`w-full text-left px-4 py-2 text-xs font-bold transition-colors flex items-center justify-between ${
+                      filterStatus === '' ? 'bg-brand-green/10 text-brand-green' : 'text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    <span>All Statuses</span>
+                    {filterStatus === '' && <Check className="h-3.5 w-3.5 text-brand-green" />}
+                  </button>
+
+                  {(['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'] as ApptStatus[]).map(s => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => { setFilterStatus(s); setStatusOpen(false); }}
+                      className={`w-full text-left px-4 py-2 text-xs font-bold transition-colors flex items-center justify-between ${
+                        filterStatus === s ? 'bg-brand-green/10 text-brand-green' : 'text-foreground hover:bg-muted'
+                      }`}
+                    >
+                      <span>{s}</span>
+                      {filterStatus === s && <Check className="h-3.5 w-3.5 text-brand-green" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {(dateInputText || filterStatus || search) && (
+              <button
+                onClick={() => { setDateInputText(''); setFilterStatus(''); setSearch(''); }}
+                className="text-xs font-extrabold text-rose-600 hover:text-rose-700 bg-rose-50 dark:bg-rose-950/40 px-3 py-2 rounded-2xl border border-rose-200 transition-all flex items-center gap-1 active:scale-95"
+                title="Reset all filters"
+              >
+                <X className="h-3.5 w-3.5" />
+                Reset
+              </button>
+            )}
           </div>
         </div>
 
         {filtered.length === 0 ? (
           <div className="py-20 text-center space-y-4">
             <HeartHandshake className="h-14 w-14 text-brand-gold mx-auto animate-pulse-slow" />
-            <h3 className="text-xl font-bold text-brand-green">No Appointments Yet</h3>
-            <p className="text-sm text-brand-foreground/60">Book a consultation with a certified Ayurvedic doctor.</p>
-            <Link href="/doctors" className="inline-block bg-brand-green text-white px-6 py-2.5 rounded-full text-sm font-semibold">Browse Doctors</Link>
+            <h3 className="text-xl font-bold text-brand-green">No Appointments Found</h3>
+            <p className="text-sm text-muted-foreground">Try adjusting your filters or search terms.</p>
+            <Link href="/doctors" className="inline-block bg-brand-green text-white px-6 py-2.5 rounded-full text-xs font-bold shadow-xs">Browse Doctors</Link>
           </div>
         ) : (
-          <div className="divide-y divide-brand-green-border/10">
-            {filtered.map(a => (
-              <div key={a.id} className="p-5 hover:bg-brand-gold-light/10 transition-colors flex flex-col gap-5">
-                {/* Top Row: Avatar, Info & Badges */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    {/* Avatar */}
-                    <div className="flex-shrink-0 h-14 w-14 sm:h-16 sm:w-16 rounded-full overflow-hidden bg-brand-green-light border border-brand-green/20">
-                      <SafeImage 
-                        src={a.consultant?.user?.avatar} 
-                        fallbackSrc="/avatar.webp"
-                        alt={a.consultant?.user?.name || 'Doctor'} 
-                        className="h-full w-full object-cover" 
-                      />
+          <div className="divide-y divide-border/40">
+            {filtered.slice(0, displayCount).map(a => {
+              const isExpanded = expandedId === a.id;
+              return (
+                <div key={a.id} className="p-5 hover:bg-muted/30 transition-colors flex flex-col gap-4">
+                  {/* First Level Summary Row (Clickable) */}
+                  <div 
+                    onClick={() => setExpandedId(isExpanded ? null : a.id)}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-4">
+                      {/* Avatar */}
+                      <div className="flex-shrink-0 h-12 w-12 sm:h-14 sm:w-14 rounded-full overflow-hidden bg-brand-green/10 border border-brand-green/20 group-hover:scale-105 transition-transform">
+                        <SafeImage 
+                          src={a.consultant?.user?.avatar} 
+                          fallbackSrc="/avatar.webp"
+                          alt={a.consultant?.user?.name || 'Doctor'} 
+                          className="h-full w-full object-cover" 
+                        />
+                      </div>
+                      {/* Doctor Info & Summary Date */}
+                      <div>
+                        <h3 className="font-extrabold text-base sm:text-lg text-brand-green group-hover:text-brand-gold-dark transition-colors leading-tight">
+                          {a.consultant?.user?.name || 'Doctor'}
+                        </h3>
+                        <p className="text-xs text-brand-gold-dark font-bold uppercase tracking-wider mt-0.5">
+                          {a.consultant?.specialization || 'Consultant'}
+                        </p>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                          <span className="font-medium text-foreground">{formatDateDDMMYYYY(a.scheduledAt)}</span>
+                          <span>•</span>
+                          <span>{new Date(a.scheduledAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                      </div>
                     </div>
-                    {/* Doctor Info */}
-                    <div>
-                      <h3 className="font-extrabold text-lg text-brand-green leading-tight">{a.consultant?.user?.name || 'Doctor'}</h3>
-                      <p className="text-xs text-brand-gold-dark font-bold uppercase tracking-wider mt-0.5">{a.consultant?.specialization || 'Consultant'}</p>
+                    
+                    {/* Status Badges & Expand Trigger */}
+                    <div className="flex items-center justify-between sm:justify-end gap-3 pl-16 sm:pl-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusStyles[a.status]}`}>{a.status}</span>
+                        <span className="flex items-center gap-1.5 text-xs font-bold text-brand-green bg-brand-green/10 px-3 py-1 rounded-full border border-brand-green/20">
+                          {typeIcon[a.type]} {a.type}
+                        </span>
+                        {a.patientName && (
+                          <span className="text-[10px] bg-brand-gold/20 text-brand-gold-dark px-2.5 py-1 rounded-full font-bold">
+                            For: {a.patientName}
+                          </span>
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedId(isExpanded ? null : a.id);
+                        }}
+                        className={`flex items-center gap-1 text-xs font-bold px-3.5 py-2 rounded-xl transition-all border ${
+                          isExpanded 
+                            ? 'bg-brand-green text-white border-brand-green shadow-xs' 
+                            : 'bg-card text-muted-foreground border-border hover:text-brand-green hover:border-brand-green'
+                        }`}
+                      >
+                        <span>{isExpanded ? 'Hide Details' : 'View Details'}</span>
+                        {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </button>
                     </div>
                   </div>
-                  
-                  {/* Status Badges */}
-                  <div className="flex flex-col items-end gap-2 pl-14 sm:pl-0">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${statusStyles[a.status]}`}>{a.status}</span>
-                      <span className="flex items-center gap-1.5 text-xs font-bold text-brand-green bg-brand-green-light px-3 py-1.5 rounded-full">
-                        {typeIcon[a.type]} {a.type}
-                      </span>
-                    </div>
-                    {a.patientName && (
-                      <span className="text-[10px] bg-brand-gold/20 text-brand-gold-dark px-2.5 py-1 rounded-full font-bold">
-                        For: {a.patientName}
-                      </span>
-                    )}
-                  </div>
-                </div>
+
+                  {/* Expanded Detail Panel */}
+                  {isExpanded && (
+                    <div className="pt-4 border-t border-border/40 space-y-5 animate-in fade-in zoom-in-95 duration-200">
 
                 {/* Details Grid (Full Width) */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-muted/50 rounded-2xl p-4 sm:px-6 border border-border">
                   <div>
-                    <span className="block text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider mb-1">Date</span>
-                    <span className="text-sm font-semibold text-brand-foreground">{new Date(a.scheduledAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                    <span className="block text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">Date</span>
+                    <span className="text-sm font-semibold text-foreground">{formatDateDDMMYYYY(a.scheduledAt)}</span>
                   </div>
                   <div>
-                    <span className="block text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider mb-1">Time</span>
-                    <span className="text-sm font-semibold text-brand-foreground">{new Date(a.scheduledAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                    <span className="block text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">Time</span>
+                    <span className="text-sm font-semibold text-foreground">{new Date(a.scheduledAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                   <div>
-                    <span className="block text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider mb-1">Duration</span>
-                    <span className="text-sm font-semibold text-brand-foreground">{a.duration} min</span>
+                    <span className="block text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">Duration</span>
+                    <span className="text-sm font-semibold text-foreground">{a.duration} min</span>
                   </div>
                   <div>
-                    <span className="block text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider mb-1">Fee</span>
+                    <span className="block text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">Fee</span>
                     <span className="text-sm font-bold text-brand-green">{formatPrice(Number(a.fee))}</span>
                   </div>
                 </div>
 
                 {/* Patient Details (Full Width) */}
                 {a.patientName && (
-                  <div className="bg-brand-gold-light/30 rounded-2xl p-4 sm:px-6 border border-border text-sm text-brand-foreground/80">
-                    <span className="text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider mb-2 block">Patient Details</span>
+                  <div className="bg-card rounded-2xl p-4 sm:px-6 border border-border text-sm text-foreground">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-2 block">Patient Details</span>
                     <div className="flex flex-wrap gap-x-6 gap-y-2">
                       <p><span className="font-bold">Name:</span> {a.patientName}</p>
                       {a.patientAge && <p><span className="font-bold">Age:</span> {a.patientAge} yrs</p>}
@@ -316,7 +510,7 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
 
                 {/* Medical History */}
                 {(a.chronicDiseases || a.allergies) && (
-                  <div className="bg-brand-gold-light/20 rounded-2xl p-4 sm:px-6 border border-brand-gold/20 text-sm text-brand-foreground/80 space-y-2">
+                  <div className="bg-brand-gold/10 rounded-2xl p-4 sm:px-6 border border-brand-gold/20 text-sm text-foreground space-y-2">
                     <span className="text-[10px] text-brand-gold-dark uppercase font-bold tracking-wider mb-2 block">Medical History</span>
                     {a.chronicDiseases && (
                       <p><span className="font-bold text-brand-green">Chronic Diseases:</span> {a.chronicDiseases}</p>
@@ -329,7 +523,7 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
 
                 {/* Concern (Full Width) */}
                 {a.concern && (
-                  <div className="text-sm text-brand-foreground/75 bg-brand-green-light/20 p-4 sm:px-6 rounded-2xl border border-brand-green-light/50">
+                  <div className="text-sm text-foreground bg-brand-green/10 p-4 sm:px-6 rounded-2xl border border-brand-green/20">
                     <span className="text-[10px] text-brand-green uppercase font-bold tracking-wider mb-2 block">Health Concern</span>
                     {a.concern}
                   </div>
@@ -337,7 +531,7 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
 
                 {/* Prescription Info */}
                 {a.prescription && a.prescription.status !== 'DRAFT' && (
-                  <div className="bg-brand-gold-light/10 rounded-2xl p-4 sm:px-6 border border-brand-gold/30">
+                  <div className="bg-card rounded-2xl p-4 sm:px-6 border border-border shadow-xs">
                     <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="h-5 w-5 text-brand-green" />
@@ -354,32 +548,39 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
                     </div>
                     {a.prescription.consultantJudgment && (
                       <div className="mb-4">
-                        <span className="text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider block mb-1">Clinical Judgment</span>
-                        <p className="text-sm font-medium text-brand-foreground/80">{a.prescription.consultantJudgment}</p>
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block mb-1">Clinical Judgment</span>
+                        <p className="text-sm font-medium text-foreground/90">{a.prescription.consultantJudgment}</p>
                       </div>
                     )}
                     <div className="space-y-3">
-                      <span className="text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider block mb-1">Prescribed Medicines</span>
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block mb-1">Prescribed Medicines</span>
                       {a.prescription.items?.map((item: any) => (
-                        <div key={item.id} className="bg-white rounded-xl p-3 border border-border shadow-sm text-sm">
-                          <p className="font-bold text-brand-green mb-1">{item.preparation?.name || item.product?.name || 'Medicine'}</p>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px] text-brand-foreground/70">
-                            <p><span className="font-bold uppercase block text-[9px] text-brand-foreground/40">Dosage</span>{item.dosage}</p>
-                            <p><span className="font-bold uppercase block text-[9px] text-brand-foreground/40">Frequency</span>{item.frequency}</p>
-                            <p><span className="font-bold uppercase block text-[9px] text-brand-foreground/40">Duration</span>{item.duration}</p>
-                            <p><span className="font-bold uppercase block text-[9px] text-brand-foreground/40">Instructions</span>{item.instructions || 'N/A'}</p>
+                        <div key={item.id} className="bg-muted/40 rounded-xl p-3 border border-border shadow-xs text-sm">
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <p className="font-bold text-brand-green">{item.preparation?.name || item.product?.name || item.customMedicine?.name || item.customName || 'Custom Medicine'}</p>
+                            {item.customMedicine && (
+                              <span className="text-[9px] bg-brand-gold-dark/10 text-brand-gold-dark px-2 py-0.5 rounded font-extrabold">
+                                {item.customMedicine.type || 'Custom'} ({item.customMedicine.manufacturer || 'External'})
+                              </span>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px] text-foreground/80">
+                            <p><span className="font-bold uppercase block text-[9px] text-muted-foreground">Dosage</span>{item.dosage}</p>
+                            <p><span className="font-bold uppercase block text-[9px] text-muted-foreground">Frequency</span>{item.frequency}</p>
+                            <p><span className="font-bold uppercase block text-[9px] text-muted-foreground">Duration</span>{item.duration}</p>
+                            <p><span className="font-bold uppercase block text-[9px] text-muted-foreground">Instructions</span>{item.instructions || 'N/A'}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                     {a.prescription.dosageInstructions && (
                       <div className="mt-4">
-                        <span className="text-[10px] text-brand-foreground/50 uppercase font-bold tracking-wider block mb-1">General Instructions</span>
-                        <p className="text-sm font-medium text-brand-foreground/80">{a.prescription.dosageInstructions}</p>
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block mb-1">General Instructions</span>
+                        <p className="text-sm font-medium text-foreground/90">{a.prescription.dosageInstructions}</p>
                       </div>
                     )}
                     {a.prescription.followUpAdvice && (
-                      <div className="mt-4 p-4 bg-brand-green-light/40 border border-brand-green-border/15 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                      <div className="mt-4 p-4 bg-brand-green/10 border border-brand-green/20 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <div>
                           <span className="text-[10px] text-brand-green uppercase font-bold tracking-wider block">Recommended Follow-up</span>
                           <p className="text-sm font-extrabold text-brand-green">In {a.prescription.followUpAdvice}</p>
@@ -653,9 +854,14 @@ export default function MyAppointmentsClient({ initialAppointments }: { initialA
                   </div>
                 </div>
               </div>
-            ))}
+            )}
           </div>
-        )}
+        );
+      })}
+      {/* Sentinel for infinite scroll batching */}
+      <div ref={sentinelRef} className="h-4" />
+    </div>
+  )}
       </div>
 
       {/* Cancel Confirmation Modal */}

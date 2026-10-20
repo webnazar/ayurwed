@@ -24,14 +24,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
     }
 
-    // Securely calculate subtotal server-side by fetching actual preparation prices from the database
+    // Securely calculate subtotal server-side by fetching actual product prices from the database
     const itemIds = items.map((i: any) => Number(i.id));
-    const databaseItems = await db.preparation.findMany({
+    const databaseItems = await db.product.findMany({
       where: { id: { in: itemIds } },
-      select: { id: true, mrp: true }
+      select: { id: true, sellingPrice: true, mrp: true }
     });
 
-    const dbItemMap = new Map(databaseItems.map(item => [item.id, Number(item.mrp || 0)]));
+    const dbItemMap = new Map(databaseItems.map(item => [item.id, Number(item.sellingPrice || item.mrp || 0)]));
 
     let subtotal = 0;
     for (const item of items) {
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
       }
       subtotal += dbPrice * Number(item.quantity);
       // Ensure we use the server-validated price in subsequent db updates
-      item.mrp = dbPrice;
+      item.sellingPrice = dbPrice;
     }
 
     const shipping = subtotal > 999 ? 0 : 50;
@@ -59,10 +59,10 @@ export async function POST(req: Request) {
         paymentStatus: 'PENDING',
         items: {
           create: items.map((item: any) => ({
-            extractId: Number(item.id),
+            productId: Number(item.id),
             quantity: Number(item.quantity),
-            price: item.mrp,
-            total: item.mrp * Number(item.quantity)
+            price: item.sellingPrice,
+            total: item.sellingPrice * Number(item.quantity)
           }))
         }
       }

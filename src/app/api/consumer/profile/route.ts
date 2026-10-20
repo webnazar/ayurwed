@@ -69,6 +69,12 @@ export async function PUT(req: Request) {
       dateOfBirth, 
       gender, 
       medicalHistory,
+      weight,
+      height,
+      bodyTemperature,
+      bloodPressure,
+      prakruti,
+      activityLevel,
       phone 
     } = body;
 
@@ -82,6 +88,8 @@ export async function PUT(req: Request) {
       });
     }
 
+    const parsedTemp = (bodyTemperature !== null && bodyTemperature !== undefined && !isNaN(Number(bodyTemperature))) ? Number(bodyTemperature) : null;
+
     const profile = await db.consumerProfile.upsert({
       where: { userId },
       update: {
@@ -92,7 +100,13 @@ export async function PUT(req: Request) {
         pincode,
         dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
         gender,
-        medicalHistory
+        medicalHistory,
+        weight: weight ? parseFloat(weight) : null,
+        height: height ? parseFloat(height) : null,
+        bodyTemperature: parsedTemp,
+        bloodPressure: bloodPressure ? String(bloodPressure) : null,
+        prakruti: prakruti ? String(prakruti) : null,
+        activityLevel: activityLevel ? String(activityLevel) : null
       },
       create: {
         userId,
@@ -103,7 +117,13 @@ export async function PUT(req: Request) {
         pincode,
         dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
         gender,
-        medicalHistory
+        medicalHistory,
+        weight: weight ? parseFloat(weight) : null,
+        height: height ? parseFloat(height) : null,
+        bodyTemperature: parsedTemp,
+        bloodPressure: bloodPressure ? String(bloodPressure) : null,
+        prakruti: prakruti ? String(prakruti) : null,
+        activityLevel: activityLevel ? String(activityLevel) : null
       }
     });
 

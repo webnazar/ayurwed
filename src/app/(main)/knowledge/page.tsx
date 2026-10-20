@@ -4,6 +4,18 @@ import Image from 'next/image';
 import { Search, BookOpen, Filter, ArrowUpRight } from 'lucide-react';
 import { fetchBloggerPosts } from '@/lib/blogger';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Ayurveda Knowledge Hub — Articles, Research & Guides | AYURWED',
+  description: 'Explore the Ayurwed Knowledge Hub for authentic articles, research, formulation guides, and expert Ayurvedic wellness insights.',
+  keywords: ['Ayurveda Knowledge', 'Ayurvedic Articles', 'Herbal Research', 'AYURWED Knowledge Hub', 'Ancient Intelligence', 'Ayurvedic Remedies'],
+  openGraph: {
+    title: 'Ayurveda Knowledge Hub — Articles, Research & Guides | AYURWED',
+    description: 'Explore the Ayurwed Knowledge Hub for authentic articles, research, formulation guides, and expert Ayurvedic wellness insights.',
+  },
+};
+
 export const revalidate = 60; // Revalidate every minute
 
 interface KnowledgePageProps {

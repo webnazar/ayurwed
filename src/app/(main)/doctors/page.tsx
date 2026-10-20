@@ -1,13 +1,42 @@
 import React, { Suspense } from 'react';
 import { db } from '@/lib/db';
 import Link from 'next/link';
-import { Star, ShieldCheck, HeartHandshake, Award, Languages, Search } from 'lucide-react';
-import { formatPrice } from '@/lib/utils';
-import SafeImage from '@/components/ui/SafeImage';
+import { Search, UserRoundCheck } from 'lucide-react';
 import ConsultantFilterSidebarClient from '@/components/consultants/ConsultantFilterSidebarClient';
 import DoctorsGridClient from '@/components/consultants/DoctorsGridClient';
-
 import AyuriTriggerButton from '@/components/layout/AyuriTriggerButton';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Certified Ayurvedic Doctors Directory — Book Consultations | AYURWED',
+  description: 'Connect directly with certified Ayurvedic doctors and clinical practitioners for online consultations, holistic treatments, and classical remedies across India.',
+  keywords: ['Ayurvedic Doctors Directory', 'Ayurveda Practitioners', 'Connect with Ayurvedic Doctors', 'AYURWED Doctors', 'Ayurvedic Consultant Phone WhatsApp', 'Ayurveda Online Consultation'],
+  alternates: {
+    canonical: 'https://www.ayurwed.com/doctors',
+  },
+  openGraph: {
+    title: 'Certified Ayurvedic Doctors Directory | AYURWED',
+    description: 'Connect directly with certified Ayurvedic doctors and clinical practitioners for holistic wellness guidance and consultations.',
+    url: 'https://www.ayurwed.com/doctors',
+    siteName: 'AYURWED',
+    locale: 'en_IN',
+    type: 'website',
+    images: [
+      {
+        url: 'https://www.ayurwed.com/icon.png',
+        width: 512,
+        height: 512,
+        alt: 'AYURWED Doctors Directory',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Certified Ayurvedic Doctors Directory | AYURWED',
+    description: 'Connect directly with certified Ayurvedic doctors and clinical practitioners across India.',
+    images: ['https://www.ayurwed.com/icon.png'],
+  },
+};
 
 export const revalidate = 0; // Fresh updates
 
@@ -21,36 +50,57 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
 
   const searchKeyword = getSingleParam(searchParams.search);
   const expParam = getSingleParam(searchParams.experience);
-  const selectedExperience = expParam ? expParam.split(',') : [];
+  const selectedExperience = expParam ? expParam.split(',').filter(Boolean) : [];
 
-  const priceParam = getSingleParam(searchParams.price);
-  const selectedPrice = priceParam ? priceParam.split(',') : [];
+  const langParam = getSingleParam(searchParams.languages);
+  const selectedLanguages = langParam ? langParam.split(',').filter(Boolean) : [];
 
-  const typesParam = getSingleParam(searchParams.types);
-  const selectedTypes = typesParam ? typesParam.split(',') : [];
+  const verifiedParam = getSingleParam(searchParams.verified);
+  const verifiedOnly = verifiedParam === 'true';
 
-  const fulfillmentsParam = getSingleParam(searchParams.fulfillments);
-  const selectedFulfillments = fulfillmentsParam ? fulfillmentsParam.split(',') : [];
+  const certifiedParam = getSingleParam(searchParams.certified);
+  const certifiedOnly = certifiedParam === 'true';
 
   const sortOption = getSingleParam(searchParams.sort);
 
   const whereConditions: any = {
-    isCaiCertified: true,
-    isAcfp: true
+    user: {
+      isActive: true,
+    },
   };
   const andConditions: any[] = [];
+
+  if (verifiedOnly) {
+    andConditions.push({ isVerified: true });
+  }
+
+  if (certifiedOnly) {
+    andConditions.push({ isCaiCertified: true });
+  }
 
   // 1. Search Filter
   if (searchKeyword) {
     andConditions.push({
       OR: [
         { user: { name: { contains: searchKeyword } } },
-        { specialization: { contains: searchKeyword } }
-      ]
+        { specialization: { contains: searchKeyword } },
+        { degree: { contains: searchKeyword } },
+        { bio: { contains: searchKeyword } },
+      ],
     });
   }
 
-  // 2. Experience Filter
+
+  // 3. Languages Filter
+  if (selectedLanguages.length > 0) {
+    andConditions.push({
+      OR: selectedLanguages.map((lang) => ({
+        languages: { contains: lang },
+      })),
+    });
+  }
+
+  // 4. Experience Filter
   if (selectedExperience.length > 0) {
     const expOr: any[] = [];
     selectedExperience.forEach((exp) => {
@@ -65,98 +115,60 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
     }
   }
 
-  // 3. Price Filter
-  if (selectedPrice.length > 0) {
-    const priceOr: any[] = [];
-    selectedPrice.forEach((price) => {
-      if (price === '0') priceOr.push({ consultationFee: 0 });
-      if (price === '1-100') priceOr.push({ consultationFee: { gte: 1, lte: 100 } });
-      if (price === '100-500') priceOr.push({ consultationFee: { gte: 100, lte: 500 } });
-      if (price === '500-1000') priceOr.push({ consultationFee: { gte: 500, lte: 1000 } });
-      if (price === '1000+') priceOr.push({ consultationFee: { gte: 1000 } });
-    });
-    if (priceOr.length > 0) {
-      andConditions.push({ OR: priceOr });
-    }
-  }
-
-  // 4. Consultation Type Filter
-  if (selectedTypes.length > 0) {
-    const typeConditions: any[] = [];
-    selectedTypes.forEach((t) => {
-      if (t === 'online') typeConditions.push({ hasOnline: true });
-      if (t === 'offline') typeConditions.push({ hasOffline: true });
-    });
-    if (typeConditions.length > 0) {
-      andConditions.push({ OR: typeConditions });
-    }
-  }
-
-  // 5. Fulfillment Method Filter
-  if (selectedFulfillments.length > 0) {
-    const fulfillmentConditions: any[] = [];
-    selectedFulfillments.forEach((f) => {
-      if (f === 'clinic_pickup') fulfillmentConditions.push({ hasClinicPickup: true });
-      if (f === 'self_dispatch') fulfillmentConditions.push({ hasSelfDispatch: true });
-      if (f === 'ayurwed_delivery') fulfillmentConditions.push({ hasAyurwedDelivery: true });
-    });
-    if (fulfillmentConditions.length > 0) {
-      andConditions.push({ OR: fulfillmentConditions });
-    }
-  }
-
   if (andConditions.length > 0) {
     whereConditions.AND = andConditions;
   }
 
   const orderBy: any[] = [];
-  if (sortOption === 'price_asc') {
-    orderBy.push({ consultationFee: 'asc' });
-  } else if (sortOption === 'price_desc') {
-    orderBy.push({ consultationFee: 'desc' });
+  if (sortOption === 'experience_desc') {
+    orderBy.push({ experience: 'desc' });
+    orderBy.push({ rating: 'desc' });
+  } else if (sortOption === 'rating_desc') {
+    orderBy.push({ rating: 'desc' });
+    orderBy.push({ totalReviews: 'desc' });
+  } else {
+    // Default: Recommended (Verified doctors first, then highest rating, then experience)
+    orderBy.push({ isVerified: 'desc' });
+    orderBy.push({ rating: 'desc' });
+    orderBy.push({ experience: 'desc' });
   }
-
-  // Default sorting
-  orderBy.push({ isVerified: 'desc' });
-  orderBy.push({ rating: 'desc' });
 
   const consultants = await db.consultantProfile.findMany({
     where: whereConditions,
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          avatar: true,
+        },
+      },
     },
     orderBy,
   });
 
   const safeConsultants = consultants.map((c) => ({
     ...c,
-    consultationFee: Number(c.consultationFee),
-    followUpFee: Number(c.followUpFee),
     rating: Number(c.rating),
   }));
 
   return (
     <div className="max-w-7xl mx-auto layout-padding-minimal py-10">
-      {/* Header (border-b removed as requested) */}
+      {/* Header */}
       <div className="text-center sm:text-left pb-0 space-y-2">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-title-primary tracking-tight">
-              Certified Ayurveda Doctors
+              Ayurvedic Doctors Directory
             </h1>
-            <p className="text-sm sm:text-base text-muted-foreground mt-2">
-              Book virtual diagnostic audits, Prakriti evaluations, and chronic symptom consultation guides.
+            <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-2xl">
+              Connect directly with verified Ayurvedic doctors via Phone or WhatsApp.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-3 justify-center sm:justify-end w-full sm:w-auto mt-4 sm:mt-0">
             <AyuriTriggerButton />
-            <Link 
-              href="/doctors?price=0" 
-              className="btn-secondary text-sm sm:text-base w-full sm:w-[260px] shadow-sm hover:shadow-lg"
-            >
-              <HeartHandshake className="h-5 w-5 flex-shrink-0" />
-              <span>Free Consultation</span>
-            </Link>
           </div>
         </div>
 
@@ -167,20 +179,20 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
             type="text"
             name="search"
             defaultValue={searchKeyword}
-            placeholder="Search doctors by name or specialization..."
+            placeholder="Search doctors by name, degree, or specialization..."
             className="w-full bg-card text-brand-foreground text-sm sm:text-base border border-border rounded-full py-4 pl-12 pr-6 shadow-sm focus:outline-none focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/10 transition-all"
           />
           {selectedExperience.length > 0 && (
             <input type="hidden" name="experience" value={selectedExperience.join(',')} />
           )}
-          {selectedPrice.length > 0 && (
-            <input type="hidden" name="price" value={selectedPrice.join(',')} />
+          {selectedLanguages.length > 0 && (
+            <input type="hidden" name="languages" value={selectedLanguages.join(',')} />
           )}
-          {selectedTypes.length > 0 && (
-            <input type="hidden" name="types" value={selectedTypes.join(',')} />
+          {verifiedOnly && (
+            <input type="hidden" name="verified" value="true" />
           )}
-          {selectedFulfillments.length > 0 && (
-            <input type="hidden" name="fulfillments" value={selectedFulfillments.join(',')} />
+          {certifiedOnly && (
+            <input type="hidden" name="certified" value="true" />
           )}
           {sortOption && (
             <input type="hidden" name="sort" value={sortOption} />
@@ -192,30 +204,30 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-6">
-        {/* Sidebar Filters (Desktop) */}
+        {/* Sidebar Filters */}
         <aside className="lg:col-span-1">
           <Suspense fallback={<div className="bg-card rounded-3xl p-6 h-64 border border-border animate-pulse"></div>}>
             <ConsultantFilterSidebarClient
               initialSearch={searchKeyword}
               initialExperience={selectedExperience}
-              initialPrice={selectedPrice}
+              initialLanguages={selectedLanguages}
+              initialVerifiedOnly={verifiedOnly}
+              initialCertifiedOnly={certifiedOnly}
               initialSort={sortOption}
-              initialTypes={selectedTypes}
-              initialFulfillments={selectedFulfillments}
             />
           </Suspense>
         </aside>
 
-        {/* Consultants Grid */}
+        {/* Doctors Grid */}
         <main className="lg:col-span-3">
           {safeConsultants.length > 0 ? (
             <DoctorsGridClient consultants={safeConsultants} />
           ) : (
             <div className="bg-card rounded-3xl p-12 text-center border border-border shadow-sm space-y-4">
-              <HeartHandshake className="h-12 w-12 text-brand-foreground/30 mx-auto" />
+              <UserRoundCheck className="h-12 w-12 text-brand-foreground/30 mx-auto" />
               <h3 className="text-xl font-bold text-title-primary">No Doctors Found</h3>
               <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-                We couldn't find any doctors matching your criteria. Try adjusting your search or experience filter.
+                We couldn&apos;t find any doctors matching your criteria. Try adjusting your search keyword or filters.
               </p>
               <Link href="/doctors" className="btn-primary text-sm px-6 py-2.5 inline-flex">
                 Clear Filters
@@ -227,3 +239,4 @@ export default async function ConsultantsPage(props: ConsultantsPageProps) {
     </div>
   );
 }
+

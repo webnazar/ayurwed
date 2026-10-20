@@ -29,7 +29,48 @@ export async function generateMetadata(props: ArticleDetailProps): Promise<Metad
   const params = await props.params;
   const article = await db.knowledgeArticle.findUnique({ where: { slug: params.slug } });
   if (!article) return { title: 'Article Not Found | AYURWED' };
-  return { title: `${article.title} | AYURWED Knowledge`, description: article.excerpt };
+
+  const baseUrl = 'https://www.ayurwed.com';
+  const pageUrl = `${baseUrl}/knowledge/${params.type.toLowerCase()}/${params.slug}`;
+  const title = `${article.title} | AYURWED Knowledge`;
+  const desc = article.excerpt || article.content?.replace(/<[^>]+>/g, '').slice(0, 160) || 'Read authentic Ayurveda research and wellness insights on Ayurwed.';
+  const imageUrl = article.featuredImage?.startsWith('http')
+    ? article.featuredImage
+    : article.featuredImage
+    ? `${baseUrl}${article.featuredImage.startsWith('/') ? '' : '/'}${article.featuredImage}`
+    : `${baseUrl}/icon.png`;
+
+  return {
+    title,
+    description: desc,
+    keywords: [article.title, article.type || 'Ayurveda', 'AYURWED Knowledge', 'Ancient Intelligence'],
+    metadataBase: new URL(baseUrl),
+    alternates: {
+      canonical: pageUrl,
+    },
+    openGraph: {
+      title,
+      description: desc,
+      url: pageUrl,
+      siteName: 'AYURWED',
+      locale: 'en_IN',
+      type: 'article',
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: desc,
+      images: [imageUrl],
+    },
+  };
 }
 
 export default async function ArticleDetailPage(props: ArticleDetailProps) {

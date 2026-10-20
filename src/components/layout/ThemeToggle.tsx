@@ -11,6 +11,14 @@ export function ThemeToggle() {
   // Avoid hydration mismatch by only rendering after mount
   React.useEffect(() => setMounted(true), []);
 
+  const handleToggle = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    if (typeof document !== "undefined") {
+      document.cookie = `theme=${nextTheme}; path=/; max-age=31536000; SameSite=Lax`;
+    }
+  };
+
   if (!mounted) {
     return (
       <button className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-brand-green/10 text-brand-green dark:text-brand-gold transition-colors" aria-label="Toggle theme">
@@ -21,7 +29,7 @@ export function ThemeToggle() {
 
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={handleToggle}
       className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-brand-green/10 dark:hover:bg-brand-gold/10 text-brand-green dark:text-brand-gold transition-colors focus:outline-none focus:ring-2 focus:ring-brand-green/20"
       aria-label="Toggle theme"
     >

@@ -18,8 +18,8 @@ export default function CarouselsClient({ initialCarousels }: { initialCarousels
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
-
   const formRef = useRef<HTMLFormElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -38,7 +38,7 @@ export default function CarouselsClient({ initialCarousels }: { initialCarousels
         imageFile: null,
         imagePreview: carousel.image,
         link: carousel.link || '',
-        isActive: carousel.isActive,
+        isActive: carousel.isActive ?? true,
         sortOrder: carousel.sortOrder,
       });
     } else {
@@ -95,7 +95,7 @@ export default function CarouselsClient({ initialCarousels }: { initialCarousels
       const data = new FormData();
       data.append('title', formData.title);
       data.append('link', formData.link);
-      data.append('isActive', formData.isActive.toString());
+      data.append('isActive', formData.isActive ? 'true' : 'false');
       data.append('sortOrder', formData.sortOrder.toString());
       if (formData.imageFile) {
         data.append('image', formData.imageFile);
@@ -175,8 +175,18 @@ export default function CarouselsClient({ initialCarousels }: { initialCarousels
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
       const inField = ['INPUT', 'TEXTAREA', 'SELECT'].includes(tag);
-      if (e.altKey && e.key.toLowerCase() === 'n') { e.preventDefault(); if (!isModalOpen && carousels.length < 5) handleOpenModal(); }
-      if (e.altKey && e.key.toLowerCase() === 's') { e.preventDefault(); if (isModalOpen) formRef.current?.requestSubmit(); }
+      if (e.altKey && e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        if (!isModalOpen && carousels.length < 5) handleOpenModal();
+      }
+      if (e.altKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        if (isModalOpen) {
+          formRef.current?.requestSubmit();
+        } else {
+          searchRef.current?.focus();
+        }
+      }
       if (e.key === 'Escape' && isModalOpen && !inField) handleCloseModal();
     };
     document.addEventListener('keydown', handler);
@@ -202,52 +212,106 @@ export default function CarouselsClient({ initialCarousels }: { initialCarousels
   }, [carousels, searchTerm]);
 
   return (
-    <div className="space-y-6">
-      {/* Stats row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[
-          { label: 'Total Carousels', value: `${stats.total}/5`, icon: ImageIcon, color: 'text-brand-green bg-brand-green-light' },
-          { label: 'Active', value: stats.active, icon: Activity, color: 'text-emerald-600 bg-emerald-50' },
-          { label: 'Available Slots', value: stats.available, icon: Layers, color: 'text-amber-600 bg-amber-50' },
-        ].map(s => (
-          <div key={s.label} className="bg-card rounded-2xl p-5 border border-border shadow-sm flex items-center gap-4">
-            <div className={`p-3 rounded-2xl ${s.color}`}>
-              <s.icon className="h-5 w-5" />
+    <div className="space-y-3.5">
+      {/* ── Header Banner with Merged Search & Action Button (Minimal Margins, No Subtitle) ── */}
+      <div className="dashboard-header-card">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-brand-green/10 text-brand-green rounded-xl shrink-0">
+              <ImageIcon className="h-5 w-5" />
             </div>
             <div>
-              <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">{s.label}</span>
-              <span className="text-xl font-extrabold text-brand-green">{s.value}</span>
+              <h1 className="dashboard-header-title text-lg sm:text-xl">Carousels</h1>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Main panel */}
-      <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 border-b border-border">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/40" />
-            <input
-              type="text"
-              placeholder="Search carousels..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="pl-9 w-full bg-brand-gold-light/40 border border-border rounded-2xl py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20"
-            />
-          </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-shrink-0">
+            {/* Search Input */}
+            <div className="relative w-full sm:w-64 md:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-green/60 dark:text-foreground/40" />
+              <input
+                ref={searchRef}
+                type="text"
+                placeholder="Search carousels, title, link..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 bg-card/90 dark:bg-card border border-brand-green/20 dark:border-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/30 text-foreground placeholder:text-foreground/40 shadow-sm"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground p-0.5"
+                  title="Clear search"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+
+            {/* Add Carousel Button */}
             <button
+              type="button"
               onClick={() => handleOpenModal()}
               disabled={carousels.length >= 5}
-              title="New Carousel (Alt+N)"
-              className="flex items-center gap-2 bg-brand-green text-white px-5 py-2.5 rounded-2xl text-sm font-bold hover:bg-brand-green/90 transition-colors shadow-sm flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+              title={carousels.length >= 5 ? 'Maximum 5 carousels reached' : 'Add Carousel (Alt+N)'}
+              className="inline-flex items-center justify-center gap-1.5 bg-brand-green hover:bg-brand-gold hover:text-brand-green text-white font-extrabold px-3.5 py-2 rounded-xl text-xs transition-all shadow-sm shrink-0 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Plus className="h-4 w-4" />
-              Add Carousel
-              <kbd className="text-[10px] bg-card/20 px-1.5 py-0.5 rounded font-mono ml-1 hidden sm:inline">Alt+N</kbd>
+              <Plus className="h-3.5 w-3.5" />
+              <span>Add Carousel</span>
+              <kbd className="text-[10px] bg-white/20 px-1 py-0.5 rounded font-mono ml-0.5 hidden sm:inline">Alt+N</kbd>
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* ── KPI Stats Grid (Equal & Minimal Margins) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <div className="bg-card border border-border rounded-2xl p-4 shadow-xs flex items-center justify-between">
+          <div>
+            <span className="text-xs font-bold text-muted-foreground block">Total Carousels</span>
+            <span className="text-2xl font-black text-brand-green dark:text-brand-gold mt-1 block">
+              {stats.total} / 5
+            </span>
+          </div>
+          <div className="p-2.5 bg-brand-green/10 text-brand-green rounded-xl">
+            <ImageIcon className="h-5 w-5" />
+          </div>
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-4 shadow-xs flex items-center justify-between">
+          <div>
+            <span className="text-xs font-bold text-muted-foreground block">Active</span>
+            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1 block">
+              {stats.active}
+            </span>
+          </div>
+          <div className="p-2.5 bg-emerald-500/10 text-emerald-600 rounded-xl">
+            <Activity className="h-5 w-5" />
+          </div>
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-4 shadow-xs flex items-center justify-between">
+          <div>
+            <span className="text-xs font-bold text-muted-foreground block">Available Slots</span>
+            <span className="text-2xl font-black text-brand-gold-dark mt-1 block">
+              {stats.available}
+            </span>
+          </div>
+          <div className="p-2.5 bg-brand-gold/15 text-brand-gold-dark rounded-xl">
+            <Layers className="h-5 w-5" />
+          </div>
+        </div>
+      </div>
+
+      {/* ── Table Container ── */}
+      <div className="bg-card rounded-2xl border border-border shadow-xs overflow-hidden">
+        <div className="px-5 py-3 border-b border-border bg-muted/20 flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 font-medium">
+            <span>Showing <strong className="text-foreground">{filtered.length}</strong> of <strong className="text-foreground">{carousels.length}</strong> banners</span>
+            {searchTerm && <span className="text-[10px] bg-brand-green/10 text-brand-green px-2 py-0.5 rounded-full font-bold">Filtered</span>}
+          </div>
+          <span className="text-[11px] text-muted-foreground/80 font-medium hidden sm:inline">Max limit: 5 banners</span>
         </div>
 
         {/* Table */}
@@ -278,7 +342,7 @@ export default function CarouselsClient({ initialCarousels }: { initialCarousels
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <img src={carousel.image} alt={carousel.title} className="h-16 w-32 object-cover rounded-xl border border-border shadow-sm" />
+                    <img src={carousel.image} alt={carousel.title} className="h-16 aspect-video object-cover rounded-xl border border-border shadow-sm" />
                   </td>
                   <td className="px-6 py-4">
                     <div className="font-bold text-brand-green">{carousel.title}</div>
@@ -320,10 +384,10 @@ export default function CarouselsClient({ initialCarousels }: { initialCarousels
 
       {/* Create / Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-card rounded-[28px] shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+          <div className="bg-card rounded-[28px] shadow-2xl w-full max-w-xl max-h-[92vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 border border-border">
             {/* Modal header */}
-            <div className="bg-gradient-to-r from-brand-green to-[#0f381b] p-6 text-white flex items-center justify-between">
+            <div className="bg-gradient-to-r from-brand-green to-[#0f381b] p-6 text-white flex items-center justify-between flex-shrink-0">
               <div>
                 <h3 className="font-extrabold text-lg">
                   {editingId ? 'Edit Carousel' : 'New Carousel'}
@@ -348,70 +412,172 @@ export default function CarouselsClient({ initialCarousels }: { initialCarousels
             </div>
 
             {/* Form */}
-            <form ref={formRef} onSubmit={handleSubmit} className="p-6 space-y-4">
-              {/* Title */}
-              <div>
-                <label className="text-xs font-bold text-brand-foreground/60 uppercase tracking-wider block mb-1.5">
-                  Banner Title <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/35" />
-                  <input
-                    type="text"
-                    required
-                    value={formData.title}
-                    onChange={e => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="e.g. Winter Wellness Sale"
-                    className="pl-9 w-full border border-border rounded-2xl py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/25 bg-brand-gold-light/20"
-                  />
-                </div>
-              </div>
-
-              {/* Link */}
-              <div>
-                <label className="text-xs font-bold text-brand-foreground/60 uppercase tracking-wider block mb-1.5">
-                  Banner Link (Optional)
-                </label>
-                <div className="relative">
-                  <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/35" />
-                  <input
-                    type="text"
-                    value={formData.link}
-                    onChange={e => setFormData({ ...formData, link: e.target.value })}
-                    placeholder="e.g. /products/chyawanprash"
-                    className="pl-9 w-full border border-border rounded-2xl py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/25 bg-brand-gold-light/20"
-                  />
-                </div>
-              </div>
-
-              {/* Image Upload */}
-              <div>
-                <label className="text-xs font-bold text-brand-foreground/60 uppercase tracking-wider block mb-1.5">
-                  Banner Image (.webp only, Width &gt; 1200px)
-                </label>
-                <div className="flex flex-col gap-4">
-                  <label className="w-full flex flex-col items-center justify-center gap-2 px-4 py-6 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:bg-brand-gold-light/20 transition-colors bg-brand-gold-light/10">
-                    <input type="file" accept="image/webp" className="hidden" onChange={handleImageUpload} />
-                    <ImageIcon className="h-6 w-6 text-brand-gold" />
-                    <span className="text-sm text-brand-foreground/70 font-medium">Click to upload .webp</span>
+            <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              {/* Scrollable Form Content */}
+              <div className="p-6 space-y-4 overflow-y-auto flex-1">
+                {/* Title */}
+                <div>
+                  <label className="text-xs font-bold text-brand-foreground/60 uppercase tracking-wider block mb-1.5">
+                    Banner Title <span className="text-rose-500">*</span>
                   </label>
-                  {formData.imagePreview && (
-                    <div className="w-full relative rounded-2xl overflow-hidden border border-border shadow-sm">
-                      <img src={formData.imagePreview} alt="Preview" className="w-full h-auto object-cover max-h-40" />
+                  <div className="relative">
+                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/35" />
+                    <input
+                      type="text"
+                      required
+                      value={formData.title}
+                      onChange={e => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="e.g. Winter Wellness Sale"
+                      className="pl-9 w-full border border-border rounded-2xl py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/25 bg-brand-gold-light/20"
+                    />
+                  </div>
+                </div>
+
+                {/* Link */}
+                <div>
+                  <label className="text-xs font-bold text-brand-foreground/60 uppercase tracking-wider block mb-1.5">
+                    Banner Link (Optional)
+                  </label>
+                  <div className="relative">
+                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/35" />
+                    <input
+                      type="text"
+                      value={formData.link}
+                      onChange={e => setFormData({ ...formData, link: e.target.value })}
+                      placeholder="e.g. /products/chyawanprash"
+                      className="pl-9 w-full border border-border rounded-2xl py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/25 bg-brand-gold-light/20"
+                    />
+                  </div>
+                </div>
+
+                {/* Image Upload & 16:9 Ratio Preview */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold text-brand-foreground/60 uppercase tracking-wider block">
+                      Banner Image (.webp only) {!editingId && <span className="text-rose-500">*</span>}
+                    </label>
+                    <span className="text-[10px] font-extrabold text-brand-green bg-brand-green-light dark:bg-emerald-950/60 dark:text-emerald-300 px-2.5 py-0.5 rounded-full border border-brand-green/20">
+                      16:9 Ratio Banner
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <label className="w-full flex flex-col items-center justify-center gap-2 px-4 py-4 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:bg-brand-gold-light/20 hover:border-brand-gold/60 transition-all bg-brand-gold-light/10 group">
+                      <input type="file" accept="image/webp" className="hidden" onChange={handleImageUpload} />
+                      <div className="p-2 rounded-xl bg-brand-gold/15 text-brand-gold group-hover:scale-110 transition-transform">
+                        <ImageIcon className="h-5 w-5" />
+                      </div>
+                      <div className="text-center">
+                        <span className="text-xs text-brand-foreground/80 font-bold block">
+                          {formData.imagePreview ? 'Click to change image (.webp)' : 'Click to upload banner (.webp)'}
+                        </span>
+                        <span className="text-[10px] text-brand-foreground/50 block mt-0.5">
+                          Recommended 16:9 banner: 1920 × 1080 px or 1280 × 720 px
+                        </span>
+                      </div>
+                    </label>
+
+                    {/* 16:9 Live Preview */}
+                    {formData.imagePreview && (
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px] text-brand-foreground/60 font-semibold px-1">
+                          <span className="flex items-center gap-1.5">
+                            <Layers className="h-3.5 w-3.5 text-brand-gold" />
+                            16:9 Homepage Banner Preview:
+                          </span>
+                          <span className="text-[10px] text-brand-foreground/40 font-mono">aspect-ratio: 16/9</span>
+                        </div>
+                        <div className="w-full aspect-video relative rounded-2xl overflow-hidden border-2 border-brand-green/30 shadow-md bg-slate-900 group">
+                          <img 
+                            src={formData.imagePreview} 
+                            alt="Banner Preview" 
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" 
+                          />
+                          {/* 16:9 Badge & Status */}
+                          <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5">
+                            {!formData.isActive && (
+                              <span className="bg-amber-600/90 backdrop-blur-md text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-white/20 shadow-sm">
+                                Deactive (Hidden)
+                              </span>
+                            )}
+                            <div className="bg-black/60 backdrop-blur-md text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-white/20 flex items-center gap-1 shadow-sm">
+                              <Layers className="h-3 w-3 text-brand-gold" />
+                              <span>16:9 Aspect</span>
+                            </div>
+                          </div>
+                          {/* Title simulation overlay matching HeroCarousel */}
+                          {formData.title && (
+                            <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent text-white pointer-events-none">
+                              <p className="text-xs font-bold line-clamp-1 drop-shadow-sm">{formData.title}</p>
+                              {formData.link && (
+                                <p className="text-[10px] text-white/70 font-mono truncate">{formData.link}</p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Active / Deactive Toggle Card */}
+                <div className="pt-2">
+                  <label className="text-xs font-bold text-brand-foreground/60 uppercase tracking-wider block mb-2">
+                    Carousel Status
+                  </label>
+                  <div
+                    onClick={() => setFormData(f => ({ ...f, isActive: !f.isActive }))}
+                    className={`flex items-center justify-between p-3.5 rounded-2xl border cursor-pointer transition-all ${
+                      formData.isActive
+                        ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800 shadow-2xs'
+                        : 'bg-amber-500/10 border-amber-500/30'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-xl transition-colors ${
+                        formData.isActive
+                          ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
+                      }`}>
+                        {formData.isActive ? <ToggleRight className="h-5 w-5" /> : <ToggleLeft className="h-5 w-5" />}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-sm font-extrabold ${formData.isActive ? 'text-emerald-800 dark:text-emerald-300' : 'text-amber-800 dark:text-amber-300'}`}>
+                            {formData.isActive ? 'Active' : 'Deactive'}
+                          </span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            formData.isActive 
+                              ? 'bg-emerald-200/80 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-200' 
+                              : 'bg-amber-200/80 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200'
+                          }`}>
+                            {formData.isActive ? 'Visible' : 'Hidden'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-foreground/60 mt-0.5">
+                          {formData.isActive 
+                            ? 'Carousel is active and will be visible on the homepage.' 
+                            : 'Carousel is deactivated and will not be visible on the homepage.'}
+                        </p>
+                      </div>
                     </div>
-                  )}
+                    <button
+                      type="button"
+                      aria-label="Toggle status"
+                      className="p-1 focus:outline-none"
+                    >
+                      {formData.isActive ? (
+                        <ToggleRight className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+                      ) : (
+                        <ToggleLeft className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <label className="flex items-center gap-2 cursor-pointer mt-4">
-                <button type="button" onClick={() => setFormData(f => ({ ...f, isActive: !f.isActive }))}>
-                  {formData.isActive ? <ToggleRight className="h-7 w-7 text-emerald-600" /> : <ToggleLeft className="h-7 w-7 text-muted-foreground" />}
-                </button>
-                <span className="text-sm font-semibold text-brand-foreground/70">Visible on homepage</span>
-              </label>
-
-              {/* Actions */}
-              <div className="flex gap-3 pt-4">
+              {/* Fixed Bottom Actions Row */}
+              <div className="p-4 sm:p-5 bg-card/95 border-t border-border flex gap-3 flex-shrink-0 backdrop-blur-xs">
                 <button
                   type="button"
                   onClick={handleCloseModal}

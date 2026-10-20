@@ -11,22 +11,34 @@ export default async function AdminEnquiriesPage() {
   const session = await getServerSession(authOptions);
   if (!session || (session.user as any).role !== 'ADMIN') redirect('/login');
 
-  const enquiries = await db.enquiry.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      manufacturer: { select: { companyName: true, slug: true } },
-      preparation: { select: { name: true, slug: true } },
-    },
-  });
+  let safeEnquiries: any[] = [];
 
-  return (
-    <div className="space-y-6">
-      <div className="dashboard-header-card">
-        <h1 className="dashboard-header-title">All Enquiries</h1>
-        <p className="dashboard-header-subtitle">{enquiries.length} total consumer enquiries across all manufacturers.</p>
-      </div>
+  try {
+    const rawRows: any[] = await db.$queryRawUnsafe(`
+      SELECT 
+        e.id, e.name, e.email, e.phone, e.message, e.isRead, e.createdAt,
+        p.name as prepName, p.slug as prepSlug,
+        m.companyName as mfgName, m.slug as mfgSlug
+      FROM enquiries e
+      LEFT JOIN products p ON e.productId = p.id
+      LEFT JOIN manufacturers m ON p.manufacturerId = m.id
+      ORDER BY e.createdAt DESC
+    `);
 
-      <EnquiriesListClient initialEnquiries={JSON.parse(JSON.stringify(enquiries))} />
-    </div>
-  );
+    safeEnquiries = rawRows.map((e: any) => ({
+      id: e.id,
+      name: e.name || 'Anonymous User',
+      email: e.email || '',
+      phone: e.phone || null,
+      message: e.message || '',
+      isRead: Boolean(e.isRead),
+      createdAt: new Date(e.createdAt).toISOString(),
+      manufacturer: e.mfgName ? { companyName: e.mfgName, slug: e.mfgSlug || '#' } : { companyName: 'Contact Form', slug: '/contact' },
+      preparation: e.prepName ? { name: e.prepName, slug: e.prepSlug || '#' } : null,
+    }));
+  } catch (err) {
+    console.error('Error fetching enquiries via raw SQL:', err);
+  }
+
+  return <EnquiriesListClient initialEnquiries={safeEnquiries} />;
 }

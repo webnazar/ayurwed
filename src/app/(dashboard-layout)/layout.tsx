@@ -17,6 +17,8 @@ import {
   Leaf,
   ChevronRight,
   Sparkles,
+  Award,
+  Tag,
   FolderTree,
   Package,
   BarChart3,
@@ -29,7 +31,9 @@ import {
   ShoppingBag,
   ShoppingCart,
   Mail,
-  LayoutDashboard
+  LayoutDashboard,
+  Activity,
+  Layers,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
@@ -69,26 +73,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const menuItems = {
     CONSUMER: [
-      { name: 'My Appointments', href: '/consumer/dashboard/appointments', icon: Calendar },
-      { name: 'Product Orders', href: '/consumer/dashboard/fulfillment', icon: Package },
-      ...(isEnrolled ? [{ name: 'My Courses', href: '/consumer/dashboard/courses', icon: BookOpen }] : []),
+      { name: 'Dashboard', href: '/user/dashboard', icon: LayoutDashboard },
+      { name: 'My Shop Orders', href: '/user/myorders', icon: Package },
+      ...(isEnrolled ? [{ name: 'My CAI Course', href: '/user/cai', icon: Award }] : []),
+      { name: 'My Profile', href: '/user/profile', icon: UserCircle },
     ],
     CONSULTANT: [
       { name: 'Dashboard', href: '/consultant/dashboard', icon: LayoutDashboard },
-      { name: 'Appointments', href: '/consultant/appointments', icon: Calendar },
-      { name: 'Medicine Fulfillments', href: '/consultant/fulfillment', icon: Package },
-      { name: 'Availability Slots', href: '/consultant/availability', icon: Settings },
+      { name: 'My Shop Orders', href: '/user/myorders', icon: Package },
+      ...(isEnrolled ? [{ name: 'My CAI Course', href: '/user/cai', icon: Award }] : []),
+      { name: 'My Profile', href: '/user/profile', icon: UserCircle },
+    ],
+    MANUFACTURER: [
+      ...(isEnrolled ? [{ name: 'My CAI Course', href: '/user/cai', icon: Award }] : []),
     ],
 
     ADMIN: [
       { name: 'Dashboard', href: '/admin/dashboard', icon: BarChart3 },
-      { name: 'Fulfillments Overview', href: '/admin/fulfillment', icon: Package },
-      { name: 'Carousel Master', href: '/admin/carousels', icon: Sparkles },
-      { name: 'Indication Master', href: '/admin/indications', icon: HeartPulse },
-      { name: 'Preparation Master', href: '/admin/preparations', icon: Package },
-      { name: 'Manufacturer Master', href: '/admin/manufacturers', icon: Building2 },
-      { name: 'Product Master', href: '/admin/products', icon: ShoppingCart },
       { name: 'Shop Orders', href: '/admin/shop-orders', icon: ShoppingBag },
+      { name: 'CAI Fee & Offer', href: '/admin/academy', icon: Award },
+      ...(isEnrolled ? [{ name: 'My CAI Course', href: '/user/cai', icon: Award }] : []),
+      { name: 'Carousel', href: '/admin/carousels', icon: Sparkles },
+      { name: 'Categories', href: '/admin/categories', icon: Layers },
+      { name: 'Symptoms', href: '/admin/symptoms', icon: Activity },
+      { name: 'Brands', href: '/admin/brands', icon: Building2 },
+      { name: 'Products', href: '/admin/products', icon: ShoppingCart },
+      { name: 'Shop Coupons', href: '/admin/coupons', icon: Tag },
       { name: 'Enquiries', href: '/admin/enquiries', icon: Inbox },
       { name: 'Newsletter Subs', href: '/admin/newsletter', icon: Mail },
       { name: 'Testimonials', href: '/admin/testimonials', icon: MessageSquare },
@@ -147,9 +157,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Profile Footer Link */}
         {(role !== 'ADMIN') && (
           <Link
-            href={role === 'CONSULTANT' ? '/consultant/profile' : '/consumer/dashboard/profile'}
+            href="/user/profile"
             className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-              pathname === (role === 'CONSULTANT' ? '/consultant/profile' : '/consumer/dashboard/profile')
+              pathname === '/user/profile'
                 ? 'bg-brand-gold text-brand-green dark:text-black font-bold shadow'
                 : 'text-brand-foreground/70 hover:bg-muted hover:text-brand-foreground'
             }`}

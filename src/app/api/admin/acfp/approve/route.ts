@@ -24,6 +24,8 @@ export async function POST(req: NextRequest) {
           isAcfp: true,
           acfpVerifiedAt: new Date(),
           isVerified: true,
+          verifiedAt: new Date(),
+          registrationCouncil: 'National Commission for Indian System of Medicine (NCISM)',
           hasOnline: true,
           hasOffline: true,
           hasFulfillment: true,

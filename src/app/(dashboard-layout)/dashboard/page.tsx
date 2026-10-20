@@ -17,6 +17,6 @@ export default async function DashboardPage() {
     case 'CONSULTANT':
       redirect('/consultant/dashboard');
     default:
-      redirect('/consumer/dashboard');
+      redirect('/user/dashboard');
   }
 }

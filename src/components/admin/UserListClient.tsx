@@ -184,99 +184,125 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
   };
 
   return (
-    <div className="space-y-6">
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
-          <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Total</span>
-          <span className="text-xl font-extrabold text-brand-green">{stats.total}</span>
-        </div>
-        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
-          <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Active</span>
-          <span className="text-xl font-extrabold text-emerald-600">{stats.active}</span>
-        </div>
-        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
-          <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Inactive</span>
-          <span className="text-xl font-extrabold text-red-500">{stats.inactive}</span>
-        </div>
-        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
-          <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Admins</span>
-          <span className="text-xl font-extrabold text-brand-gold-dark">{stats.admins}</span>
-        </div>
-        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center">
-          <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Doctors</span>
-          <span className="text-xl font-extrabold text-brand-green">{stats.consultants}</span>
-        </div>
-
-        <div className="bg-card rounded-2xl p-4 border border-border shadow-sm text-center col-span-2 md:col-span-1">
-          <span className="text-[10px] text-brand-foreground/50 block font-bold uppercase tracking-wider">Users</span>
-          <span className="text-xl font-extrabold text-muted-foreground">{stats.consumers}</span>
-        </div>
-      </div>
-
-      {/* Action Filters Panel */}
-      <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-4">
-        <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
-          
-          {/* Search Box */}
-          <div className="relative w-full flex-grow">
-            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-brand-foreground/40">
-              <Search className="h-5 w-5" />
-            </span>
-            <input
-              type="text"
-              placeholder="Search users by name, email, phone..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full bg-muted border border-border rounded-2xl py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20"
-            />
+    <div className="space-y-3.5">
+      {/* ── Header Banner with Merged Search & Controls (Minimal Margins, No Subtitle) ── */}
+      <div className="dashboard-header-card">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-brand-green/10 text-brand-green rounded-xl shrink-0">
+              <User className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="dashboard-header-title text-lg sm:text-xl">Users</h1>
+            </div>
           </div>
 
-          {/* Quick Filters */}
-          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-start lg:justify-end flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-brand-green" />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-shrink-0">
+            {/* Search Input */}
+            <div className="relative w-full sm:w-56 md:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-green/60 dark:text-foreground/40" />
+              <input
+                type="text"
+                placeholder="Search name, email, phone..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 bg-card/90 dark:bg-card border border-brand-green/20 dark:border-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/30 text-foreground placeholder:text-foreground/40 shadow-sm"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground p-0.5"
+                  title="Clear search"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+
+            {/* Role Filter */}
+            <div className="relative flex-shrink-0">
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="bg-muted border border-border rounded-2xl px-3 py-2.5 text-xs font-semibold focus:outline-none"
+                className="bg-card/90 dark:bg-card border border-brand-green/20 dark:border-border rounded-xl py-2 px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-green/30 shadow-sm cursor-pointer"
               >
                 <option value="ALL">All Roles</option>
-                <option value="ADMIN">Administrators</option>
+                <option value="ADMIN">Admins</option>
                 <option value="CONSULTANT">Doctors</option>
-                <option value="CONSUMER">Users</option>
+                <option value="CONSUMER">Consumers</option>
               </select>
             </div>
 
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-muted border border-border rounded-2xl px-3 py-2.5 text-xs font-semibold focus:outline-none"
-            >
-              <option value="ALL">All Status</option>
-              <option value="ACTIVE">Active Only</option>
-              <option value="INACTIVE">Inactive Only</option>
-            </select>
+            {/* Status Filter */}
+            <div className="relative flex-shrink-0">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="bg-card/90 dark:bg-card border border-brand-green/20 dark:border-border rounded-xl py-2 px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-green/30 shadow-sm cursor-pointer"
+              >
+                <option value="ALL">All Status</option>
+                <option value="ACTIVE">Active</option>
+                <option value="INACTIVE">Inactive</option>
+              </select>
+            </div>
 
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-muted border border-border rounded-2xl px-3 py-2.5 text-xs font-semibold focus:outline-none"
+            {/* Add User Button */}
+            <button
+              type="button"
+              onClick={() => setIsCreateModalOpen(true)}
+              title="Create New User"
+              className="inline-flex items-center justify-center gap-1.5 bg-brand-green hover:bg-brand-gold hover:text-brand-green text-white font-extrabold px-3.5 py-2 rounded-xl text-xs transition-all shadow-sm shrink-0 whitespace-nowrap active:scale-95"
             >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="name-az">Name A-Z</option>
-              <option value="name-za">Name Z-A</option>
-            </select>
+              <Plus className="h-3.5 w-3.5" />
+              <span>Add User</span>
+            </button>
           </div>
-
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="flex-shrink-0 bg-brand-green text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-sm hover:bg-brand-gold hover:text-brand-green transition-colors flex items-center gap-2 w-full lg:w-auto justify-center"
-          >
-            <Plus className="h-4 w-4" /> Create User
-          </button>
         </div>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+        <div className="bg-card rounded-2xl p-3.5 border border-border shadow-sm text-center">
+          <span className="text-[10px] text-foreground/50 block font-bold uppercase tracking-wider">Total</span>
+          <span className="text-lg font-extrabold text-brand-green">{stats.total}</span>
+        </div>
+        <div className="bg-card rounded-2xl p-3.5 border border-border shadow-sm text-center">
+          <span className="text-[10px] text-foreground/50 block font-bold uppercase tracking-wider">Active</span>
+          <span className="text-lg font-extrabold text-emerald-600">{stats.active}</span>
+        </div>
+        <div className="bg-card rounded-2xl p-3.5 border border-border shadow-sm text-center">
+          <span className="text-[10px] text-foreground/50 block font-bold uppercase tracking-wider">Inactive</span>
+          <span className="text-lg font-extrabold text-rose-500">{stats.inactive}</span>
+        </div>
+        <div className="bg-card rounded-2xl p-3.5 border border-border shadow-sm text-center">
+          <span className="text-[10px] text-foreground/50 block font-bold uppercase tracking-wider">Admins</span>
+          <span className="text-lg font-extrabold text-brand-gold-dark">{stats.admins}</span>
+        </div>
+        <div className="bg-card rounded-2xl p-3.5 border border-border shadow-sm text-center">
+          <span className="text-[10px] text-foreground/50 block font-bold uppercase tracking-wider">Doctors</span>
+          <span className="text-lg font-extrabold text-brand-green">{stats.consultants}</span>
+        </div>
+        <div className="bg-card rounded-2xl p-3.5 border border-border shadow-sm text-center col-span-2 sm:col-span-1">
+          <span className="text-[10px] text-foreground/50 block font-bold uppercase tracking-wider">Users</span>
+          <span className="text-lg font-extrabold text-muted-foreground">{stats.consumers}</span>
+        </div>
+      </div>
+
+      {/* Table Sorting Control */}
+      <div className="flex justify-end items-center gap-2 text-xs">
+        <span className="text-foreground/50 font-bold">Sort:</span>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="bg-card border border-border rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none"
+        >
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="name-az">Name A-Z</option>
+          <option value="name-za">Name Z-A</option>
+        </select>
+      </div>
 
         {/* Responsive Table */}
         <div className="overflow-x-auto rounded-2xl border border-border">
@@ -395,7 +421,6 @@ export default function UserListClient({ initialUsers }: { initialUsers: UserIte
             </tbody>
           </table>
         </div>
-      </div>
 
       {/* User Details Inspection Modal */}
       {selectedUser && (

@@ -27,6 +27,7 @@ export default function SearchSelect({
   value,
   onChange,
   placeholder = 'Select…',
+  label,
   icon,
   clearable = true,
   className = '',
@@ -121,6 +122,11 @@ export default function SearchSelect({
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
+      {label && (
+        <label className="block text-xs font-bold text-foreground uppercase tracking-wider mb-1.5">
+          {label}
+        </label>
+      )}
       {/* Trigger */}
       <button
         type="button"

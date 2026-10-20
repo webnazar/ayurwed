@@ -12,6 +12,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required profile fields' }, { status: 400 });
     }
 
+    // Security: Disallow privilege escalation — public registration cannot create ADMIN users
+    if (role === 'ADMIN' || !['CONSUMER', 'CONSULTANT'].includes(role)) {
+      return NextResponse.json({ error: 'Restricted role. Administrator accounts cannot be registered publicly.' }, { status: 403 });
+    }
+
     // 1. Check if user already exists
     const existing = await db.user.findUnique({
       where: { email },

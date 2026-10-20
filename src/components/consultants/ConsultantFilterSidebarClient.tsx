@@ -2,7 +2,17 @@
 
 import React, { useState } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { Search, SlidersHorizontal, Check, ArrowDownUp } from 'lucide-react';
+import {
+  SlidersHorizontal,
+  Check,
+  Award,
+  ShieldCheck,
+  RotateCcw,
+  Languages,
+  Briefcase,
+  Phone,
+  MessageCircle,
+} from 'lucide-react';
 
 const EXPERIENCE_RANGES = [
   { id: '0-5', label: '0-5 Years' },
@@ -12,81 +22,112 @@ const EXPERIENCE_RANGES = [
   { id: '20+', label: '20+ Years' },
 ];
 
-const PRICE_RANGES = [
-  { id: '0', label: 'Free (₹0)' },
-  { id: '1-100', label: 'Under ₹100' },
-  { id: '100-500', label: '₹100 - ₹500' },
-  { id: '500-1000', label: '₹500 - ₹1,000' },
-  { id: '1000+', label: '₹1,000+' },
+const LANGUAGES = [
+  { id: 'English', label: 'English' },
+  { id: 'Hindi', label: 'Hindi' },
+  { id: 'Urdu', label: 'Urdu' },
+  { id: 'Marathi', label: 'Marathi' },
+  { id: 'Bengali', label: 'Bengali' },
+  { id: 'Telugu', label: 'Telugu' },
+  { id: 'Tamil', label: 'Tamil' },
+  { id: 'Gujarati', label: 'Gujarati' },
+  { id: 'Kannada', label: 'Kannada' },
+  { id: 'Malayalam', label: 'Malayalam' },
+  { id: 'Punjabi', label: 'Punjabi' },
+  { id: 'Odia', label: 'Odia' },
+  { id: 'Assamese', label: 'Assamese' },
+  { id: 'Sanskrit', label: 'Sanskrit' },
+  { id: 'Arabic', label: 'Arabic' },
+  { id: 'French', label: 'French' },
+  { id: 'German', label: 'German' },
+  { id: 'Spanish', label: 'Spanish' },
+  { id: 'Russian', label: 'Russian' },
+  { id: 'Chinese', label: 'Chinese' },
+  { id: 'Japanese', label: 'Japanese' },
 ];
 
 const SORT_OPTIONS = [
   { id: '', label: 'Recommended' },
-  { id: 'price_asc', label: 'Price: Low to High' },
-  { id: 'price_desc', label: 'Price: High to Low' },
-];
-
-const TYPE_OPTIONS = [
-  { id: 'online', label: 'Online Consultation' },
-  { id: 'offline', label: 'Offline Consultation' },
-];
-
-const FULFILLMENT_OPTIONS = [
-  { id: 'clinic_pickup', label: 'Clinic Pickup' },
-  { id: 'self_dispatch', label: 'Doctor Self-Dispatch' },
-  { id: 'ayurwed_delivery', label: 'AYURWED Delivery' },
+  { id: 'experience_desc', label: 'Experience: High to Low' },
+  { id: 'rating_desc', label: 'Rating: High to Low' },
 ];
 
 interface ConsultantFilterSidebarClientProps {
-  initialSearch: string;
-  initialExperience: string[];
-  initialPrice: string[];
-  initialSort: string;
-  initialTypes: string[];
-  initialFulfillments: string[];
+  initialSearch?: string;
+  initialExperience?: string[];
+  initialSort?: string;
+  initialSpecialization?: string[];
+  initialLanguages?: string[];
+  initialVerifiedOnly?: boolean;
+  initialCertifiedOnly?: boolean;
+  // Legacy props fallback
+  initialPrice?: string[];
+  initialTypes?: string[];
+  initialFulfillments?: string[];
 }
 
 export default function ConsultantFilterSidebarClient({
-  initialSearch,
-  initialExperience,
-  initialPrice,
-  initialSort,
-  initialTypes,
-  initialFulfillments,
+  initialSearch = '',
+  initialExperience = [],
+  initialSort = '',
+  initialSpecialization = [],
+  initialLanguages = [],
+  initialVerifiedOnly = false,
+  initialCertifiedOnly = false,
 }: ConsultantFilterSidebarClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
   const [selectedExperience, setSelectedExperience] = useState<string[]>(initialExperience);
-  const [selectedPrice, setSelectedPrice] = useState<string[]>(initialPrice);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>(initialTypes);
-  const [selectedFulfillments, setSelectedFulfillments] = useState<string[]>(initialFulfillments);
-  const [sort, setSort] = useState<string>(initialSort);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
+    searchParams.get('languages')?.split(',').filter(Boolean) || initialLanguages
+  );
+  const [sort, setSort] = useState<string>(initialSort || searchParams.get('sort') || '');
+  const [verifiedOnly, setVerifiedOnly] = useState<boolean>(
+    searchParams.get('verified') === 'true' || initialVerifiedOnly
+  );
+  const [certifiedOnly, setCertifiedOnly] = useState<boolean>(
+    searchParams.get('certified') === 'true' || initialCertifiedOnly
+  );
 
-  const updateFilters = (
+  React.useEffect(() => {
+    setSort(searchParams.get('sort') || '');
+    setSelectedExperience(searchParams.get('experience')?.split(',').filter(Boolean) || []);
+    setSelectedLanguages(searchParams.get('languages')?.split(',').filter(Boolean) || []);
+    setVerifiedOnly(searchParams.get('verified') === 'true');
+    setCertifiedOnly(searchParams.get('certified') === 'true');
+  }, [searchParams]);
+
+  const applyFilters = (
     newExp: string[],
-    newPrice: string[],
+    newLang: string[],
     newSort: string,
-    newTypes: string[],
-    newFulfillments: string[]
+    newVerified: boolean,
+    newCertified: boolean
   ) => {
     const params = new URLSearchParams(searchParams.toString());
-    
+
+    // Clean up old obsolete booking params and specialization
+    params.delete('price');
+    params.delete('types');
+    params.delete('fulfillments');
+    params.delete('specialization');
+
     if (newExp.length > 0) params.set('experience', newExp.join(','));
     else params.delete('experience');
 
-    if (newPrice.length > 0) params.set('price', newPrice.join(','));
-    else params.delete('price');
+    if (newLang.length > 0) params.set('languages', newLang.join(','));
+    else params.delete('languages');
 
     if (newSort) params.set('sort', newSort);
     else params.delete('sort');
 
-    if (newTypes.length > 0) params.set('types', newTypes.join(','));
-    else params.delete('types');
+    if (newVerified) params.set('verified', 'true');
+    else params.delete('verified');
 
-    if (newFulfillments.length > 0) params.set('fulfillments', newFulfillments.join(','));
-    else params.delete('fulfillments');
+    if (newCertified) params.set('certified', 'true');
+    else params.delete('certified');
 
     router.push(`${pathname}?${params.toString()}`);
   };
@@ -96,204 +137,216 @@ export default function ConsultantFilterSidebarClient({
       ? selectedExperience.filter((e) => e !== id)
       : [...selectedExperience, id];
     setSelectedExperience(updated);
-    updateFilters(updated, selectedPrice, sort, selectedTypes, selectedFulfillments);
+    applyFilters(updated, selectedLanguages, sort, verifiedOnly, certifiedOnly);
   };
 
-  const togglePrice = (id: string) => {
-    const updated = selectedPrice.includes(id)
-      ? selectedPrice.filter((e) => e !== id)
-      : [...selectedPrice, id];
-    setSelectedPrice(updated);
-    updateFilters(selectedExperience, updated, sort, selectedTypes, selectedFulfillments);
+  const toggleLanguage = (id: string) => {
+    const updated = selectedLanguages.includes(id)
+      ? selectedLanguages.filter((l) => l !== id)
+      : [...selectedLanguages, id];
+    setSelectedLanguages(updated);
+    applyFilters(selectedExperience, updated, sort, verifiedOnly, certifiedOnly);
   };
 
-  const toggleType = (id: string) => {
-    const updated = selectedTypes.includes(id)
-      ? selectedTypes.filter((t) => t !== id)
-      : [...selectedTypes, id];
-    setSelectedTypes(updated);
-    updateFilters(selectedExperience, selectedPrice, sort, updated, selectedFulfillments);
+  const handleSortChange = (newSort: string) => {
+    const nextSort = sort === newSort && newSort !== '' ? '' : newSort;
+    setSort(nextSort);
+    applyFilters(selectedExperience, selectedLanguages, nextSort, verifiedOnly, certifiedOnly);
   };
 
-  const toggleFulfillment = (id: string) => {
-    const updated = selectedFulfillments.includes(id)
-      ? selectedFulfillments.filter((f) => f !== id)
-      : [...selectedFulfillments, id];
-    setSelectedFulfillments(updated);
-    updateFilters(selectedExperience, selectedPrice, sort, selectedTypes, updated);
+  const toggleVerifiedOnly = () => {
+    const nextVal = !verifiedOnly;
+    setVerifiedOnly(nextVal);
+    applyFilters(selectedExperience, selectedLanguages, sort, nextVal, certifiedOnly);
   };
 
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newSort = e.target.value;
-    setSort(newSort);
-    updateFilters(selectedExperience, selectedPrice, newSort, selectedTypes, selectedFulfillments);
+  const toggleCertifiedOnly = () => {
+    const nextVal = !certifiedOnly;
+    setCertifiedOnly(nextVal);
+    applyFilters(selectedExperience, selectedLanguages, sort, verifiedOnly, nextVal);
   };
 
-  const clearFilters = () => {
+  const resetAllFilters = () => {
     setSelectedExperience([]);
-    setSelectedPrice([]);
-    setSelectedTypes([]);
-    setSelectedFulfillments([]);
+    setSelectedLanguages([]);
     setSort('');
-    router.push(pathname);
+    setVerifiedOnly(false);
+    setCertifiedOnly(false);
+
+    const params = new URLSearchParams();
+    const currentSearch = searchParams.get('search');
+    if (currentSearch) params.set('search', currentSearch);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
-  const hasFilters =
-    selectedExperience.length > 0 ||
-    selectedPrice.length > 0 ||
-    selectedTypes.length > 0 ||
-    selectedFulfillments.length > 0 ||
-    initialSearch ||
-    sort;
+  const activeFiltersCount =
+    selectedExperience.length +
+    selectedLanguages.length +
+    (sort ? 1 : 0) +
+    (verifiedOnly ? 1 : 0) +
+    (certifiedOnly ? 1 : 0);
 
   return (
-    <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-6 sticky top-24">
-      <div className="flex items-center justify-between text-brand-green font-bold border-b border-brand-green-light pb-3">
+    <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-6">
+      {/* Sidebar Header */}
+      <div className="flex items-center justify-between border-b border-border pb-4">
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-5 w-5" />
-          <span>Filters</span>
+          <SlidersHorizontal className="h-5 w-5 text-brand-green" />
+          <h2 className="font-extrabold text-base text-foreground">Filter Doctors</h2>
         </div>
-        {hasFilters && (
-          <button 
-            onClick={clearFilters}
-            className="text-xs text-brand-gold-dark hover:text-brand-gold underline"
+        {activeFiltersCount > 0 && (
+          <button
+            type="button"
+            onClick={resetAllFilters}
+            className="text-xs text-brand-gold-dark hover:text-brand-green font-bold flex items-center gap-1 transition-colors"
           >
-            Clear All
+            <RotateCcw className="h-3 w-3" />
+            <span>Reset</span>
           </button>
         )}
       </div>
 
-      {/* Sort Dropdown */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-bold text-brand-green flex items-center gap-2">
-          <ArrowDownUp className="h-4 w-4" /> Sort By
-        </h3>
-        <select
-          value={sort}
-          onChange={handleSortChange}
-          className="w-full bg-brand-gold-light/20 text-brand-foreground text-sm border border-border rounded-xl py-2 px-3 shadow-sm focus:outline-none focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/10 transition-all appearance-none cursor-pointer"
-        >
-          {SORT_OPTIONS.map(option => (
-            <option key={option.id} value={option.id}>{option.label}</option>
+      {/* Direct Contact Notice */}
+      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-3.5 space-y-1">
+        <div className="flex items-center gap-1.5 font-bold text-xs text-emerald-800 dark:text-emerald-300">
+          <Phone className="h-3.5 w-3.5" />
+          <span>Direct Patient Connection</span>
+        </div>
+        <p className="text-[11px] text-emerald-900/70 dark:text-emerald-200/70 leading-relaxed">
+          Call or WhatsApp listed Ayurvedic doctors directly. Zero platform fees or booking charges.
+        </p>
+      </div>
+
+      {/* Sort By */}
+      <div className="space-y-2.5">
+        <label className="text-xs font-bold text-foreground/70 uppercase tracking-wider block">
+          Sort By
+        </label>
+        <div className="space-y-1.5">
+          {SORT_OPTIONS.map((opt) => (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => handleSortChange(opt.id)}
+              className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between transition-colors ${
+                sort === opt.id
+                  ? 'bg-brand-green text-white shadow-sm'
+                  : 'bg-muted/50 text-foreground/70 hover:bg-muted'
+              }`}
+            >
+              <span>{opt.label}</span>
+              {sort === opt.id && <Check className="h-3.5 w-3.5" />}
+            </button>
           ))}
-        </select>
-      </div>
-
-      {/* Consultation Type Filter */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-bold text-brand-green">Consultation Type</h3>
-        <div className="flex flex-col space-y-2.5">
-          {TYPE_OPTIONS.map((type) => {
-            const isSelected = selectedTypes.includes(type.id);
-            return (
-              <div 
-                key={type.id} 
-                onClick={() => toggleType(type.id)}
-                className="flex items-center space-x-3 cursor-pointer group"
-              >
-                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                  isSelected 
-                    ? 'bg-brand-green border-brand-green' 
-                    : 'border-brand-foreground/30 group-hover:border-brand-gold'
-                }`}>
-                  {isSelected && <Check className="h-3 w-3 text-white" />}
-                </div>
-                <span className={`text-sm transition-colors ${
-                  isSelected ? 'text-brand-green font-semibold' : 'text-brand-foreground/80 group-hover:text-brand-green'
-                }`}>
-                  {type.label}
-                </span>
-              </div>
-            );
-          })}
         </div>
       </div>
 
-      {/* Medicine Fulfillment Filter */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-bold text-brand-green">Medicine Fulfillment</h3>
-        <div className="flex flex-col space-y-2.5">
-          {FULFILLMENT_OPTIONS.map((fulfillment) => {
-            const isSelected = selectedFulfillments.includes(fulfillment.id);
-            return (
-              <div 
-                key={fulfillment.id} 
-                onClick={() => toggleFulfillment(fulfillment.id)}
-                className="flex items-center space-x-3 cursor-pointer group"
-              >
-                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                  isSelected 
-                    ? 'bg-brand-green border-brand-green' 
-                    : 'border-brand-foreground/30 group-hover:border-brand-gold'
-                }`}>
-                  {isSelected && <Check className="h-3 w-3 text-white" />}
-                </div>
-                <span className={`text-sm transition-colors ${
-                  isSelected ? 'text-brand-green font-semibold' : 'text-brand-foreground/80 group-hover:text-brand-green'
-                }`}>
-                  {fulfillment.label}
-                </span>
-              </div>
-            );
-          })}
+      {/* Verified & Credentials Toggles */}
+      <div className="space-y-2.5 pt-2 border-t border-border">
+        <label className="text-xs font-bold text-foreground/70 uppercase tracking-wider block">
+          Credentials
+        </label>
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={toggleVerifiedOnly}
+            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between border transition-all ${
+              verifiedOnly
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-300'
+                : 'bg-card border-border text-foreground/70 hover:bg-muted/40'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-emerald-600" />
+              <span>Verified Degrees Only</span>
+            </div>
+            {verifiedOnly && <Check className="h-3.5 w-3.5 text-emerald-600" />}
+          </button>
+
+          <button
+            type="button"
+            onClick={toggleCertifiedOnly}
+            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between border transition-all ${
+              certifiedOnly
+                ? 'bg-brand-gold/15 border-brand-gold/30 text-brand-gold-dark'
+                : 'bg-card border-border text-foreground/70 hover:bg-muted/40'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Award className="h-4 w-4 text-brand-gold-dark" />
+              <span>CAI Certified Doctors</span>
+            </div>
+            {certifiedOnly && <Check className="h-3.5 w-3.5 text-brand-gold-dark" />}
+          </button>
         </div>
       </div>
 
-      {/* Experience Filter */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-bold text-brand-green">Years of Experience</h3>
-        <div className="flex flex-col space-y-2.5">
+
+      {/* Experience Ranges */}
+      <div className="space-y-2.5 pt-2 border-t border-border">
+        <label className="text-xs font-bold text-foreground/70 uppercase tracking-wider block flex items-center gap-1.5">
+          <Briefcase className="h-3.5 w-3.5 text-brand-green" />
+          <span>Experience</span>
+        </label>
+        <div className="space-y-1">
           {EXPERIENCE_RANGES.map((range) => {
             const isSelected = selectedExperience.includes(range.id);
             return (
-              <div 
-                key={range.id} 
+              <label
+                key={range.id}
                 onClick={() => toggleExperience(range.id)}
-                className="flex items-center space-x-3 cursor-pointer group"
+                className={`flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer transition-colors ${
+                  isSelected
+                    ? 'bg-brand-green-light text-brand-green font-bold'
+                    : 'hover:bg-muted/50 text-foreground/80'
+                }`}
               >
-                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                  isSelected 
-                    ? 'bg-brand-green border-brand-green' 
-                    : 'border-brand-foreground/30 group-hover:border-brand-gold'
-                }`}>
-                  {isSelected && <Check className="h-3 w-3 text-white" />}
-                </div>
-                <span className={`text-sm transition-colors ${
-                  isSelected ? 'text-brand-green font-semibold' : 'text-brand-foreground/80 group-hover:text-brand-green'
-                }`}>
-                  {range.label}
+                <span>{range.label}</span>
+                <span
+                  className={`w-4 h-4 rounded-md border flex items-center justify-center ${
+                    isSelected
+                      ? 'bg-brand-green border-brand-green text-white'
+                      : 'border-border bg-card'
+                  }`}
+                >
+                  {isSelected && <Check className="h-3 w-3 stroke-[3]" />}
                 </span>
-              </div>
+              </label>
             );
           })}
         </div>
       </div>
 
-      {/* Price Filter */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-bold text-brand-green">Consultation Fee</h3>
-        <div className="flex flex-col space-y-2.5">
-          {PRICE_RANGES.map((range) => {
-            const isSelected = selectedPrice.includes(range.id);
+      {/* Languages */}
+      <div className="space-y-2.5 pt-2 border-t border-border">
+        <label className="text-xs font-bold text-foreground/70 uppercase tracking-wider block flex items-center gap-1.5">
+          <Languages className="h-3.5 w-3.5 text-brand-green" />
+          <span>Languages Spoken</span>
+        </label>
+        <div className="space-y-1">
+          {LANGUAGES.map((lang) => {
+            const isSelected = selectedLanguages.includes(lang.id);
             return (
-              <div 
-                key={range.id} 
-                onClick={() => togglePrice(range.id)}
-                className="flex items-center space-x-3 cursor-pointer group"
+              <label
+                key={lang.id}
+                onClick={() => toggleLanguage(lang.id)}
+                className={`flex items-center justify-between p-2 rounded-xl text-xs cursor-pointer transition-colors ${
+                  isSelected
+                    ? 'bg-brand-green-light text-brand-green font-bold'
+                    : 'hover:bg-muted/50 text-foreground/80'
+                }`}
               >
-                <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                  isSelected 
-                    ? 'bg-brand-green border-brand-green' 
-                    : 'border-brand-foreground/30 group-hover:border-brand-gold'
-                }`}>
-                  {isSelected && <Check className="h-3 w-3 text-white" />}
-                </div>
-                <span className={`text-sm transition-colors ${
-                  isSelected ? 'text-brand-green font-semibold' : 'text-brand-foreground/80 group-hover:text-brand-green'
-                }`}>
-                  {range.label}
+                <span>{lang.label}</span>
+                <span
+                  className={`w-4 h-4 rounded-md border flex items-center justify-center ${
+                    isSelected
+                      ? 'bg-brand-green border-brand-green text-white'
+                      : 'border-border bg-card'
+                  }`}
+                >
+                  {isSelected && <Check className="h-3 w-3 stroke-[3]" />}
                 </span>
-              </div>
+              </label>
             );
           })}
         </div>

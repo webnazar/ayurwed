@@ -1,331 +1,427 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Leaf, ShieldCheck, HeartPulse, Sparkles, MessageSquare, ArrowUpRight, Award, Star, Smartphone, User } from 'lucide-react';
+import {
+  ArrowRight,
+  Leaf,
+  ShieldCheck,
+  Award,
+  Star,
+  Smartphone,
+  ShoppingBag,
+  Truck,
+  Sparkles,
+} from 'lucide-react';
 import { db } from '@/lib/db';
 import { formatPrice } from '@/lib/utils';
-import Image from 'next/image';
-import AyuriTriggerButton from '@/components/layout/AyuriTriggerButton';
 import HeroCard from '@/components/home/HeroCard';
 import HeroCarousel from '@/components/home/HeroCarousel';
 import SafeImage from '@/components/ui/SafeImage';
+import type { Metadata } from 'next';
+import { SYMPTOM_QUICK_CHIPS } from '@/lib/constants';
+
+export const metadata: Metadata = {
+  title: 'AYURWED — Ancient Intelligence | Authentic Ayurvedic Healthcare & Remedies',
+  description: 'Ayurwed brings you Ancient Intelligence. Discover pure Ayurveda remedies, book clinical doctor consultations, and explore classical formulations verified for quality.',
+  alternates: {
+    canonical: 'https://www.ayurwed.com',
+  },
+  openGraph: {
+    title: 'AYURWED — Ancient Intelligence | Authentic Ayurvedic Healthcare & Remedies',
+    description: 'Ayurwed brings you Ancient Intelligence. Discover pure Ayurveda remedies, book clinical doctor consultations, and explore classical formulations verified for quality.',
+    url: 'https://www.ayurwed.com',
+    siteName: 'AYURWED',
+    locale: 'en_IN',
+    type: 'website',
+    images: [
+      {
+        url: 'https://www.ayurwed.com/icon.png',
+        width: 512,
+        height: 512,
+        alt: 'AYURWED — Ancient Intelligence',
+      },
+    ],
+  },
+};
 
 export const revalidate = 0; // Dynamic rendering to fetch latest db updates
 
+function getProductThumbnail(images: any): string | null {
+  if (!images) return null;
+  let list: string[] = [];
+  if (Array.isArray(images)) {
+    list = images;
+  } else if (typeof images === 'string') {
+    try {
+      const parsed = JSON.parse(images);
+      if (Array.isArray(parsed)) list = parsed;
+      else if (typeof parsed === 'string') list = [parsed];
+    } catch {
+      if (images.trim() && !images.startsWith('[') && !images.startsWith('{')) {
+        list = [images.trim()];
+      }
+    }
+  }
+
+  const valid = list.find(
+    (url) =>
+      typeof url === 'string' &&
+      url.trim().length > 0 &&
+      url !== '[]' &&
+      url !== '/placeholder-product.png'
+  );
+
+  return valid ? valid.trim() : null;
+}
+
+const POPULAR_CATEGORIES = [
+  { name: 'Capsules', slug: 'Capsule', icon: '💊', desc: 'Concentrated daily herbal extracts' },
+  { name: 'Tablets & Vati', slug: 'Tablet', icon: '🌿', desc: 'Classical compressed herbs & rasayanas' },
+  { name: 'Syrup & Liquid', slug: 'Syrup & Liquid', icon: '🍯', desc: 'Fast-acting fermented Asavas & Arishtas' },
+  { name: 'Powders (Churna)', slug: 'Powder', icon: '🍃', desc: 'Pure micronized single & multi-herbs' },
+  { name: 'Ayurvedic Oils', slug: 'Oil', icon: '🪔', desc: 'Traditional medicated massage & hair oils' },
+  { name: 'Herbal Ghee', slug: 'Ghee', icon: '🧈', desc: 'Nourishing medicated Ghritas & rasayanas' },
+];
+
 export default async function HomePage() {
-  // Fetch active carousels
+  // 1. Fetch active carousels
   const carousels = await db.carousel.findMany({
     where: { isActive: true },
     orderBy: { sortOrder: 'asc' },
-    take: 5,
   });
 
-  // 1. Fetch Dynamic Formulations (Randomly selected)
-  const activePreps = await db.preparation.findMany({
-    where: { isActive: true },
-    select: { id: true }
-  });
-  
-  // Shuffle all active preparation IDs and pick 3
-  const shuffledIds = activePreps.sort(() => 0.5 - Math.random()).slice(0, 3).map(p => p.id);
-  
-  const featuredProducts = await db.preparation.findMany({
-    where: { id: { in: shuffledIds } },
-    include: { indications: true }
+  // 2. Fetch Featured & Top eCommerce Products
+  const featuredDbProducts = await db.product.findMany({
+    where: { isActive: true, isFeatured: true },
+    include: {
+      manufacturer: { select: { id: true, companyName: true } },
+      indications: { select: { id: true, name: true } },
+    },
+    take: 8,
+    orderBy: { createdAt: 'desc' },
   });
 
-  // 2. Fetch Verified Consultants
-  const consultants = await db.consultantProfile.findMany({
-    where: { isCaiCertified: true },
-    take: 2,
-    include: { user: true }
-  });
+  let displayProducts = featuredDbProducts;
+  if (displayProducts.length < 4) {
+    const additional = await db.product.findMany({
+      where: {
+        isActive: true,
+        id: { notIn: featuredDbProducts.map((p) => p.id) },
+      },
+      include: {
+        manufacturer: { select: { id: true, companyName: true } },
+        indications: { select: { id: true, name: true } },
+      },
+      take: 8 - displayProducts.length,
+      orderBy: { createdAt: 'desc' },
+    });
+    displayProducts = [...displayProducts, ...additional];
+  }
 
-  // 3. Fetch Knowledge Articles
-  const articles = await db.knowledgeArticle.findMany({
-    where: { isPublished: true },
-    take: 2,
-    include: { author: true }
-  });
-
-  // 4. Fetch active testimonials
+  // 3. Fetch active testimonials
   const testimonials = await db.testimonial.findMany({
     where: { isActive: true },
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
     take: 3,
   });
 
+  // 4. Fetch dynamic categories from Category master
+  const fetchCategories = async () => {
+    try {
+      return await db.category.findMany({
+        where: { isActive: true },
+        orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      });
+    } catch {
+      try {
+        const simple = await db.category.findMany({
+          where: { isActive: true },
+          select: { id: true, name: true, slug: true, description: true, sortOrder: true },
+          orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+        });
+        return simple.map((c) => ({ ...c, icon: null }));
+      } catch {
+        return [];
+      }
+    }
+  };
+
+  const dbCategories = await fetchCategories();
+
+  const displayCategories = dbCategories.length > 0
+    ? dbCategories.map((c) => ({
+        name: c.name,
+        slug: c.slug,
+        icon: c.icon || '🌿',
+        desc: c.description || `Classical Ayurvedic ${c.name} formulations`,
+      }))
+    : POPULAR_CATEGORIES;
+
   return (
     <div className="space-y-16 pb-20">
       {/* 1. Carousel Section */}
       {carousels.length > 0 && (
-        <section className="w-full relative z-20 -mb-16">
+        <section className="w-full relative z-20">
           <HeroCarousel carousels={carousels} />
         </section>
       )}
 
-      {/* 2. Hero Card (Logo & Ayuri Section) */}
-      <section className="relative overflow-hidden bg-card text-brand-green py-16">
-        {/* Soft background glow circles */}
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-brand-green-light rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-10 w-80 h-80 bg-brand-gold/10 rounded-full blur-2xl pointer-events-none" />
+      {/* 3. eCommerce Quality & Trust Badges */}
+      <section className="max-w-7xl mx-auto layout-padding-minimal">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-sm flex items-center gap-4 group hover:border-brand-green/30 transition-all">
+            <div className="p-3.5 rounded-2xl bg-brand-green/10 text-brand-green flex-shrink-0 group-hover:scale-110 transition-transform">
+              <Leaf className="h-6 w-6" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-title-primary">100% Classical Herbs</h4>
+              <p className="text-xs text-muted-foreground mt-0.5">Pure single & compound extracts</p>
+            </div>
+          </div>
 
+          <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-sm flex items-center gap-4 group hover:border-brand-green/30 transition-all">
+            <div className="p-3.5 rounded-2xl bg-brand-gold/15 text-brand-gold-dark flex-shrink-0 group-hover:scale-110 transition-transform">
+              <Award className="h-6 w-6" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-title-primary">GMP Certified Quality</h4>
+              <p className="text-xs text-muted-foreground mt-0.5">Licensed manufacturing units</p>
+            </div>
+          </div>
+
+          <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-sm flex items-center gap-4 group hover:border-brand-green/30 transition-all">
+            <div className="p-3.5 rounded-2xl bg-emerald-500/10 text-emerald-600 flex-shrink-0 group-hover:scale-110 transition-transform">
+              <ShieldCheck className="h-6 w-6" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-title-primary">Lab Tested Potency</h4>
+              <p className="text-xs text-muted-foreground mt-0.5">Heavy metal & purity verified</p>
+            </div>
+          </div>
+
+          <div className="bg-card rounded-3xl p-5 sm:p-6 border border-border shadow-sm flex items-center gap-4 group hover:border-brand-green/30 transition-all">
+            <div className="p-3.5 rounded-2xl bg-brand-green/10 text-brand-green flex-shrink-0 group-hover:scale-110 transition-transform">
+              <Truck className="h-6 w-6" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-title-primary">Pan-India Express</h4>
+              <p className="text-xs text-muted-foreground mt-0.5">Direct dispatch to your doorstep</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Shop by Concern / Symptoms */}
+      <section className="max-w-7xl mx-auto layout-padding-minimal space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-5">
+          <div>
+            <span className="text-xs font-extrabold uppercase tracking-wider text-brand-gold-dark">Targeted Ayurveda</span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-title-primary tracking-tight mt-1">
+              Shop by Health Concern
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+              Select your specific health goal to discover classical remedies and proven herbal formulations.
+            </p>
+          </div>
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-brand-green hover:text-brand-gold transition-colors flex-shrink-0"
+          >
+            <span>Explore All Concerns</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          {SYMPTOM_QUICK_CHIPS.map((chip) => (
+            <Link
+              key={chip.id}
+              href={`/shop?search=${encodeURIComponent(chip.symptoms[0])}`}
+              className="bg-card hover:bg-brand-green/5 border border-border hover:border-brand-green/30 rounded-3xl p-4 sm:p-5 text-center flex flex-col items-center justify-between space-y-2 group transition-all duration-200 shadow-sm hover:shadow"
+            >
+              <span className="text-2xl sm:text-3xl block group-hover:scale-125 transition-transform duration-200">
+                {chip.icon}
+              </span>
+              <div>
+                <h4 className="text-xs sm:text-sm font-bold text-title-primary group-hover:text-brand-green transition-colors leading-tight">
+                  {chip.label}
+                </h4>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* 5. Featured Products Grid */}
+      <section className="max-w-7xl mx-auto layout-padding-minimal space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-5">
+          <div>
+            <span className="text-xs font-extrabold uppercase tracking-wider text-brand-gold-dark">Authentic Store</span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-title-primary tracking-tight mt-1">
+              Featured Formulations & Products
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+              Handpicked classical extracts, churnas, vati, and preparations for daily vitality.
+            </p>
+          </div>
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-brand-green hover:text-brand-gold transition-colors flex-shrink-0"
+          >
+            <span>View All Products</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {displayProducts.map((p) => {
+            const thumbnail = getProductThumbnail(p.images);
+            const mrp = Number(p.mrp);
+            const sellingPrice = Number(p.sellingPrice);
+            const discountPct = mrp > sellingPrice ? Math.round(((mrp - sellingPrice) / mrp) * 100) : 0;
+            const primaryIndication = p.indications?.[0]?.name;
+
+            return (
+              <div
+                key={p.id}
+                className="bg-card rounded-3xl overflow-hidden border border-border shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group relative"
+              >
+                {/* Product Thumbnail */}
+                <Link href={`/shop/${p.slug}`} className="relative aspect-square bg-muted/30 overflow-hidden block">
+                  {thumbnail ? (
+                    <SafeImage
+                      src={thumbnail}
+                      fallbackSrc="/icon.webp"
+                      fallbackClassName="h-full w-full object-contain p-8 bg-emerald-50/50 group-hover:scale-105 transition-transform duration-500"
+                      alt={p.name}
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <img
+                      src="/icon.webp"
+                      alt={p.name}
+                      className="w-full h-full object-contain p-8 bg-emerald-50/50 group-hover:scale-105 transition-transform duration-500"
+                    />
+                  )}
+                  {/* Badges */}
+                  <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                    {discountPct > 0 && (
+                      <span className="bg-red-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm">
+                        {discountPct}% OFF
+                      </span>
+                    )}
+                    {p.isFeatured && (
+                      <span className="bg-brand-gold text-brand-green text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-sm">
+                        FEATURED
+                      </span>
+                    )}
+                  </div>
+                  {p.type && (
+                    <span className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase">
+                      {p.type.replace('_', ' ')}
+                    </span>
+                  )}
+                </Link>
+
+                {/* Product Info */}
+                <div className="p-5 flex-grow flex flex-col justify-between space-y-3">
+                  <div className="space-y-1.5">
+                    {p.manufacturer && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block line-clamp-1">
+                        {p.manufacturer.companyName}
+                      </span>
+                    )}
+                    <Link href={`/shop/${p.slug}`}>
+                      <h3 className="text-sm font-bold text-title-primary group-hover:text-brand-green transition-colors line-clamp-2">
+                        {p.name}
+                      </h3>
+                    </Link>
+                    {primaryIndication && (
+                      <span className="inline-block bg-brand-green/10 text-brand-green text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                        {primaryIndication}
+                      </span>
+                    )}
+                    {p.shortDesc && (
+                      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                        {p.shortDesc}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Price & CTA */}
+                  <div className="pt-3 border-t border-border flex items-center justify-between gap-2">
+                    <div>
+                      <span className="text-base font-extrabold text-title-primary">
+                        {formatPrice(sellingPrice)}
+                      </span>
+                      {mrp > sellingPrice && (
+                        <span className="text-xs text-muted-foreground line-through ml-1.5">
+                          {formatPrice(mrp)}
+                        </span>
+                      )}
+                    </div>
+                    <Link
+                      href={`/shop/${p.slug}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-green hover:bg-brand-green/90 text-white text-xs font-bold shadow-sm transition-all active:scale-95"
+                    >
+                      <ShoppingBag className="h-3.5 w-3.5" />
+                      <span>Details</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 6. Dynamic Category & Formulations */}
+      <section className="max-w-7xl mx-auto layout-padding-minimal space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-5">
+          <div>
+            <span className="text-xs font-extrabold uppercase tracking-wider text-brand-gold-dark">Browse Dispensary</span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-title-primary tracking-tight mt-1">
+              Explore by Category
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+              Choose the delivery format and category that best suits your daily wellness and digestive preferences.
+            </p>
+          </div>
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-brand-green hover:text-brand-gold transition-colors flex-shrink-0"
+          >
+            <span>All Categories</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {displayCategories.map((cat) => (
+            <Link
+              key={cat.slug}
+              href={`/shop?category=${encodeURIComponent(cat.name)}`}
+              className="bg-card rounded-3xl p-5 border border-border shadow-sm hover:shadow-md hover:border-brand-green/30 transition-all text-center flex flex-col justify-between items-center group"
+            >
+              <span className="text-3xl block group-hover:scale-125 transition-transform duration-200 mb-2">
+                {cat.icon}
+              </span>
+              <h4 className="text-xs sm:text-sm font-bold text-title-primary group-hover:text-brand-green transition-colors">
+                {cat.name}
+              </h4>
+              <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2">
+                {cat.desc}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* 7. Ayuri AI Ecosystem & Chatbot Card */}
+      <section className="relative overflow-hidden py-2">
         <HeroCard />
       </section>
 
-      {/* 3. How It Works Section */}
-      <section className="max-w-7xl mx-auto layout-padding-minimal">
-        <div className="text-center space-y-4">
-          <h2 className="text-3xl sm:text-4xl font-bold text-brand-green">The Wellness Journey</h2>
-          <p className="text-brand-foreground/75 max-w-xl mx-auto">Three simple steps to transition from chronic issues to pure holistic wellness.</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-          {/* Step 1 */}
-          <div className="bg-card rounded-3xl p-8 border border-border shadow-sm hover:shadow-md transition-all duration-300 text-center space-y-4">
-            <div className="inline-flex p-4 bg-brand-green-light rounded-full text-brand-green">
-              <Leaf className="h-8 w-8" />
-            </div>
-            <h3 className="text-xl font-bold text-title-primary">1. Discover Remedies</h3>
-            <p className="text-sm text-brand-foreground/70 leading-relaxed">
-              Browse classical certifications, pure adaptogenic single herbs, daily preparations, and learn about your Dosha types.
-            </p>
-          </div>
-          {/* Step 2 */}
-          <div className="bg-card rounded-3xl p-8 border border-border shadow-sm hover:shadow-md transition-all duration-300 text-center space-y-4">
-            <div className="inline-flex p-4 bg-brand-gold/15 rounded-full text-brand-gold-dark">
-              <MessageSquare className="h-8 w-8" />
-            </div>
-            <h3 className="text-xl font-bold text-title-primary">2. Consult Experts</h3>
-            <p className="text-sm text-brand-foreground/70 leading-relaxed">
-              Book live, secure video or chat sessions with certified Ayurvedic doctors specializing in internal medicine, Panchakarma, and ENT.
-            </p>
-          </div>
-          {/* Step 3 */}
-          <div className="bg-card rounded-3xl p-8 border border-border shadow-sm hover:shadow-md transition-all duration-300 text-center space-y-4">
-            <div className="inline-flex p-4 bg-emerald-100 dark:bg-emerald-950/40 rounded-full text-emerald-700 dark:text-emerald-400">
-              <HeartPulse className="h-8 w-8" />
-            </div>
-            <h3 className="text-xl font-bold text-title-primary">3. Heal Naturally</h3>
-            <p className="text-sm text-brand-foreground/70 leading-relaxed">
-              Receive custom diet sheets, specialized preparation regimes, and follow-up consultation routines tailored to your Prakriti.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Featured Products Grid */}
-      <section className="max-w-7xl mx-auto layout-padding-minimal">
-        <div className="flex flex-col sm:flex-row justify-between items-end gap-4 border-b border-border pb-6">
-          <div>
-            <h2 className="text-3xl font-bold text-brand-green">Dynamic Formulations</h2>
-            <p className="text-brand-foreground/70 mt-1">Custom-prescribed generic extracts, powders, tablets, and capsules for your unique wellness journey.</p>
-          </div>
-
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
-          {featuredProducts.map((p) => {
-            let imagesList: string[] = [];
-            try {
-              imagesList = typeof p.images === 'string' ? JSON.parse(p.images) : (p.images || []);
-            } catch {
-              imagesList = [];
-            }
-            const thumbnail = imagesList?.[0] || '/icon.webp';
-            const isPlaceholder = !imagesList?.[0];
-
-            return (
-              <div key={p.id} className="bg-card rounded-3xl overflow-hidden border border-border shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col group">
-                <div className="relative h-64 bg-muted overflow-hidden">
-                  <Image
-                    src={thumbnail}
-                    alt={p.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className={`group-hover:scale-105 transition-transform duration-500 ${
-                      isPlaceholder ? 'object-contain p-8 bg-emerald-50/50' : 'object-cover'
-                    }`}
-                  />
-                  <span className="absolute top-4 left-4 bg-brand-gold text-brand-green dark:text-brand-green-light font-bold text-xs px-3 py-1 rounded-full uppercase">
-                    {p.type.replace('_', ' ')}
-                  </span>
-                </div>
-              <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <span className="text-xs font-semibold text-brand-green/80 uppercase tracking-wider">
-                    {p.indications && p.indications.length > 0 ? p.indications[0].name : 'Wellness'}
-                  </span>
-                  <h3 className="text-lg font-bold text-title-primary group-hover:text-brand-gold transition-colors duration-200 line-clamp-1">
-                    {p.name}
-                  </h3>
-                  <p className="text-sm text-brand-foreground/70 line-clamp-2">
-                    {p.description}
-                  </p>
-                </div>
-                <div className="flex items-center justify-end pt-4 border-t border-brand-green-light">
-                  <Link
-                    href={`/preparations/${p.slug}`}
-                    className="btn-primary px-4 py-2 text-sm"
-                  >
-                    Details
-                  </Link>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        </div>
-      </section>
-
-      {/* 4. Ayuri Chatbot Banner */}
-      <section className="max-w-7xl mx-auto layout-padding-minimal">
-        <div className="bg-brand-green-light rounded-3xl p-8 sm:p-12 text-brand-green relative overflow-hidden shadow-sm border border-brand-green/10">
-          <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-72 h-72 bg-card/50 rounded-full blur-3xl pointer-events-none" />
-          <div className="relative z-10 max-w-2xl space-y-6">
-            <span className="inline-flex items-center gap-1.5 bg-brand-green/10 text-brand-green px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-              <Award className="h-4 w-4" />
-              <span>Meet Ayuri — Official AI Guide</span>
-            </span>
-            <h2 className="text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight md:whitespace-nowrap">
-              Instant Ayurvedic Wisdom, Tailored to You
-            </h2>
-            <p className="text-brand-green/70 text-sm sm:text-base leading-relaxed">
-              Not sure which product matches your body profile? Ask Ayuri about herbal ingredients, dosage plans, lifestyle guidelines, and get instant, clinically grounded guidance.
-            </p>
-            <div className="pt-2">
-              <AyuriTriggerButton />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Featured Consultants */}
-      <section className="max-w-7xl mx-auto layout-padding-minimal">
-        <div className="flex flex-col sm:flex-row justify-between items-end gap-4 border-b border-border pb-6">
-          <div>
-            <h2 className="text-3xl font-bold text-brand-green">Verified Specialists</h2>
-            <p className="text-brand-foreground/70 mt-1">Book professional diagnostic audits & customized Panchakarma routines.</p>
-          </div>
-          <Link href="/doctors" className="text-brand-gold hover:text-brand-green font-bold flex items-center gap-1 group">
-            <span>View All Doctors</span>
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
-          {consultants.map((c) => (
-            <div key={c.id} className="bg-card rounded-3xl p-6 border border-border shadow-sm hover:shadow-md transition-all duration-300 flex flex-col sm:flex-row gap-6">
-              <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-brand-green-light flex-shrink-0 mx-auto">
-                <Image
-                  src={c.user?.avatar || (c.id % 2 === 0 ? '/female-doctor.webp' : '/male-doctor.webp')}
-                  alt={c.user?.name || 'Doctor'}
-                  fill
-                  sizes="128px"
-                  className="object-cover"
-                />
-              </div>
-              <div className="flex-grow flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-brand-green">{c.user?.name}</h3>
-                    <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                      <ShieldCheck className="h-3 w-3" />
-                      <span>Verified</span>
-                    </span>
-                  </div>
-                  <p className="text-xs font-semibold text-brand-gold-dark">{c.specialization}</p>
-                  <p className="text-sm text-brand-foreground/70 line-clamp-2">{c.bio}</p>
-                  <div className="flex flex-wrap gap-1 pt-1">
-                    {(() => {
-                      try {
-                        const parsed = JSON.parse(c.languages as string);
-                        if (Array.isArray(parsed)) {
-                          return parsed.map((l: string) => (
-                            <span key={l} className="bg-brand-green-light text-brand-green text-[10px] font-medium px-2.5 py-0.5 rounded-full">
-                              {l}
-                            </span>
-                          ));
-                        }
-                      } catch (e) {
-                        // ignore error and fallback
-                      }
-                      const fallbackLang = typeof c.languages === 'string' ? c.languages : 'English';
-                      return (
-                        <span className="bg-brand-green-light text-brand-green text-[10px] font-medium px-2.5 py-0.5 rounded-full">
-                          {fallbackLang}
-                        </span>
-                      );
-                    })()}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between pt-4 border-t border-brand-green-light">
-                  <div>
-                    <span className="text-xs text-brand-foreground/50 block">Consultation Fee</span>
-                    <span className="text-lg font-extrabold text-brand-green">{formatPrice(Number(c.consultationFee))}</span>
-                  </div>
-                  <Link
-                    href={`/doctors/${c.userId}`}
-                    className="bg-brand-gold hover:bg-brand-green hover:text-white dark:hover:text-black text-brand-green dark:text-brand-green-light px-5 py-2.5 rounded-full text-xs font-bold transition-all duration-300"
-                  >
-                    Book Appointment
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 6. Knowledge Hub Preview */}
-      <section className="max-w-7xl mx-auto layout-padding-minimal">
-        <div className="flex flex-col sm:flex-row justify-between items-end gap-4 border-b border-border pb-6">
-          <div>
-            <h2 className="text-3xl font-bold text-brand-green">Ayurveda Academy</h2>
-            <p className="text-brand-foreground/70 mt-1">Read clinical research, recipes, and lifestyle suggestions.</p>
-          </div>
-          <Link href="/knowledge" className="text-brand-gold hover:text-brand-green font-bold flex items-center gap-1 group">
-            <span>Browse Academy</span>
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
-          {articles.map((art) => (
-            <div key={art.id} className="bg-card rounded-3xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-300 flex flex-col sm:flex-row group">
-              <div className="relative h-48 sm:h-auto sm:w-48 bg-slate-150 flex-shrink-0">
-                <Image
-                  src={art.featuredImage || 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=400&q=80'}
-                  alt={art.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 192px"
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
-                <div className="space-y-2">
-                  <span className="bg-brand-gold/15 text-brand-gold-dark text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider inline-block">
-                    {art.type}
-                  </span>
-                  <h3 className="text-base font-bold text-brand-green group-hover:text-brand-gold transition-colors duration-200">
-                    {art.title}
-                  </h3>
-                  <p className="text-sm text-brand-foreground/70 line-clamp-2">
-                    {art.excerpt}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between pt-2">
-                  <span className="text-xs text-brand-foreground/40 font-medium">By {art.author?.name}</span>
-                  <Link
-                    href={`/knowledge/${art.type.toLowerCase()}/${art.slug}`}
-                    className="text-brand-green hover:text-brand-gold font-bold text-xs flex items-center gap-0.5"
-                  >
-                    <span>Read Article</span>
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 6.5. Mobile App Banner */}
+      {/* 8. Mobile App Banner (Kept exactly as requested) */}
       <section className="max-w-7xl mx-auto layout-padding-minimal">
         <div className="bg-brand-gold-light rounded-3xl overflow-hidden border border-border shadow-sm flex flex-col md:flex-row items-center justify-between p-8 sm:p-12 gap-8">
           <div className="space-y-6 max-w-xl">
@@ -339,37 +435,31 @@ export default async function HomePage() {
             <p className="text-brand-foreground/85 text-sm sm:text-base leading-relaxed">
               Scan product ingredients, chat with Ayuri AI instantly, schedule secure consultations, and manage your health dashboard. Download the official Ayurwed app today.
             </p>
-            <div className="flex flex-wrap gap-4 pt-2">
+            <div className="flex flex-wrap items-center gap-4 pt-2">
               {/* App Store Button */}
               <a
                 href="#app-download-ios"
-                className="btn-primary rounded-2xl px-6 py-3 border border-transparent group/btn"
+                className="inline-block transition-transform duration-300 hover:scale-105 active:scale-95"
+                title="Download on the App Store"
               >
                 <img
-                  src="https://icons.getbootstrap.com/assets/icons/apple.svg"
-                  alt="Apple Store"
-                  className="h-6 w-6 invert group-hover/btn:invert-0 transition-all duration-300"
+                  src="/app-store-badge.svg"
+                  alt="Download on the App Store"
+                  className="h-12 w-auto object-contain"
                 />
-                <div className="text-left leading-none">
-                  <span className="text-[10px] font-medium block opacity-75">Download on the</span>
-                  <span className="text-sm font-extrabold">App Store</span>
-                </div>
               </a>
 
               {/* Play Store Button */}
               <a
                 href="#app-download-android"
-                className="btn-primary rounded-2xl px-6 py-3 border border-transparent group/btn"
+                className="inline-block transition-transform duration-300 hover:scale-105 active:scale-95"
+                title="Get it on Google Play"
               >
                 <img
-                  src="https://icons.getbootstrap.com/assets/icons/google-play.svg"
-                  alt="Google Play"
-                  className="h-6 w-6 invert group-hover/btn:invert-0 transition-all duration-300"
+                  src="/google-play-badge.svg"
+                  alt="Get it on Google Play"
+                  className="h-12 w-auto object-contain"
                 />
-                <div className="text-left leading-none">
-                  <span className="text-[10px] font-medium block opacity-75">GET IT ON</span>
-                  <span className="text-sm font-extrabold">Google Play</span>
-                </div>
               </a>
             </div>
           </div>
@@ -403,12 +493,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 7. Testimonials */}
+      {/* 9. Testimonials (Kept exactly as requested) */}
       {testimonials.length > 0 && (
         <section className="max-w-7xl mx-auto layout-padding-minimal">
           <h2 className="text-3xl font-bold text-brand-green text-center mb-10">What Our Wellness Circle Says</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map(t => (
+            {testimonials.map((t) => (
               <div key={t.id} className="bg-card rounded-3xl p-6 border border-brand-green-border/15 shadow-sm flex flex-col space-y-4 h-full">
                 <div className="flex gap-0.5 text-brand-gold">
                   {[...Array(t.rating)].map((_, i) => (
@@ -436,7 +526,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Video Introduction Section */}
+      {/* 10. Video Introduction Section (Kept exactly as requested) */}
       <section className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 pb-10">
         <div className="text-center space-y-4 mb-8">
           <h2 className="text-3xl font-bold text-brand-green">Experience AYURWED</h2>

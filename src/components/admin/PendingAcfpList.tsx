@@ -59,22 +59,22 @@ export default function PendingAcfpList({ initialList }: PendingAcfpListProps) {
   }
 
   return (
-    <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <div className="p-6 border-b border-border bg-brand-gold/10 flex items-center justify-between">
+    <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <div className="p-3.5 border-b border-border bg-brand-gold/10 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Award className="h-5.5 w-5.5 text-brand-gold-dark dark:text-brand-gold animate-pulse-slow" />
-          <h2 className="font-extrabold text-brand-green dark:text-foreground text-lg">
+          <Award className="h-5 w-5 text-brand-gold-dark dark:text-brand-gold animate-pulse-slow" />
+          <h2 className="font-extrabold text-brand-green dark:text-foreground text-sm sm:text-base">
             Platform Access Activations
           </h2>
         </div>
-        <span className="bg-brand-gold text-brand-green font-black px-3 py-1 rounded-full text-xs animate-bounce">
+        <span className="bg-brand-gold text-brand-green font-black px-2.5 py-0.5 rounded-full text-xs animate-bounce">
           {list.length} Pending
         </span>
       </div>
 
-      <div className="divide-y divide-brand-green-border/10">
+      <div className="divide-y divide-border">
         {list.map(c => (
-          <div key={c.id} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-brand-gold-light/5 transition-colors">
+          <div key={c.id} className="p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-brand-gold-light/5 transition-colors">
             {/* Doctor details */}
             <div className="flex items-start gap-4">
               <div className="h-12 w-12 rounded-full overflow-hidden bg-brand-green-light flex-shrink-0">

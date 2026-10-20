@@ -80,16 +80,30 @@ export default function Footer() {
           <p className="text-sm text-brand-green/70 dark:text-muted-foreground leading-relaxed">
             Ancient Intelligence. Connecting Indian heritage with modern clinical research for complete holistic health.
           </p>
-          <div className="space-y-2 pt-1">
+          <div className="space-y-2.5 pt-1">
             <span className="text-[10px] font-bold text-brand-green dark:text-foreground uppercase tracking-wider block">Get the Mobile App</span>
-            <div className="flex gap-2 w-full max-w-[220px]">
-              <a href="#app-download-ios"
-                className="flex-1 inline-flex justify-center items-center gap-1.5 bg-brand-green/5 hover:bg-brand-green hover:text-white dark:bg-muted dark:text-foreground dark:hover:bg-brand-gold dark:hover:text-black text-brand-green text-[10px] font-bold px-2 py-1.5 rounded-xl border border-brand-green/10 dark:border-border/30 transition-all duration-300">
-                App Store
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <a
+                href="#app-download-ios"
+                className="inline-block transition-transform duration-200 hover:scale-105 active:scale-95"
+                title="Download on the App Store"
+              >
+                <img
+                  src="/app-store-badge.svg"
+                  alt="Download on the App Store"
+                  className="h-10 w-auto object-contain"
+                />
               </a>
-              <a href="#app-download-android"
-                className="flex-1 inline-flex justify-center items-center gap-1.5 bg-brand-green/5 hover:bg-brand-green hover:text-white dark:bg-muted dark:text-foreground dark:hover:bg-brand-gold dark:hover:text-black text-brand-green text-[10px] font-bold px-2 py-1.5 rounded-xl border border-brand-green/10 dark:border-border/30 transition-all duration-300">
-                Google Play
+              <a
+                href="#app-download-android"
+                className="inline-block transition-transform duration-200 hover:scale-105 active:scale-95"
+                title="Get it on Google Play"
+              >
+                <img
+                  src="/google-play-badge.svg"
+                  alt="Get it on Google Play"
+                  className="h-10 w-auto object-contain"
+                />
               </a>
             </div>
           </div>
@@ -159,15 +173,17 @@ export default function Footer() {
             <li><Link href="/academy" className="text-brand-green/70 dark:text-muted-foreground hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Academy</Link></li>
             <li><Link href="/knowledge" className="text-brand-green/70 dark:text-muted-foreground hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Knowledge Hub</Link></li>
             <li><Link href="/about" className="text-brand-green/70 dark:text-muted-foreground hover:text-brand-gold dark:hover:text-brand-gold transition-colors">About Us</Link></li>
+            <li><Link href="/contact" className="text-brand-green/70 dark:text-muted-foreground hover:text-brand-gold dark:hover:text-brand-gold transition-colors">Contact Us</Link></li>
           </ul>
         </div>
 
         {/* Contact info */}
         <div>
-          <h4 className="text-brand-green dark:text-foreground text-sm font-semibold tracking-wider uppercase mb-4">Ayurwed India</h4>
+          <h4 className="text-brand-green dark:text-foreground text-sm font-semibold tracking-wider uppercase mb-4">Ayurwed - Ancient Intelligence</h4>
           <ul className="space-y-2 text-sm text-brand-green/70 dark:text-muted-foreground">
-            <li>Support: support@ayurwed.com</li>
-            <li>Phone: +9271711722</li>
+            <li>Support: <a href="mailto:support@ayurwed.com" className="hover:text-brand-gold transition-colors">support@ayurwed.com</a></li>
+            <li>Phone: <a href="tel:+919271711722" className="hover:text-brand-gold transition-colors">+919271711722</a></li>
+            <li><Link href="/contact" className="hover:text-brand-gold transition-colors">Contact Us & Inquiries</Link></li>
           </ul>
         </div>
       </div>
@@ -177,6 +193,7 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto layout-padding-minimal flex flex-col sm:flex-row items-center justify-between text-xs text-brand-green/60 dark:text-muted-foreground/60 gap-4">
           <p>© {new Date().getFullYear()} Ayurwed Ecosystem Platform. All Rights Reserved.</p>
           <div className="flex space-x-6">
+            <Link href="/contact" className="hover:text-brand-gold">Contact Us</Link>
             <Link href="/terms" className="hover:text-brand-gold">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-brand-gold">Privacy Policy</Link>
             <Link href="/ayuri-bot-policy" className="hover:text-brand-gold">Ayuri Bot Policy</Link>

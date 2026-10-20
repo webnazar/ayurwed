@@ -30,13 +30,17 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "scratch",
+    "scratch/**/*",
+    "scripts",
+    "scripts/**/*"
   ],
   "ts-node": {
     "compilerOptions": {

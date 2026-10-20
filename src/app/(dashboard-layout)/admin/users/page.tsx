@@ -48,16 +48,5 @@ export default async function AdminUsersPage() {
     }))
   }));
 
-  return (
-    <div className="space-y-6">
-      <div className="dashboard-header-card">
-        <h1 className="dashboard-header-title">User Account Management</h1>
-        <p className="dashboard-header-subtitle">
-          Manage system users, change workspace credentials, modify roles, and toggle activity bans.
-        </p>
-      </div>
-
-      <UserListClient initialUsers={serializedUsers} />
-    </div>
-  );
+  return <UserListClient initialUsers={serializedUsers} />;
 }

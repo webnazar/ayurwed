@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { Save, UserCircle, Stethoscope, Languages, Clock, Pencil, Truck, ShieldCheck } from 'lucide-react';
+import { Save, UserCircle, Stethoscope, Languages, Clock, Pencil, ShieldCheck, Lock, Eye, EyeOff } from 'lucide-react';
 import ImageUploadCrop from '@/components/admin/ImageUploadCrop';
 
 interface ConsultantProfileProps {
@@ -38,9 +38,11 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
     ? data.profile.languages.join(', ') 
     : '';
 
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     name: data.user.name || '',
     avatar: data.user.avatar || '',
+    password: '',
     degree: data.profile.degree || '',
     specialization: data.profile.specialization || '',
     experience: data.profile.experience || 0,
@@ -60,13 +62,6 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
     registrationNumber: data.profile.registrationNumber || '',
   });
 
-  const [fulfillmentMode, setFulfillmentMode] = useState<'PRESCRIPTION_ONLY' | 'BOTH'>(() => {
-    if (data.profile.hasClinicPickup || data.profile.hasSelfDispatch || data.profile.hasAyurwedDelivery) {
-      return 'BOTH';
-    }
-    return 'PRESCRIPTION_ONLY';
-  });
-  
   const [saving, setSaving] = useState(false);
 
   React.useEffect(() => {
@@ -94,8 +89,6 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
       .map(lang => lang.trim())
       .filter(lang => lang.length > 0);
 
-    const isFulfilling = fulfillmentMode === 'BOTH';
-
     try {
       const res = await fetch('/api/consultant/profile', {
         method: 'PATCH',
@@ -104,6 +97,7 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
           targetUserId: data.adminTargetUserId,
           name: form.name,
           avatar: form.avatar,
+          password: form.password && form.password.trim().length > 0 ? form.password.trim() : undefined,
           degree: form.degree,
           specialization: form.specialization,
           experience: Number(form.experience),
@@ -113,18 +107,19 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
           followUpFee: Number(form.followUpFee),
           isCaiCertified: form.isCaiCertified,
           isVerified: form.isVerified,
-          isAcfp: form.isAcfp,
+          isAcfp: false,
           fulfillmentMethod: form.fulfillmentMethod,
-          hasClinicPickup: isFulfilling,
-          hasSelfDispatch: isFulfilling,
+          hasClinicPickup: false,
+          hasSelfDispatch: false,
           hasAyurwedDelivery: false,
-          procurementDeclaration: isFulfilling ? form.procurementDeclaration : false,
-          procurementReference: isFulfilling ? form.procurementReference : '',
+          procurementDeclaration: false,
+          procurementReference: '',
           registrationNumber: form.registrationNumber,
         }),
       });
       if (res.ok) {
         toast.success('Profile updated successfully!');
+        setForm((f) => ({ ...f, password: '' }));
         router.refresh();
       } else {
         const err = await res.json();
@@ -140,7 +135,7 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
   const inp = "w-full text-sm bg-brand-green-light/20 border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold";
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-7xl mx-auto w-full space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-5">
         <h2 className="font-bold text-brand-green flex items-center gap-2 border-b border-brand-green-light pb-3">
           <UserCircle className="h-5 w-5" /> Basic Identity
@@ -169,10 +164,41 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
           <p className="text-[10px] text-brand-foreground/40 mt-4 text-center">Click to change photo · Recommended 500x500px</p>
         </div>
 
-        <div>
-          <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5">Full Name *</label>
-          <input required type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-            placeholder="Dr. Rajesh Kumar" className={inp} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5">Full Name *</label>
+            <input required type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+              placeholder="Dr. Rajesh Kumar" className={inp} />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1.5">
+              <label className="text-xs font-bold text-brand-foreground/60 flex items-center gap-1.5">
+                <Lock className="h-3.5 w-3.5 text-brand-green" /> Password
+              </label>
+              <span className="text-[10px] text-muted-foreground font-medium">
+                (Leave blank to keep existing password)
+              </span>
+            </div>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={form.password}
+                onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                placeholder="•••••••• (Enter new password to change)"
+                className={`${inp} pr-10`}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 transition-colors"
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
         </div>
 
         <div>
@@ -231,7 +257,7 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
               <Languages className="h-3.5 w-3.5" /> Languages Spoken
             </label>
             <input type="text" value={form.languages} onChange={e => setForm(f => ({ ...f, languages: e.target.value }))} 
-              placeholder="English, Hindi, Marathi"
+              placeholder="e.g. English, Hindi, Arabic, French, German"
               className={inp} />
             <p className="text-[10px] text-brand-foreground/40 mt-1.5 pl-1">Separate with commas.</p>
           </div>
@@ -250,105 +276,6 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
         </div>
       </div>
 
-      {/* Fulfillment Settings */}
-      <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-5">
-        <h2 className="font-bold text-brand-green flex items-center gap-2 border-b border-brand-green-light pb-3">
-          <Truck className="h-5 w-5" /> Fulfillment & Practice Settings
-        </h2>
-        <div className="space-y-6">
-          <p className="text-xs text-brand-foreground/70 leading-relaxed">
-            Select your preferred medicine dispensing model on the platform. Depending on your choice, patients will either purchase medicines independently or request fulfillment directly from you.
-          </p>
-
-          {/* Mode Selector */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button
-              type="button"
-              onClick={() => setFulfillmentMode('PRESCRIPTION_ONLY')}
-              className={`text-left p-5 rounded-2xl border-2 transition-all duration-200 flex flex-col justify-between ${
-                fulfillmentMode === 'PRESCRIPTION_ONLY'
-                  ? 'border-brand-gold bg-brand-gold-light/40 shadow-sm'
-                  : 'border-border hover:border-brand-green hover:bg-brand-green-light/10'
-              }`}
-            >
-              <div>
-                <span className="text-sm font-bold block text-brand-green mb-1">Option A: Prescription Only</span>
-                <span className="text-[11px] text-brand-foreground/75 leading-relaxed block">
-                  You only write prescriptions. Patients procure medicines independently outside of the platform. No inventory or shipping required from you.
-                </span>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setFulfillmentMode('BOTH')}
-              className={`text-left p-5 rounded-2xl border-2 transition-all duration-200 flex flex-col justify-between ${
-                fulfillmentMode === 'BOTH'
-                  ? 'border-brand-gold bg-brand-gold-light/40 shadow-sm'
-                  : 'border-border hover:border-brand-green hover:bg-brand-green-light/10'
-              }`}
-            >
-              <div>
-                <span className="text-sm font-bold block text-brand-green mb-1">Option B: Prescription & Fulfillment (Both)</span>
-                <span className="text-[11px] text-brand-foreground/75 leading-relaxed block">
-                  You prescribe and dispense medicines under your practitioner registration. Patients can order prescribed medicines directly through your fulfillment options.
-                </span>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Conditionally show Compliance & Procurement Declarations only for BOTH */}
-      {fulfillmentMode === 'BOTH' && (
-        <div className="bg-card rounded-3xl p-6 border border-border shadow-sm space-y-5">
-          <h2 className="font-bold text-brand-green flex items-center gap-2 border-b border-brand-green-light pb-3">
-            <ShieldCheck className="h-5 w-5 text-brand-gold-dark" />
-            <span>Compliance & Procurement Declarations</span>
-          </h2>
-          <div className="space-y-4">
-            <p className="text-xs text-brand-foreground/70 leading-relaxed">
-              To satisfy Ayurwed practitioner exemptions, you must declare your independent procurement and verify that all medicines/preparations are stocked and dispensed directly under your own registration.
-            </p>
-
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-brand-foreground/60 block mb-1.5">
-                  Manufacturer/Supplier Account Reference *
-                </label>
-                <input
-                  required={fulfillmentMode === 'BOTH'}
-                  type="text"
-                  value={form.procurementReference}
-                  onChange={(e) => setForm(f => ({ ...f, procurementReference: e.target.value }))}
-                  placeholder="e.g., Account ID, Registration No, or Supplier Reference Details"
-                  className={inp}
-                />
-                <p className="text-[10px] text-brand-foreground/40 mt-1.5 pl-1">
-                  Enter your direct supplier/manufacturer account ID or reference under which you procure preparations.
-                </p>
-              </div>
-
-              <label className="flex items-start gap-3 p-4 bg-brand-green-light/10 border border-brand-green/10 rounded-2xl cursor-pointer hover:bg-brand-green-light/25 transition-colors">
-                <input
-                  type="checkbox"
-                  required={fulfillmentMode === 'BOTH'}
-                  checked={form.procurementDeclaration}
-                  onChange={(e) => setForm(f => ({ ...f, procurementDeclaration: e.target.checked }))}
-                  className="mt-1 h-4 w-4 rounded text-brand-green focus:ring-brand-green cursor-pointer"
-                />
-                <div>
-                  <span className="text-xs font-bold block text-brand-green">Independent Practitioner Exemption Agreement *</span>
-                  <span className="text-[11px] text-brand-foreground/75 block mt-1 leading-normal">
-                    I confirm that I independently procure, stock, and dispense all medicines/preparations under my own Ayurvedic practitioner registration. AYURWED does not supply, stock, invoice, or ship medicine on my behalf.
-                  </span>
-                </div>
-              </label>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Admin Controls */}
       {data.adminTargetUserId && (
         <div className="bg-card rounded-3xl p-6 border border-brand-gold/30 shadow-sm space-y-5">
@@ -356,21 +283,7 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
             <UserCircle className="h-5 w-5 text-brand-gold-dark" /> Administrative Controls
           </h2>
           
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
-            {/* CAI Certified */}
-            <label className="flex items-center gap-3 p-4 bg-brand-green-light/10 border border-brand-green/10 rounded-2xl cursor-pointer hover:bg-brand-green-light/25 transition-colors">
-              <input
-                type="checkbox"
-                checked={form.isCaiCertified}
-                onChange={e => setForm(f => ({ ...f, isCaiCertified: e.target.checked }))}
-                className="h-4 w-4 rounded text-brand-green focus:ring-brand-green cursor-pointer"
-              />
-              <div>
-                <span className="text-xs font-bold block text-brand-green">CAI Certified</span>
-                <span className="text-[9px] text-brand-foreground/50 block">Eligible to prescribe</span>
-              </div>
-            </label>
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
             {/* Profile Verified */}
             <label className="flex items-center gap-3 p-4 bg-brand-green-light/10 border border-brand-green/10 rounded-2xl cursor-pointer hover:bg-brand-green-light/25 transition-colors">
               <input
@@ -385,17 +298,17 @@ export default function ConsultantProfileForm({ data }: { data: ConsultantProfil
               </div>
             </label>
 
-            {/* ACFP Verified */}
-            <label className="flex items-center gap-3 p-4 bg-brand-gold/10 border border-brand-gold/20 rounded-2xl cursor-pointer hover:bg-brand-gold/20 transition-colors">
+            {/* CAI Certified */}
+            <label className="flex items-center gap-3 p-4 bg-brand-green-light/10 border border-brand-green/10 rounded-2xl cursor-pointer hover:bg-brand-green-light/25 transition-colors">
               <input
                 type="checkbox"
-                checked={form.isAcfp}
-                onChange={e => setForm(f => ({ ...f, isAcfp: e.target.checked }))}
-                className="h-4 w-4 rounded text-brand-gold focus:ring-brand-gold cursor-pointer"
+                checked={form.isCaiCertified}
+                onChange={e => setForm(f => ({ ...f, isCaiCertified: e.target.checked }))}
+                className="h-4 w-4 rounded text-brand-green focus:ring-brand-green cursor-pointer"
               />
               <div>
-                <span className="text-xs font-bold block text-brand-gold-dark">ACFP Certified</span>
-                <span className="text-[9px] text-brand-foreground/50 block">Partner & Fulfillment</span>
+                <span className="text-xs font-bold block text-brand-green">CAI Certified</span>
+                <span className="text-[9px] text-brand-foreground/50 block">Eligible to prescribe</span>
               </div>
             </label>
           </div>

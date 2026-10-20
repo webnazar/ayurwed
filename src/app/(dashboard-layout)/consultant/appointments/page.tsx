@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { redirect } from 'next/navigation';
+import { serialize } from '@/lib/utils';
 import AppointmentScheduleClient from '@/components/consultant/AppointmentScheduleClient';
 
 export const revalidate = 0;
@@ -30,10 +31,7 @@ export default async function ConsultantSchedulePage() {
     },
   });
 
-  const serializedAppointments = appointments.map(appt => ({
-    ...appt,
-    fee: appt.fee ? Number(appt.fee) : 0,
-  }));
+  const serializedAppointments = serialize(appointments);
 
   return (
     <div className="space-y-6">

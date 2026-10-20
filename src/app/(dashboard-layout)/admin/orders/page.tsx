@@ -17,7 +17,7 @@ export default async function AdminOrdersPage() {
       user: { select: { name: true, email: true, phone: true } },
       items: {
         include: {
-          preparation: { select: { name: true, images: true } }
+          product: { select: { name: true, images: true } }
         }
       }
     }
@@ -34,16 +34,5 @@ export default async function AdminOrdersPage() {
     }))
   }));
 
-  return (
-    <div className="space-y-6">
-      <div className="dashboard-header-card">
-        <h1 className="dashboard-header-title">Orders Management</h1>
-        <p className="dashboard-header-subtitle">
-          View, manage, and process customer orders across the platform.
-        </p>
-      </div>
-      
-      <OrderListClient initialOrders={safeOrders} />
-    </div>
-  );
+  return <OrderListClient initialOrders={safeOrders} />;
 }

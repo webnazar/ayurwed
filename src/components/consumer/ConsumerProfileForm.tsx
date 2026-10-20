@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { UserCircle, MapPin, Activity, Save, Loader2 } from 'lucide-react';
+import { UserCircle, MapPin, Save, Loader2, ShieldCheck, Stethoscope, FileCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import SearchSelect from '@/components/ui/SearchSelect';
 
@@ -53,7 +53,6 @@ interface ProfileData {
   pincode?: string;
   dateOfBirth?: string;
   gender?: string;
-  medicalHistory?: string;
   user?: {
     name: string;
     email: string;
@@ -76,8 +75,41 @@ export default function ConsumerProfileForm() {
     pincode: '',
     dateOfBirth: '',
     gender: '',
-    medicalHistory: ''
   });
+
+  // Practitioner Application state
+  const [docForm, setDocForm] = useState({
+    degree: 'BAMS',
+    registrationNumber: '',
+    specialization: 'Ayurvedic Medicine',
+    experience: 5,
+  });
+  const [isSubmittingDoc, setIsSubmittingDoc] = useState(false);
+  const [docApplied, setDocApplied] = useState(false);
+
+  const handleApplyDoctor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!docForm.registrationNumber) {
+      toast.error('Please enter your Medical Registration Number');
+      return;
+    }
+    setIsSubmittingDoc(true);
+    try {
+      const res = await fetch('/api/consultant/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(docForm),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to submit application');
+      toast.success(data.message || 'Application submitted successfully for Admin review!');
+      setDocApplied(true);
+    } catch (err: any) {
+      toast.error(err.message || 'Error submitting application');
+    } finally {
+      setIsSubmittingDoc(false);
+    }
+  };
 
   useEffect(() => {
     fetchProfile();
@@ -115,7 +147,6 @@ export default function ConsumerProfileForm() {
           pincode: p.pincode || '',
           dateOfBirth: p.dateOfBirth ? new Date(p.dateOfBirth).toISOString().split('T')[0] : '',
           gender: p.gender || '',
-          medicalHistory: p.medicalHistory || ''
         });
       }
     } catch (error) {
@@ -132,17 +163,17 @@ export default function ConsumerProfileForm() {
       const res = await fetch('/api/consumer/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
-      
-      if (res.ok) {
-        toast.success('Profile updated successfully');
-        await update(); // Update NextAuth session if needed
-      } else {
-        toast.error('Failed to update profile');
+
+      if (!res.ok) throw new Error('Failed to update profile');
+
+      toast.success('Profile updated successfully!');
+      if (session) {
+        await update();
       }
-    } catch (error) {
-      toast.error('An error occurred while saving');
+    } catch (error: any) {
+      toast.error(error.message || 'Error updating profile');
     } finally {
       setSaving(false);
     }
@@ -163,67 +194,71 @@ export default function ConsumerProfileForm() {
   return (
     <form id="consumer-profile-form" onSubmit={handleSubmit} className="space-y-8 max-w-4xl">
       
-      {/* Personal Information */}
-      <div className="bg-card rounded-[2rem] p-8 border border-border shadow-sm space-y-6">
-        <div className="flex items-center gap-3 pb-4 border-b border-brand-green-light">
+      {/* 1. Personal Information */}
+      <div className="bg-card rounded-[2rem] p-6 sm:p-8 border border-border shadow-sm space-y-6">
+        <div className="flex items-center gap-3 pb-4 border-b border-border">
           <div className="bg-brand-green/10 p-2.5 rounded-xl">
             <UserCircle className="h-6 w-6 text-brand-green" />
           </div>
-          <h2 className="text-xl font-bold text-brand-green">Personal Information</h2>
+          <div>
+            <h2 className="text-xl font-bold text-brand-green">Personal Information</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Your personal identity and contact details</p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-brand-foreground/80">Full Name</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Full Name</label>
             <input 
               type="text" 
               name="name" 
               value={formData.name} 
               disabled
-              className="w-full bg-slate-50 border border-border rounded-xl px-4 py-3 text-brand-foreground/60 cursor-not-allowed" 
+              className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground/70 cursor-not-allowed font-medium" 
             />
-            <p className="text-[10px] text-brand-foreground/40">Name cannot be changed directly.</p>
+            <p className="text-[10px] text-muted-foreground">Name is linked to your registration account.</p>
           </div>
           
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-brand-foreground/80">Email Address</label>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email Address</label>
             <input 
               type="email" 
               name="email" 
               value={formData.email} 
               disabled
-              className="w-full bg-slate-50 border border-border rounded-xl px-4 py-3 text-brand-foreground/60 cursor-not-allowed" 
+              className="w-full bg-muted/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground/70 cursor-not-allowed font-medium" 
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-brand-foreground/80">Phone Number</label>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Mobile Phone Number</label>
             <input 
               type="tel" 
               name="phone" 
               value={formData.phone} 
               onChange={handleChange}
-              className="w-full bg-card border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
-              placeholder="+91 "
+              className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green font-medium" 
+              placeholder="+91 9XXXXXXXXX"
             />
+            <p className="text-[10px] text-muted-foreground">Used for e-commerce courier dispatch & SMS tracking.</p>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-brand-foreground/80">Date of Birth</label>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Date of Birth (Optional)</label>
             <input 
               type="date" 
               name="dateOfBirth" 
               value={formData.dateOfBirth} 
               onChange={handleChange}
-              className="w-full bg-card border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
+              className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green font-medium" 
             />
           </div>
 
-          <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-semibold text-brand-foreground/80">Gender</label>
-            <div className="flex gap-4">
+          <div className="space-y-2 md:col-span-2 pt-1">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Gender</label>
+            <div className="flex flex-wrap gap-4 pt-0.5">
               {['Male', 'Female', 'Other', 'Prefer not to say'].map(g => (
-                <label key={g} className="flex items-center gap-2 cursor-pointer">
+                <label key={g} className="flex items-center gap-2 cursor-pointer bg-muted/40 hover:bg-muted/70 px-3.5 py-2 rounded-xl border border-border text-xs font-semibold text-foreground transition-colors">
                   <input 
                     type="radio" 
                     name="gender" 
@@ -232,7 +267,7 @@ export default function ConsumerProfileForm() {
                     onChange={handleChange}
                     className="text-brand-green focus:ring-brand-green"
                   />
-                  <span className="text-sm text-brand-foreground/80">{g}</span>
+                  <span>{g}</span>
                 </label>
               ))}
             </div>
@@ -240,88 +275,174 @@ export default function ConsumerProfileForm() {
         </div>
       </div>
 
-      {/* Delivery Address */}
-      <div className="bg-card rounded-[2rem] p-8 border border-border shadow-sm space-y-6">
-        <div className="flex items-center gap-3 pb-4 border-b border-brand-green-light">
-          <div className="bg-brand-gold/10 p-2.5 rounded-xl">
+      {/* 2. Shipping & Delivery Address */}
+      <div className="bg-card rounded-[2rem] p-6 sm:p-8 border border-border shadow-sm space-y-6">
+        <div className="flex items-center gap-3 pb-4 border-b border-border">
+          <div className="bg-brand-gold/15 p-2.5 rounded-xl">
             <MapPin className="h-6 w-6 text-brand-gold-dark" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-brand-green">Delivery Address</h2>
-            <p className="text-xs text-brand-foreground/50 mt-1">This address will be used to deliver prescribed medicines.</p>
+            <h2 className="text-xl font-bold text-brand-green">Shipping & Delivery Address</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Primary delivery address for your e-commerce store purchases</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-semibold text-brand-foreground/80">Street Address</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-1.5 md:col-span-2">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Street Address / House No. / Building</label>
             <textarea 
               name="address" 
               value={formData.address} 
               onChange={handleChange}
               rows={2}
-              className="w-full bg-card border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold resize-none" 
-              placeholder="House/Flat No., Building Name, Street"
+              className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green resize-none font-medium" 
+              placeholder="Flat/House No., Building Name, Street / Locality"
             />
           </div>
 
-          <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-semibold text-brand-foreground/80">Landmark (Optional)</label>
+          <div className="space-y-1.5 md:col-span-2">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Landmark (Optional)</label>
             <input 
               type="text" 
               name="landmark" 
               value={formData.landmark} 
               onChange={handleChange}
-              className="w-full bg-card border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
-              placeholder="Near Apollo Hospital"
+              className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green font-medium" 
+              placeholder="Near Metro Station, Opposite City Park, etc."
             />
           </div>
 
-          <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-semibold text-brand-foreground/80">City / District</label>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">City / District</label>
             <input 
               type="text" 
               name="city" 
               value={formData.city} 
               onChange={handleChange}
-              className="w-full bg-card border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
+              className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green font-medium" 
+              placeholder="e.g. Pune, Mumbai, Bangalore"
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:col-span-2">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-brand-foreground/80">State</label>
-              <SearchSelect
-                options={INDIAN_STATES}
-                value={formData.state}
-                onChange={(val) => setFormData(prev => ({ ...prev, state: val }))}
-                placeholder="Select State"
-                className="w-full bg-card"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-brand-foreground/80">Pincode</label>
-              <input 
-                type="text" 
-                name="pincode" 
-                value={formData.pincode} 
-                onChange={handleChange}
-                className="w-full bg-card border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold" 
-                placeholder="6 Digits"
-              />
-            </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">State</label>
+            <SearchSelect
+              options={INDIAN_STATES}
+              value={formData.state}
+              onChange={(val) => setFormData(prev => ({ ...prev, state: val }))}
+              placeholder="Select State"
+              className="w-full bg-background"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">PIN Code</label>
+            <input 
+              type="text" 
+              name="pincode" 
+              value={formData.pincode} 
+              onChange={handleChange}
+              maxLength={6}
+              className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green font-medium" 
+              placeholder="6 Digits (e.g. 411001)"
+            />
           </div>
         </div>
       </div>
 
-      <div className="flex justify-end pt-4 pb-12">
+      {/* 3. Practitioner Access Application Card */}
+      <div className="bg-card rounded-[2rem] p-6 sm:p-8 border border-brand-gold/30 shadow-sm space-y-6 relative overflow-hidden">
+        <div className="flex items-center gap-3 pb-4 border-b border-border">
+          <div className="bg-brand-green/10 p-2.5 rounded-xl text-brand-green">
+            <Stethoscope className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-brand-green flex flex-wrap items-center gap-2">
+              <span>Apply for Doctor / Practitioner Directory Listing</span>
+              <span className="text-[10px] bg-brand-gold/20 text-brand-gold-dark px-2.5 py-0.5 rounded-full font-extrabold uppercase">
+                BAMS • MD • AYUSH
+              </span>
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Are you a licensed Ayurvedic practitioner? Submit your registration credentials to be verified and listed in our public doctor directory.
+            </p>
+          </div>
+        </div>
+
+        {docApplied ? (
+          <div className="bg-emerald-50 dark:bg-emerald-950/40 p-5 rounded-2xl border border-emerald-200 text-xs text-emerald-800 dark:text-emerald-200 flex items-center gap-3">
+            <FileCheck className="h-6 w-6 text-emerald-600 shrink-0" />
+            <div>
+              <p className="font-extrabold">Application Received for Verification!</p>
+              <p className="text-[11px] opacity-80 mt-0.5">
+                Our Verification Team is validating your Medical Council Registration. Once approved, your account will be upgraded to a verified doctor profile.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">
+                  Qualifying Degree / Title *
+                </label>
+                <select
+                  value={docForm.degree}
+                  onChange={e => setDocForm(f => ({ ...f, degree: e.target.value }))}
+                  className="w-full bg-background border border-border rounded-xl px-4 py-3 text-xs font-bold text-foreground focus:outline-none focus:border-brand-gold"
+                >
+                  <option value="BAMS">BAMS (Bachelor of Ayurvedic Medicine & Surgery)</option>
+                  <option value="MD (Ayurveda)">MD (Ayurveda) / MS (Ayurveda)</option>
+                  <option value="BUMS">BUMS (Bachelor of Unani Medicine & Surgery)</option>
+                  <option value="BSMS">BSMS (Siddha Medicine & Surgery)</option>
+                  <option value="BHMS">BHMS (Homeopathic Medicine)</option>
+                  <option value="MBBS">MBBS with Integrative Medicine</option>
+                  <option value="Certified Nutrition Expert">Certified Nutrition / Ayurvedic Lifestyle Consultant</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">
+                  Medical Council Registration Number *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={docForm.registrationNumber}
+                  onChange={e => setDocForm(f => ({ ...f, registrationNumber: e.target.value }))}
+                  placeholder="e.g. MH/AYU/88412 or Central Council Reg."
+                  className="w-full bg-background border border-border rounded-xl px-4 py-3 text-xs font-bold text-foreground focus:outline-none focus:border-brand-gold"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={handleApplyDoctor}
+                disabled={isSubmittingDoc || !docForm.registrationNumber}
+                className="btn-gold px-6 py-3 rounded-xl text-xs font-extrabold transition-all shadow-xs disabled:opacity-40 flex items-center gap-2 cursor-pointer"
+              >
+                {isSubmittingDoc ? (
+                  <><Loader2 className="h-4 w-4 animate-spin" /> Submitting...</>
+                ) : (
+                  <><ShieldCheck className="h-4 w-4" /> Submit Practitioner Verification Credentials</>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Save Button */}
+      <div className="flex justify-end pt-4 pb-8">
         <button
           type="submit"
           disabled={saving}
-          className="bg-brand-green text-white px-8 py-3.5 rounded-full font-bold hover:bg-brand-gold hover:text-brand-green transition-all duration-300 shadow-md flex items-center gap-2 disabled:opacity-70"
+          className="btn-green px-8 py-3.5 rounded-full font-bold shadow-md flex items-center gap-2 disabled:opacity-70 cursor-pointer"
         >
           {saving ? (
-            <><Loader2 className="h-5 w-5 animate-spin" /> Saving...</>
+            <><Loader2 className="h-5 w-5 animate-spin" /> Saving Changes...</>
           ) : (
             <><Save className="h-5 w-5" /> Save Profile <span className="hidden sm:inline-flex ml-2 text-[10px] bg-white/20 px-2 py-0.5 rounded border border-white/30 font-medium">Alt+S</span></>
           )}

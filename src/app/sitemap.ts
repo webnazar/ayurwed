@@ -11,6 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/academy',
     '/knowledge',
     '/about',
+    '/contact',
     '/terms',
     '/privacy',
   ].map((route) => ({
@@ -43,10 +44,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('[SITEMAP_DOCTORS_ERROR]', error);
   }
 
-  // 3. Active Medicine & Herb Preparations
-  let prepRoutes: MetadataRoute.Sitemap = [];
+  // 3. Active Shop Products & Medicines
+  let productRoutes: MetadataRoute.Sitemap = [];
   try {
-    const preparations = await db.preparation.findMany({
+    const products = await db.product.findMany({
       where: {
         isActive: true,
       },
@@ -56,14 +57,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       },
     });
 
-    prepRoutes = preparations.map((p) => ({
-      url: `${baseUrl}/preparations/${p.slug}`,
+    productRoutes = products.map((p) => ({
+      url: `${baseUrl}/shop/${p.slug}`,
       lastModified: p.updatedAt,
       changeFrequency: 'weekly' as const,
       priority: 0.6,
     }));
   } catch (error) {
-    console.error('[SITEMAP_PREPARATIONS_ERROR]', error);
+    console.error('[SITEMAP_PRODUCTS_ERROR]', error);
   }
 
   // 4. Published Knowledge Articles
@@ -90,5 +91,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('[SITEMAP_ARTICLES_ERROR]', error);
   }
 
-  return [...staticRoutes, ...doctorRoutes, ...prepRoutes, ...articleRoutes];
+  return [...staticRoutes, ...doctorRoutes, ...productRoutes, ...articleRoutes];
 }

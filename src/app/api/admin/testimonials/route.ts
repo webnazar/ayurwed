@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       quote: quote.trim(),
       rating: Number(rating) || 5,
       avatar: avatar?.trim() || null,
-      isActive: isActive ?? true,
+      isActive: isActive ?? false,
       sortOrder: Number(sortOrder) || 0,
     },
   });

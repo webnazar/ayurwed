@@ -2,17 +2,18 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
+import bcrypt from 'bcryptjs';
 
 export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     const body = await req.json();
     const { 
-      targetUserId, name, avatar, degree, specialization, experience, bio, languages, consultationFee, followUpFee,
+      targetUserId, name, avatar, password, degree, specialization, experience, bio, languages, consultationFee, followUpFee,
       isCaiCertified, isVerified, isAcfp, fulfillmentMethod,
       hasClinicPickup, hasSelfDispatch, hasAyurwedDelivery,
       procurementDeclaration, procurementReference,
-      registrationNumber
+      registrationNumber, registrationCouncil, verificationProofUrl
     } = body;
 
     const isAdmin = session && (session.user as any).role === 'ADMIN';
@@ -28,6 +29,11 @@ export async function PATCH(req: Request) {
       profileUserId = Number(targetUserId);
     }
 
+    let hashedPassword: string | undefined = undefined;
+    if (password && typeof password === 'string' && password.trim().length > 0) {
+      hashedPassword = await bcrypt.hash(password.trim(), 10);
+    }
+
     // Use a transaction to update both User and ConsultantProfile
     const [updatedUser, updatedProfile] = await db.$transaction([
       db.user.update({
@@ -35,6 +41,7 @@ export async function PATCH(req: Request) {
         data: {
           name: name || undefined,
           avatar: avatar !== undefined ? avatar : undefined,
+          ...(hashedPassword ? { password: hashedPassword } : {}),
         },
       }),
       db.consultantProfile.update({
@@ -54,9 +61,12 @@ export async function PATCH(req: Request) {
           procurementDeclaration: procurementDeclaration !== undefined ? Boolean(procurementDeclaration) : undefined,
           procurementReference: procurementReference !== undefined ? procurementReference : undefined,
           registrationNumber: registrationNumber !== undefined ? registrationNumber : undefined,
+          registrationCouncil: registrationCouncil !== undefined ? registrationCouncil : undefined,
+          verificationProofUrl: verificationProofUrl !== undefined ? verificationProofUrl : undefined,
           // Admin override flags
           isCaiCertified: (isAdmin && isCaiCertified !== undefined) ? isCaiCertified : undefined,
           isVerified: (isAdmin && isVerified !== undefined) ? isVerified : undefined,
+          verifiedAt: (isAdmin && isVerified === true) ? new Date() : (isAdmin && isVerified === false) ? null : undefined,
           isAcfp: (isAdmin && isAcfp !== undefined) ? isAcfp : undefined,
           acfpVerifiedAt: (isAdmin && isAcfp === true) ? new Date() : (isAdmin && isAcfp === false) ? null : undefined,
         },

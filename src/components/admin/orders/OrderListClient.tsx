@@ -83,37 +83,62 @@ export default function OrderListClient({ initialOrders }: { initialOrders: any[
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3.5">
       
       {/* Print Overlay */}
       {printOrder && <OrderPrintBill order={printOrder} />}
 
-      {/* Toolbar */}
-      <div className="bg-card rounded-3xl p-6 border border-border shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-foreground/40" />
-          <input
-            type="text"
-            placeholder="Search by Order ID, Name, Email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 bg-brand-gold-light/40 border border-border rounded-2xl py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20"
-          />
-        </div>
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <Filter className="h-4 w-4 text-brand-foreground/50" />
-          <select 
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-brand-gold-light/40 border border-border rounded-2xl py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/20 outline-none w-full md:w-48"
-          >
-            <option value="ALL">All Statuses</option>
-            <option value="PENDING">Pending</option>
-            <option value="PROCESSING">Processing</option>
-            <option value="SHIPPED">Shipped</option>
-            <option value="DELIVERED">Delivered</option>
-            <option value="CANCELLED">Cancelled</option>
-          </select>
+      {/* ── Header Banner with Merged Search & Status Filter (Minimal Margins, No Subtitle) ── */}
+      <div className="dashboard-header-card">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-brand-green/10 text-brand-green rounded-xl shrink-0">
+              <PackageOpen className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="dashboard-header-title text-lg sm:text-xl">Orders</h1>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-shrink-0">
+            {/* Search Input */}
+            <div className="relative w-full sm:w-60 md:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-brand-green/60 dark:text-foreground/40" />
+              <input
+                type="text"
+                placeholder="Search Order ID, Name, Email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 bg-card/90 dark:bg-card border border-brand-green/20 dark:border-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/30 text-foreground placeholder:text-foreground/40 shadow-sm"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground p-0.5"
+                  title="Clear search"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+
+            {/* Status Filter */}
+            <div className="relative flex-shrink-0">
+              <select 
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="bg-card/90 dark:bg-card border border-brand-green/20 dark:border-border rounded-xl py-2 px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-green/30 shadow-sm cursor-pointer"
+              >
+                <option value="ALL">All Statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="PROCESSING">Processing</option>
+                <option value="SHIPPED">Shipped</option>
+                <option value="DELIVERED">Delivered</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -290,7 +315,10 @@ export default function OrderListClient({ initialOrders }: { initialOrders: any[
                   {selectedOrder.shippingAddress ? (
                     <div className="p-4 bg-muted rounded-xl text-sm text-gray-700">
                       <p className="font-bold text-foreground mb-1">{selectedOrder.user?.name}</p>
-                      <p>{selectedOrder.shippingAddress.street}</p>
+                      <p>{selectedOrder.shippingAddress.address || selectedOrder.shippingAddress.street}</p>
+                      {selectedOrder.shippingAddress.landmark && (
+                        <p className="text-xs text-brand-gold-dark font-medium">Landmark: {selectedOrder.shippingAddress.landmark}</p>
+                      )}
                       <p>{selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} - {selectedOrder.shippingAddress.pincode}</p>
                       <p className="mt-2 text-xs font-semibold text-muted-foreground flex items-center gap-1"><Truck className="h-3 w-3"/> Delivery Details</p>
                     </div>

@@ -22,7 +22,7 @@ export async function GET() {
     const indications = await db.indication.findMany({
       orderBy: { name: 'asc' },
       include: {
-        _count: { select: { preparations: true } }
+        _count: { select: { products: true } }
       }
     });
 
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       const results = { successful: 0, failed: 0, errors: [] as string[] };
       for (const item of body) {
         try {
-          const { name, description, isActive } = item;
+          const { name, description, symptomsKeywords, isActive } = item;
           if (!name) throw new Error("Name is required");
           
           const existing = await db.indication.findUnique({ where: { name } });
@@ -55,6 +55,7 @@ export async function POST(req: Request) {
               where: { id: existing.id },
               data: {
                 description: description !== undefined ? description : existing.description,
+                symptomsKeywords: symptomsKeywords !== undefined ? symptomsKeywords : existing.symptomsKeywords,
                 isActive: isActive !== undefined ? (String(isActive).toLowerCase() === 'true' || isActive === true) : existing.isActive,
               }
             });
@@ -70,6 +71,7 @@ export async function POST(req: Request) {
                 name,
                 slug,
                 description: description || null,
+                symptomsKeywords: symptomsKeywords || null,
                 isActive: isActive !== undefined ? (String(isActive).toLowerCase() === 'true' || isActive === true) : true,
               }
             });
@@ -83,7 +85,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, ...results }, { status: 201 });
     }
 
-    const { name, description, isActive } = body;
+    const { name, description, symptomsKeywords, isActive } = body;
 
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
@@ -101,10 +103,11 @@ export async function POST(req: Request) {
         name,
         slug,
         description: description || null,
+        symptomsKeywords: symptomsKeywords || null,
         isActive: isActive ?? true,
       },
       include: {
-        _count: { select: { preparations: true } }
+        _count: { select: { products: true } }
       }
     });
 
@@ -123,7 +126,7 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    const { id, name, description, isActive } = body;
+    const { id, name, description, symptomsKeywords, isActive } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
@@ -135,13 +138,14 @@ export async function PATCH(req: Request) {
       updateData.slug = slugify(name);
     }
     if (description !== undefined) updateData.description = description;
+    if (symptomsKeywords !== undefined) updateData.symptomsKeywords = symptomsKeywords;
     if (isActive !== undefined) updateData.isActive = isActive;
 
     const updated = await db.indication.update({
       where: { id: Number(id) },
       data: updateData,
       include: {
-        _count: { select: { preparations: true } }
+        _count: { select: { products: true } }
       }
     });
 

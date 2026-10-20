@@ -75,7 +75,7 @@ export default function OrderPrintBill({ order }: OrderPrintBillProps) {
               {order.items?.map((item: any, idx: number) => (
                 <tr key={item.id}>
                   <td className="py-4 px-4 text-sm text-gray-800">{idx + 1}</td>
-                  <td className="py-4 px-4 text-sm font-semibold text-foreground">{item.preparation?.name || 'Unknown Preparation'}</td>
+                  <td className="py-4 px-4 text-sm font-semibold text-foreground">{item.product?.name || item.preparation?.name || 'Product'}</td>
                   <td className="py-4 px-4 text-sm text-gray-800 text-center">{item.quantity}</td>
                   <td className="py-4 px-4 text-sm text-gray-800 text-right">₹{Number(item.price).toFixed(2)}</td>
                   <td className="py-4 px-4 text-sm font-bold text-foreground text-right">₹{Number(item.total).toFixed(2)}</td>

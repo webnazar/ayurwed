@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required data' }, { status: 400 });
     }
 
-    // Fetch available preparations to feed into the AI
-    const preparations = await db.preparation.findMany({
+    // Fetch available active products to feed into the AI
+    const products = await db.product.findMany({
       where: { isActive: true },
       select: {
         id: true,
@@ -32,21 +32,30 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    const prepContext = preparations.map(p => 
-      `ID: ${p.id} | Name: ${p.name} | Type: ${p.type} | Benefits: ${JSON.stringify(p.benefits)} | Usage: ${p.usage}`
+    const productContext = products.map(p => 
+      `ID: ${p.id} | Name: ${p.name} | Type: ${p.type || 'Product'} | Benefits: ${JSON.stringify(p.benefits || '')} | Usage: ${p.usage || ''}`
     ).join('\n');
 
     const prompt = `
     You are the Ancient Intelligence Prescription Engine (AIPE) for an Ayurvedic platform.
-    Your task is to analyze patient data, consultation notes, and indications to suggest suitable Ayurvedic preparations from the available list.
+    Your task is to analyze patient data, consultation notes, and indications to suggest suitable Ayurvedic products & medicines from the available list.
     
-    IMPORTANT: You must ONLY suggest preparations from the provided Available Preparations list. Do not invent new ones.
+    IMPORTANT: You must ONLY suggest products from the provided Available Products list. Do not invent new ones.
     
     --- INPUT DATA ---
     Patient Profile:
+    Name: ${patient.name || 'Patient'}
     Age: ${patient.age || 'Unknown'}
     Gender: ${patient.gender || 'Unknown'}
-    Weight: ${patient.weight || 'Unknown'}
+    Height: ${patient.height || 'Unknown'} cm
+    Weight: ${patient.weight || 'Unknown'} kg
+    Activity Level: ${patient.activityLevel || 'Sedentary'}
+    BMR (Basal Metabolic Rate): ${patient.bmr || 'N/A'} kcal/day
+    Daily Energy Requirement (TDEE): ${patient.tdee || 'N/A'} kcal/day
+    Ayurvedic Pathya Calorie Target: ${patient.calorieTarget || 'N/A'} kcal/day (${patient.calorieTargetReason || ''})
+    Ayurvedic Prakruti (Dosha): ${patient.prakruti || 'Not specified'}
+    Body Temp: ${patient.bodyTemperature || 'Unknown'} °F
+    Blood Pressure: ${patient.bloodPressure || 'Unknown'}
     Chronic Diseases: ${patient.chronicDiseases || 'None reported'}
     Allergies: ${patient.allergies || 'None reported'}
 
@@ -56,8 +65,8 @@ export async function POST(req: NextRequest) {
     Indications:
     ${indications.map((i: any) => i.name).join(', ')}
 
-    Available Preparations:
-    ${prepContext}
+    Available Products & Medicines:
+    ${productContext}
     --- END INPUT DATA ---
     `;
 
@@ -73,8 +82,10 @@ export async function POST(req: NextRequest) {
               items: {
                 type: SchemaType.OBJECT,
                 properties: {
-                  preparationId: { type: SchemaType.INTEGER, description: "the ID of the suggested preparation" },
-                  preparationName: { type: SchemaType.STRING, description: "the name of the suggested preparation" },
+                  productId: { type: SchemaType.INTEGER, description: "the ID of the suggested product" },
+                  productName: { type: SchemaType.STRING, description: "the name of the suggested product" },
+                  preparationId: { type: SchemaType.INTEGER, description: "same as productId" },
+                  preparationName: { type: SchemaType.STRING, description: "same as productName" },
                   dosage: { type: SchemaType.STRING, description: "e.g., '10 Drops', '1 Tablet'" },
                   frequency: { type: SchemaType.STRING, description: "e.g., 'Twice Daily', 'Morning and Evening'" },
                   duration: { type: SchemaType.STRING, description: "e.g., '15 Days', '1 Month'" },
@@ -82,8 +93,8 @@ export async function POST(req: NextRequest) {
                   reason: { type: SchemaType.STRING, description: "a brief explanation of why this is suggested based on the patient's indications" }
                 },
                 required: [
-                  "preparationId",
-                  "preparationName",
+                  "productId",
+                  "productName",
                   "dosage",
                   "frequency",
                   "duration",

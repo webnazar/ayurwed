@@ -42,8 +42,8 @@ export default async function PrintPrescriptionPage(props: { params: Promise<{ a
         include: {
           items: {
             include: {
-              preparation: true,
-              product: true
+              product: true,
+              customMedicine: true
             }
           },
           indications: true
@@ -108,6 +108,17 @@ export default async function PrintPrescriptionPage(props: { params: Promise<{ a
 
   const rawDoctorName = doctor.user?.name || '';
   const doctorName = rawDoctorName.toLowerCase().startsWith('dr') ? rawDoctorName : `Dr. ${rawDoctorName}`;
+
+  // Vitals & Clinical Indicators
+  const h = prescription.patientHeight ? Number(prescription.patientHeight) : (patient.patientHeight ? Number(patient.patientHeight) : null);
+  const w = prescription.patientWeight ? Number(prescription.patientWeight) : (patient.patientWeight ? Number(patient.patientWeight) : null);
+  const bmiVal = (h && w && h > 0) ? (w / Math.pow(h / 100, 2)) : null;
+  const bmiStr = bmiVal ? bmiVal.toFixed(1) : null;
+
+  const tempVal = prescription.patientBodyTemperature ? Number(prescription.patientBodyTemperature) : (patient.patientBodyTemperature ? Number(patient.patientBodyTemperature) : null);
+  const bpStr = prescription.patientBloodPressure || patient.patientBloodPressure || null;
+  const prakrutiStr = prescription.patientPrakruti || patient.patientPrakruti || null;
+  const activityStr = prescription.patientActivityLevel || patient.patientActivityLevel || null;
 
   return (
     <div className="prescription-print-container min-h-screen bg-slate-50 print:bg-white text-slate-900 flex flex-col">
@@ -189,9 +200,19 @@ export default async function PrintPrescriptionPage(props: { params: Promise<{ a
             {/* Doctor & Clinic details */}
             <div className="grid grid-cols-2 gap-4 bg-[#045829]/5 p-3.5 rounded-2xl border border-[#045829]/10">
               <div className="space-y-0.5">
-                <p className="text-xs font-bold text-[#045829]">{doctorName}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-xs font-bold text-[#045829]">{doctorName}</p>
+                  {doctor.isAcfp && (
+                    <span className="bg-[#f0b836] text-slate-900 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tighter shadow-xs">
+                      ACFP Certified
+                    </span>
+                  )}
+                </div>
                 <p className="text-[10px] text-[#f0b836] font-extrabold uppercase tracking-wider">{doctor.specialization}</p>
                 <p className="text-[10px] text-slate-600 font-medium">{doctor.degree || 'Ayurveda Consultant'}</p>
+                {doctor.registrationNumber && (
+                  <p className="text-[9px] text-slate-500 font-semibold">Reg. No: <span className="text-slate-800">{doctor.registrationNumber}</span></p>
+                )}
               </div>
               <div className="space-y-0.5 text-right text-[10px]">
                 <p className="font-bold text-[#045829]">Ayurwed Wellness Circle</p>
@@ -200,10 +221,17 @@ export default async function PrintPrescriptionPage(props: { params: Promise<{ a
               </div>
             </div>
 
-            {/* Patient details */}
+            {/* Patient details & Vital Signs */}
             <div className="border border-slate-200 rounded-2xl p-3.5 space-y-3 bg-white/60">
-              <h3 className="text-[10px] font-bold uppercase text-[#045829] tracking-wider border-b border-slate-100 pb-1">Patient Information</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-800">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-1">
+                <h3 className="text-[10px] font-bold uppercase text-[#045829] tracking-wider">Patient Information & Vital Signs</h3>
+                {prakrutiStr && (
+                  <span className="text-[9px] font-extrabold px-2 py-0.5 bg-[#045829]/10 text-[#045829] rounded-full border border-[#045829]/20">
+                    Prakruti: {prakrutiStr}
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs text-slate-800">
                 <div>
                   <span className="block text-[9px] text-slate-500 uppercase font-bold mb-0.5">Name</span>
                   <span className="font-bold text-slate-900">{patient.patientName || appointment.user.name}</span>
@@ -213,20 +241,23 @@ export default async function PrintPrescriptionPage(props: { params: Promise<{ a
                   <span className="font-semibold text-slate-900">{prescription.patientAge || patient.patientAge || '?'} yrs / {prescription.patientGender || patient.patientGender || '?'}</span>
                 </div>
                 <div>
-                  <span className="block text-[9px] text-slate-500 uppercase font-bold mb-0.5">Weight</span>
-                  <span className="font-semibold text-slate-900">{prescription.patientWeight ? `${Number(prescription.patientWeight).toFixed(0)} kg` : '? kg'}</span>
+                  <span className="block text-[9px] text-slate-500 uppercase font-bold mb-0.5">Height / Weight / BMI</span>
+                  <span className="font-semibold text-slate-900">
+                    {h ? `${h.toFixed(0)} cm` : '?'} / {w ? `${w.toFixed(0)} kg` : '?'}
+                    {bmiStr && <span className="font-bold text-[#045829] ml-1">({bmiStr})</span>}
+                  </span>
                 </div>
-                {patient.patientPhone && (
-                  <div>
-                    <span className="block text-[9px] text-slate-500 uppercase font-bold mb-0.5">Phone</span>
-                    <span className="font-semibold text-slate-900">{patient.patientPhone}</span>
-                  </div>
-                )}
+                <div>
+                  <span className="block text-[9px] text-slate-500 uppercase font-bold mb-0.5">Vitals (Temp / BP)</span>
+                  <span className="font-semibold text-slate-900">
+                    {tempVal ? `${tempVal.toFixed(1)}°F` : 'Norm'} {bpStr ? `• ${bpStr}` : ''}
+                  </span>
+                </div>
               </div>
 
               {/* History details */}
-              {(patient.chronicDiseases || patient.allergies) && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs">
+              {(patient.chronicDiseases || patient.allergies || activityStr) && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100 text-xs">
                   {patient.chronicDiseases && (
                     <div>
                       <span className="block text-[9px] text-slate-500 uppercase font-bold mb-0.5">Chronic Conditions</span>
@@ -237,6 +268,12 @@ export default async function PrintPrescriptionPage(props: { params: Promise<{ a
                     <div>
                       <span className="block text-[9px] text-slate-500 uppercase font-bold mb-0.5">Known Allergies</span>
                       <span className="font-medium text-rose-800">{patient.allergies}</span>
+                    </div>
+                  )}
+                  {activityStr && (
+                    <div>
+                      <span className="block text-[9px] text-slate-500 uppercase font-bold mb-0.5">Daily Activity</span>
+                      <span className="font-medium text-slate-700">{activityStr}</span>
                     </div>
                   )}
                 </div>
@@ -272,7 +309,10 @@ export default async function PrintPrescriptionPage(props: { params: Promise<{ a
                   <tbody className="divide-y divide-slate-100 bg-transparent">
                     {prescription.items?.map((item) => (
                       <tr key={item.id} className="hover:bg-slate-50">
-                        <td className="py-1.5 px-2.5 font-bold text-[#045829]">{item.preparation?.name || item.product?.name}</td>
+                        <td className="py-1.5 px-2.5 font-bold text-[#045829]">
+                          {item.product?.name || item.customMedicine?.name || item.customName || 'Medicine'}
+                          {item.customMedicine?.type && <span className="block text-[9px] font-normal text-slate-500">{item.customMedicine.type} ({item.customMedicine.manufacturer || 'External'})</span>}
+                        </td>
                         <td className="py-1.5 px-2.5 font-medium text-slate-900">{item.dosage}</td>
                         <td className="py-1.5 px-2.5 font-medium text-slate-900">{item.frequency}</td>
                         <td className="py-1.5 px-2.5 font-medium text-slate-900">{item.duration}</td>

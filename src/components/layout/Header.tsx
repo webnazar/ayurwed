@@ -21,18 +21,17 @@ export default function Header() {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'Consult', href: '/doctors' },
     { name: 'Shop', href: '/shop' },
+    { name: 'Doctors', href: '/doctors' },
     { name: 'Academy', href: '/academy' },
     { name: 'Knowledge', href: '/knowledge' },
-    { name: 'About', href: '/about' },
   ];
 
   const getDashboardLink = (role: string) => {
     switch (role) {
       case 'ADMIN': return '/admin/dashboard';
       case 'CONSULTANT': return '/consultant/dashboard';
-      default: return '/consumer/dashboard';
+      default: return '/user/dashboard';
     }
   };
 

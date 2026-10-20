@@ -13,15 +13,5 @@ export default async function TestimonialsPage() {
     createdAt: t.createdAt.toISOString(),
   }));
 
-  return (
-    <div className="space-y-6">
-      <div className="dashboard-header-card">
-        <h1 className="dashboard-header-title">Testimonial Manager</h1>
-        <p className="dashboard-header-subtitle">
-          Manage the "What Our Wellness Circle Says" section on the homepage.
-        </p>
-      </div>
-      <TestimonialsClient initialTestimonials={formattedTestimonials as any} />
-    </div>
-  );
+  return <TestimonialsClient initialTestimonials={formattedTestimonials as any} />;
 }

@@ -23,3 +23,8 @@ export function slugify(text: string) {
     .replace(/[^a-z0-9-]/g, '')
     .replace(/-+/g, '-');
 }
+
+export function serialize<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}
+

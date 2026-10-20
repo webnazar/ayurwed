@@ -17,7 +17,9 @@ export async function POST(req: Request) {
 
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
-    const folder = (formData.get('folder') as string) || 'misc';
+    const rawFolder = (formData.get('folder') as string) || 'misc';
+    // Security: sanitize folder against directory traversal (e.g., ../../)
+    const folder = rawFolder.replace(/[^a-zA-Z0-9_\-]/g, '') || 'misc';
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });

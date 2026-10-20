@@ -116,15 +116,35 @@ select option {
 }
 
 @layer components {
-  /* Layout Headers */
-  .dashboard-header-card {
-    @apply bg-brand-green-light rounded-3xl p-8 text-brand-green border border-brand-green/10 shadow-sm relative overflow-hidden;
+  /* Layout Headers with minimal layout margins */
+  .dashboard-header-card,
+  .admin-header-card {
+    @apply bg-brand-green-light rounded-2xl p-3 sm:py-3.5 sm:px-5 text-brand-green border border-brand-green/10 shadow-sm relative overflow-hidden;
   }
-  .dashboard-header-title {
-    @apply text-2xl font-extrabold flex items-center gap-3;
+  .dashboard-header-title,
+  .admin-header-title {
+    @apply text-lg sm:text-xl font-extrabold flex items-center gap-2;
   }
-  .dashboard-header-subtitle {
+  .dashboard-header-subtitle,
+  .admin-header-subtitle {
     @apply text-brand-green/70 mt-1 text-sm;
+  }
+
+  /* Admin Standard Layout Classes */
+  .admin-page-container {
+    @apply space-y-3.5;
+  }
+  .admin-search-input {
+    @apply w-full pl-9 pr-8 py-2 bg-card/90 dark:bg-card border border-brand-green/20 dark:border-border rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/30 text-foreground placeholder:text-foreground/40 shadow-sm transition-all;
+  }
+  .admin-filter-select {
+    @apply bg-card/90 dark:bg-card border border-brand-green/20 dark:border-border rounded-xl py-2 px-3 text-xs font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-brand-green/30 shadow-sm cursor-pointer transition-all;
+  }
+  .admin-btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 bg-brand-green hover:bg-brand-gold hover:text-brand-green text-white font-extrabold px-3.5 py-2 rounded-xl text-xs sm:text-sm transition-all shadow-sm shrink-0 whitespace-nowrap active:scale-95;
+  }
+  .admin-btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 bg-card border border-border hover:border-brand-green text-foreground hover:text-brand-green font-extrabold px-3 py-2 rounded-xl text-xs transition-all shadow-sm shrink-0 whitespace-nowrap active:scale-95;
   }
 
   /* Component Utility Cards */
@@ -198,10 +218,55 @@ select option {
 }
 
 @layer utilities {
+  /* Minimal Layout Margins & Paddings */
+  .layout-margin-minimal {
+    @apply m-2 sm:m-3 lg:m-4;
+  }
+  .layout-margin-minimal-x {
+    @apply mx-2 sm:mx-3 lg:mx-4;
+  }
+  .layout-margin-minimal-y {
+    @apply my-2 sm:my-3 lg:my-4;
+  }
+  .layout-gap-minimal {
+    @apply gap-2.5 sm:gap-3.5 lg:gap-4;
+  }
+  .layout-space-minimal {
+    @apply space-y-3 sm:space-y-4 lg:space-y-5;
+  }
   .layout-padding-minimal {
     @apply px-3 sm:px-4 lg:px-6;
   }
   .layout-padding-minimal-all {
-    @apply p-3 sm:p-4 lg:p-6;
+    @apply p-2.5 sm:p-4 lg:p-5;
+  }
+  .glass-panel {
+    @apply bg-card/85 backdrop-blur-md border border-border/60 shadow-lg;
+  }
+  .glass-panel-green {
+    @apply bg-brand-green-light/80 backdrop-blur-md border border-brand-green/20 shadow-md;
+  }
+  .glass-glow-emerald {
+    @apply bg-emerald-500/10 backdrop-blur-md border border-emerald-500/20 shadow-lg shadow-emerald-500/5;
+  }
+  .glass-glow-gold {
+    @apply bg-amber-500/10 backdrop-blur-md border border-amber-500/20 shadow-lg shadow-amber-500/5;
+  }
+  .badge-pulse {
+    @apply relative inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all duration-300;
+  }
+  .hover-card-rise {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-brand-green/30 dark:hover:border-brand-gold/30;
   }
 }
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float-slow {
+  animation: floatSlow 4s ease-in-out infinite;
+}
+
+

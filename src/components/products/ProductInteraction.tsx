@@ -107,7 +107,7 @@ export default function ExtractInteraction({ preparation }: ExtractInteractionPr
             {preparation.mrp && (
               <p className="text-sm text-brand-foreground/60">
                 Reference MRP: <span className="font-bold text-brand-foreground/80">₹{Number(preparation.mrp).toFixed(0)}</span>
-                <span className="ml-2 text-[10px] italic">(For reference; consult a specialist to prescribe custom remedies)</span>
+                <span className="ml-2 text-[10px] italic">(For educational reference; consult a certified practitioner for guidance)</span>
               </p>
             )}
           </div>
@@ -133,7 +133,7 @@ export default function ExtractInteraction({ preparation }: ExtractInteractionPr
               className="btn-secondary text-sm sm:text-base w-full sm:w-[260px] shadow-sm hover:shadow-lg flex items-center justify-center gap-2"
             >
               <HeartHandshake className="h-5 w-5 flex-shrink-0" />
-              <span>Book Consultation</span>
+              <span>Browse Doctors Directory</span>
             </Link>
           </div>
 

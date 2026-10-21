@@ -8,9 +8,9 @@ import AyuriTriggerButton from '@/components/layout/AyuriTriggerButton';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Certified Ayurvedic Doctors Directory — Book Consultations | AYURWED',
-  description: 'Connect directly with certified Ayurvedic doctors and clinical practitioners for online consultations, holistic treatments, and classical remedies across India.',
-  keywords: ['Ayurvedic Doctors Directory', 'Ayurveda Practitioners', 'Connect with Ayurvedic Doctors', 'AYURWED Doctors', 'Ayurvedic Consultant Phone WhatsApp', 'Ayurveda Online Consultation'],
+  title: 'Certified Ayurvedic Doctors Directory & Practitioner List | AYURWED',
+  description: 'Connect directly with certified Ayurvedic doctors and clinical practitioners for holistic treatments, wellness guidance, and classical remedies across India.',
+  keywords: ['Ayurvedic Doctors Directory', 'Ayurveda Practitioners', 'Connect with Ayurvedic Doctors', 'AYURWED Doctors', 'Ayurvedic Consultant Phone WhatsApp', 'Ayurvedic Doctor List'],
   alternates: {
     canonical: 'https://www.ayurwed.com/doctors',
   },

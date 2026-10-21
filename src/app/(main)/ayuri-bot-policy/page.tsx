@@ -97,33 +97,33 @@ export default function AyuriBotPolicyPage() {
             </div>
           </div>
 
-          {/* Card 3: Doctor Autonomy & Prescription Software */}
+          {/* Card 3: Platform Scope & No-Prescription / No-Booking Policy */}
           <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
             <div className="flex items-center gap-3 border-b border-border pb-4">
               <div className="p-2.5 bg-brand-green/10 text-brand-green rounded-2xl">
                 <Stethoscope className="h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-brand-green">3. Practitioner Autonomy & Software Role</h2>
-                <p className="text-xs text-muted-foreground">Independent Human Judgment Always Prevails</p>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-brand-green">3. Platform Boundaries: No Prescriptions or Appointment Bookings</h2>
+                <p className="text-xs text-muted-foreground">eCommerce Shop • Knowledge Center • Doctors List Directory</p>
               </div>
             </div>
 
             <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed">
-              When subscribed doctors utilize our clinical AI diagnosis and digital prescription software:
+              AYURWED strictly operates across three specific informational and retail pillars:
             </p>
             <ul className="space-y-2 text-xs sm:text-sm text-foreground/80">
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-brand-green shrink-0 mt-0.5" />
-                <span><strong>Support Tool Only:</strong> The AI acts solely as a clinical decision support assistant (CDSS), surfacing classical herb indications, dosage references, and herb-drug contraindication warnings.</span>
+                <span><strong>No Prescriptions:</strong> AYURWED and Ayuri AI do not generate, handle, or dispense clinical or medical prescriptions. Any guidance provided by Ayuri is strictly informational and educational.</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-brand-green shrink-0 mt-0.5" />
-                <span><strong>Sole Doctor Responsibility:</strong> The licensed medical practitioner remains 100% professionally, ethically, and legally responsible for validating all diagnostic findings and signing digital prescriptions under their own medical council registration.</span>
+                <span><strong>No Appointment Bookings:</strong> The platform does not schedule, book, or process clinical consultations or doctor appointments.</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-brand-green shrink-0 mt-0.5" />
-                <span><strong>No Automatic Prescriptions:</strong> Ayuri or the software never automatically generates or dispatches prescriptions without active practitioner review and electronic signature.</span>
+                <span><strong>Direct Practitioner Directory:</strong> Our Doctors List connects users directly with certified practitioners. Users can view public profiles and reach out to doctors directly via phone or WhatsApp at their own discretion.</span>
               </li>
             </ul>
           </div>

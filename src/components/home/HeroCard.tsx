@@ -45,7 +45,7 @@ export default function HeroCard() {
 
               {/* Ecosystem Narrative */}
               <p className="text-sm sm:text-base text-foreground/80 leading-relaxed font-medium">
-                India&apos;s complete Ayurveda ecosystem connecting consumers, clinical consultants, and AI-driven personalized wellness based on custom formulations of generic extracts, powders, capsules, and tablets.
+                India&apos;s premier Ayurvedic platform bringing you an authentic eCommerce Shop, an educational Knowledge Center, and a verified Doctors Directory.
               </p>
 
               {/* Practical Guidance */}

@@ -449,7 +449,7 @@ export default async function HomePage() {
               Ancient Intelligence in Your Pocket
             </h2>
             <p className="text-brand-foreground/85 text-sm sm:text-base leading-relaxed">
-              Scan product ingredients, chat with Ayuri AI instantly, schedule secure consultations, and manage your health dashboard. Download the official Ayurwed app today.
+              Explore authentic remedies, chat with Ayuri AI guide, discover verified doctors, and learn classical Ayurveda wisdom. Download the official Ayurwed app today.
             </p>
             <div className="flex flex-wrap items-center gap-4 pt-2">
               {/* App Store Button */}

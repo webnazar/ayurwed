@@ -4,11 +4,12 @@ import { db } from '@/lib/db';
 
 // Simple Ayurveda-themed fallback answers when Gemini API key is missing or calls fail
 const AYURVEDA_FALLBACKS = [
-  "Based on Ayurvedic principles, this preparation matches a Vata-balancing routine. Try consuming it with warm water or milk.",
-  "Ayurveda recommends avoiding raw foods or cold drinks if you are experiencing Vata imbalance. Root vegetables and warm ghee are beneficial.",
-  "For hair health, Bringadi oil is excellent. Ensure you massage it into the scalp twice a week, leaving it for 30 minutes before washing.",
-  "Ashwagandha is an adaptogen that helps with stress and sleep quality. It is best consumed at night with warm milk.",
-  "For Pitta constitution, cooling herbs like Aloe Vera, Shatavari, and Amalaki are highly recommended.",
+  "Based on Ayurvedic principles, this preparation matches a Vata-balancing routine. Explore remedies in our [Shop](/shop) or read our [Knowledge Center](/knowledge).",
+  "Ayurveda recommends warm, easily digestible meals when balancing Vata. Discover educational articles in our [Knowledge Center](/knowledge) or consult our [Doctors List](/doctors).",
+  "For hair and scalp vitality, Bhringraj oil is a classical favorite. Check our [Shop](/shop) for authentic formulations.",
+  "Ashwagandha is an adaptogen that helps with stress and sleep quality. Browse available remedies in our [Shop](/shop).",
+  "For Pitta constitution, cooling herbs like Aloe Vera, Shatavari, and Amalaki are highly recommended. Learn more in our [Knowledge Center](/knowledge).",
+  "AYURWED provides an authentic Ayurvedic Shop, an educational Knowledge Center, and a verified Doctors List. Please note that we do not book appointments or provide prescriptions; you can contact doctors directly from our [Doctors List](/doctors)."
 ];
 
 const AYURI_STRUCTURAL_DISCLAIMER = "\n\n*Disclaimer: Ayuri AI provides general educational and wellness guidance only and is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a certified Ayurvedic doctor before starting any herbal regimen or treatment plan.*";
@@ -56,17 +57,31 @@ export async function POST(req: Request) {
     const productContext = products.map(p => `- ${p.name} (${p.type || 'Product'}): ${JSON.stringify(p.benefits || '')} (Link: /shop/${p.slug})`).join('\n');
     const doctorContext = consultants.map(c => `- Dr. ${c.user?.name || 'Practitioner'} (${c.specialization}) (Link: /doctors/${c.id})`).join('\n');
 
-    const systemInstruction = `You are Ayuri, a kind, knowledgeable Ayurvedic AI assistant. You answer health and wellness questions using authentic, classical Ayurvedic guidelines.
-Suggest lifestyle modifications, dosha balancing routines, and single herbs.
+    const systemInstruction = `You are Ayuri, a kind, knowledgeable Ayurvedic AI assistant for AYURWED.
+You answer health, lifestyle, and herbal wellness questions using authentic, classical Ayurvedic guidelines (doshas, dinacharya, herbs, dietary tips).
 
-Below are the actual wellness products, medicines, and certified consultants available on our platform. 
-Whenever relevant to the user's question, mention these products or consultants and provide their EXACT relative URLs using standard markdown links (e.g., [Ashwagandha Capsules](/shop/ashwagandha) or [Dr. Nair](/doctors/1)).
+PLATFORM SCOPE & THREE CORE PILLARS:
+AYURWED exclusively offers three core services:
+1. eCommerce Shop: Authentic classical Ayurvedic products, single herbs, and wellness formulations (Link: /shop).
+2. Knowledge Center: Educational articles, wellness blogs, dosha balance guides, and classical wisdom (Link: /knowledge).
+3. Doctors List: A verified directory of certified Ayurvedic doctors and practitioners with their direct contact details (Link: /doctors).
+
+STRICT NEGATIVE CONSTRAINTS (MANDATORY & CRITICAL):
+- AYURWED and Ayuri DO NOT handle medical prescriptions, digital prescriptions, or medicine prescribing.
+- AYURWED and Ayuri DO NOT handle doctor appointment bookings, clinical scheduling, or video consultations.
+- Ayuri does NOT diagnose diseases or prescribe medications.
+- If a user asks to "book an appointment", "schedule a consultation", "get a prescription", or asks "can you prescribe medicine?":
+  Politely and clearly explain:
+  "AYURWED does not handle appointment bookings or medical prescriptions. Our platform provides an authentic Ayurvedic Shop, an educational Knowledge Center, and a verified Doctors List. You can browse our [Doctors List](/doctors) to view verified Ayurvedic practitioners and contact them directly, explore wellness remedies in our [Shop](/shop), or read helpful articles in our [Knowledge Center](/knowledge)."
+
+RECOMMENDATIONS & LINKS:
+Whenever relevant to the user's question, mention matching products or doctors from the lists below and provide their EXACT relative URLs using standard markdown links (e.g., [Ashwagandha Capsules](/shop/ashwagandha), [Knowledge Center](/knowledge), or [Dr. Nair](/doctors/1)).
 Do not invent products or doctor URLs that are not in this list.
 
 AVAILABLE PRODUCTS & MEDICINES:
 ${productContext || 'None available at the moment'}
 
-AVAILABLE CERTIFIED CONSULTANTS:
+AVAILABLE CERTIFIED CONSULTANTS (DOCTORS DIRECTORY):
 ${doctorContext || 'None available at the moment'}
 
 CRITICAL MANDATORY REQUIREMENT:

@@ -13,7 +13,7 @@ export default function AyuriChatWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Namaste! I am Ayuri, your AI Ayurveda guide. I can help you discover classical formulations, understand body Doshas, or find verified doctors on AYURWED. How can I guide your wellness journey today?",
+      content: "Namaste! I am Ayuri, your AI Ayurveda guide. AYURWED offers an authentic Ayurvedic Shop, an educational Knowledge Center, and a verified Doctors List. I can help you discover classical remedies, understand Doshas, or find practitioner contact details. How can I guide your wellness journey today?",
     },
   ]);
   const [input, setInput] = useState('');
@@ -21,10 +21,10 @@ export default function AyuriChatWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const quickReplies = [
-    "🌿 What herbs balance Vata?",
-    "👨‍⚕️ Recommend a doctor for skin care",
-    "☕ Best Ayurvedic tea for digestion",
-    "✨ How do I know my Prakruti?",
+    "🌿 Herbs for Vata balance",
+    "🛍️ Explore Shop remedies",
+    "📚 Knowledge Center: Doshas",
+    "👨‍⚕️ Browse Doctors List",
   ];
 
   useEffect(() => {
@@ -112,7 +112,7 @@ export default function AyuriChatWidget() {
                     Live
                   </span>
                 </h3>
-                <span className="text-[10px] text-brand-green-light/80 block">Ayurvedic Wisdom & Botanical Intelligence</span>
+                <span className="text-[10px] text-brand-green-light/80 block">Ayurvedic Wisdom, Shop Remedies &amp; Doctor Directory</span>
               </div>
             </div>
             <button
@@ -186,7 +186,7 @@ export default function AyuriChatWidget() {
           {/* Advisory warning */}
           <div className="px-3.5 py-2 bg-amber-500/10 border-t border-amber-500/20 flex gap-2 items-center text-[10px] text-amber-900 dark:text-amber-300 font-medium">
             <ShieldAlert className="h-4 w-4 flex-shrink-0 text-amber-600" />
-            <span><strong>Medical Advisory:</strong> For educational discovery only. Consult a certified doctor for personalized diagnosis.</span>
+            <span><strong>Platform Scope:</strong> Informational guide for our Shop, Knowledge Center &amp; Doctors List. We do not provide prescriptions or book appointments.</span>
           </div>
 
           {/* Input Footer */}
